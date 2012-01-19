@@ -1,0 +1,13 @@
+ali:
+    common:
+        # Desc: Actions
+        action: Actions  
+
+        # Desc: Are you sure to delete this item ?
+        confirm_delete: 'Are you sure to delete this item ?' 
+
+        # Desc: delete
+        delete: delete  
+
+        # Desc: edit
+        edit: edit   

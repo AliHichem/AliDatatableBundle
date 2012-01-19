@@ -1,0 +1,77 @@
+{% block main %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.button-delete').live('click',function(){
+            if (!confirm('{{ 'ali.common.confirm_delete'|trans()|desc('Are you sure to delete this item ?')  }}')) {
+                return false;
+            }
+        });
+        $options = {{ js | raw }}
+        $defaults = {
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
+            "iDisplayLength": 10,
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": null,
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bSort": false,
+            "bFilter": false,
+        };
+        $.extend($defaults,$options);
+        {% if action %} 
+        $.extend($defaults,{
+            "aoColumnDefs": [ 
+                {
+                    "fnRender": function ( oObj ) {
+                        var $edit_url = strtr(
+                            "{{ path(edit_route , { 'id': "xx" }) }}",
+                            { "xx": oObj.aData[{{fields|length}}-1] }
+                        );
+                        var $link_edit = "<a  style='float:right; margin-right:10px' class='dialog' title='edit'";
+                        $link_edit += "href='"+$edit_url+"'>";
+                        $link_edit += "{{ 'ali.common.edit'|trans()|desc('edit') }}</a>";
+                        var $delete_url = strtr(
+                            "{{ path(delete_route, { 'id': "xx" }) }}",
+                            { "xx": oObj.aData[{{fields|length}}-1] }
+                        );
+                        var $link_delete = "<form style='float:right' class='form' action='"+$delete_url+"' method='post'>";
+                        $link_delete += strtr(
+                                            '{{ form_widget(delete_form) }}',
+                                            { "_id_": oObj.aData[{{fields|length}}-1] }
+                                        );
+                        $link_delete += "<button class='button-delete' type='submit'>{{ 'ali.common.delete'|trans()|desc('delete') }}</button>";
+                        $link_delete += " </form>";
+                        var $out = $link_delete+ " " + $link_edit ;
+                        if (oObj.aData[{{fields|length}}-1] == null )
+                        {
+                            $out = "<div style='float:right'>{{ 'ali.common.no_action'|trans()|desc('(can\'t remove)') }}</div>";
+                        }
+                        return $out
+                    },
+                    "aTargets": [ {{fields|length}}-1  ]
+                }
+            ]
+        });
+        {% endif %}
+        
+        oTable = $('#{{id}}').dataTable($defaults);
+    });
+</script>    
+<table class="display" id="{{id}}"> 
+    <thead> 
+        <tr> 
+            {% for label,key in fields %}
+                {% if label != '_identifier_' %}
+                <th>{{ label }}</th>
+                {% endif %}
+            {% endfor %}
+            {% if action %}
+                <th>{{ 'ali.common.action'|trans()|desc('Actions')  }}</th>
+            {% endif %}
+        </tr> 
+    </thead> 
+</table>
+{% endblock  %}
