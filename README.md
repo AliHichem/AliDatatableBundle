@@ -23,8 +23,12 @@ Installation
 include the source to your deps files
 
     [AliDatatableBundle]
-    git=git://github.com/AliHichem/AliDatatableBundle
-    target=bundles/Ali/DatatableBundle
+        git=git://github.com/AliHichem/AliDatatableBundle
+        target=bundles/Ali/DatatableBundle
+
+install the bundle
+
+    $ bin/vendor install
 
 register the bundle
     
