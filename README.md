@@ -108,6 +108,7 @@ Assuming for example that you need a grid in your "index" action, create in your
     <link href="{{ asset('bundles/alidatatable/css/demo_page.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('bundles/alidatatable/css/demo_table.css') }}" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.datatable.inc.js') }}"></script>
     <script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.dataTables.min.js') }}"></script>    
     
     {{ datatable({ 
