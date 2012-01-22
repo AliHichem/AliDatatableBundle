@@ -15,6 +15,7 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 
  * Do not support doctrine2 associations
  * No sorting available
+ * No search available
  
 Installation
 ------------
@@ -122,6 +123,7 @@ Assuming for example that you need a grid in your "index" action, create in your
 
 **Future improvements**: 
 
+ * add sorting
  * add search
  * add support for doctrine associations
  

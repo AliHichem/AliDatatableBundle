@@ -1,13 +1,8 @@
 ali:
     common:
-        # Desc: Actions
-        action: Actions  
+        action: Actions
+        confirm_delete: 'Are you sure to delete this item ?'
+        delete: delete
+        edit: edit
+        no_action: "(can't remove)"
 
-        # Desc: Are you sure to delete this item ?
-        confirm_delete: 'Are you sure to delete this item ?' 
-
-        # Desc: delete
-        delete: delete  
-
-        # Desc: edit
-        edit: edit   

@@ -181,13 +181,18 @@ class Datatable
     private function _getData()
     {
         $request = $this->request;
+        $dql_fields = array_values($this->fields);
+        $this->order_field = $dql_fields[$request->get('iSortCol_0')];
+        
         $dql = "select ";
         $dql .= implode(" , ", $this->fields)." ";
         $dql .= " from {$this->entity_name} {$this->entity_alias} ";
+        
         if (!is_null($this->order_field))
         {
-            $dql .= " order by {$this->order_field} {$this->order_type} ";
+            $dql .= " order by {$this->order_field} {$request->get('sSortDir_0','asc')} ";
         }
+        
         $query = $this->em->createQuery($dql);
         $iDisplayLength = (int)$request->get('iDisplayLength');
         if ($iDisplayLength > 0)
