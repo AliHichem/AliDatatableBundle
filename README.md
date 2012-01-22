@@ -9,14 +9,14 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * dynamic pager handler : no need to set your pager.
  * default action link builder: if activated, the bundle generates default edit/delete links. 
 
-<img src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample.png" alt="Screenshot" />
+<div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample.png"></div>
 
 **Compatibility**: latest successiful test with Symfony 2.0.7. Compatibility with higher version of symfony2 is not guaranteed.
 
 **Limitations**: 
 
  * Do not support doctrine2 associations
- * No sorting available
+ * No search available
  
 Installation
 ------------
