@@ -9,6 +9,8 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * dynamic pager handler : no need to set your pager.
  * default action link builder: if activated, the bundle generates default edit/delete links. 
 
+<img src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample.png" alt="Screenshot" />
+
 **Compatibility**: latest successiful test with Symfony 2.0.7. Compatibility with higher version of symfony2 is not guaranteed.
 
 **Limitations**: 
@@ -104,8 +106,8 @@ Assuming for example that you need a grid in your "index" action, create in your
     <!-- XXX\MyBundle\Resources\views\Module\index.html.twig -->
     
     <!-- include the assets -->
-    <link href="{{ asset('bundles/alidatatable/css/demo_page.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('bundles/alidatatable/css/demo_table.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('bundles/alidatatable/css/smoothness/jquery-ui-1.8.4.custom.css') }}" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.datatable.inc.js') }}"></script>
     <script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.dataTables.min.js') }}"></script>    
