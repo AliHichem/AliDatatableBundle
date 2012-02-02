@@ -4,6 +4,7 @@ namespace Ali\DatatableBundle\Util;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\ORM\Query;
 
 class Datatable
 {
@@ -18,6 +19,7 @@ class Datatable
     private $order_type = "asc";
     private $has_action = true; 
     private $fixed_data = NULL;
+    private $renderer = NULL;
     
     /**
      * class constructor 
@@ -178,14 +180,21 @@ class Datatable
      * 
      * @return array
      */
-    private function _getData()
+    private function _getData($hydration_mode)
     {
         $request = $this->request;
         $dql_fields = array_values($this->fields);
         $this->order_field = $dql_fields[$request->get('iSortCol_0')];
         
         $dql = "select ";
-        $dql .= implode(" , ", $this->fields)." ";
+        if ($hydration_mode == Query::HYDRATE_ARRAY)
+        {
+            $dql .= implode(" , ", $this->fields)." ";
+        }
+        else
+        {
+            $dql .= " {$this->entity_alias} ";
+        }
         $dql .= " from {$this->entity_name} {$this->entity_alias} ";
         
         if (!is_null($this->order_field))
@@ -199,14 +208,70 @@ class Datatable
         {
             $query->setMaxResults( $iDisplayLength )->setFirstResult( $request->get('iDisplayStart') );
         }
-        $items = $query->getArrayResult();
+        $items = $query->getResult($hydration_mode);
         $iTotalDisplayRecords = (string)count($items);
         $data = array();
-        foreach ($items as $item) 
+        if ($hydration_mode == Query::HYDRATE_ARRAY)
         {
-            $data[]= array_values($item);
+            foreach ($items as $item) 
+            {
+                $data[]= array_values($item);
+            }
+        }
+        else
+        {
+            foreach ($items as $item) 
+            {
+                $_data = array();
+                foreach ($this->fields as $field)
+                {
+                    $method = "get".ucfirst(substr($field,strpos($field,'.')+1));
+                    $_data[] = $item->$method();
+                }
+                $data[]= $_data;
+            }
         }
         return $data;
+    }
+
+    /**
+     * set a php closure as renderer
+     * 
+     * @example:
+     * 
+     *  $controller_instance = $this;
+     *  $datatable = $this->get('datatable')
+     *       ->setEntity("AliBaseBundle:Entity", "e")
+     *       ->setFields($fields)
+     *       ->setOrder("e.created", "desc")
+     *       ->setRenderer(
+     *               function(&$data) use ($controller_instance)
+     *               {
+     *                   foreach ($data as $key => $value)
+     *                   {
+     *                       if ($key == 1)
+     *                       {
+     *                           $data[$key] = $controller_instance
+     *                               ->get('templating')
+     *                               ->render('AliBaseBundle:Entity:_decorator.html.twig',
+     *                                       array(
+     *                                           'data' => $value
+     *                                       )
+     *                               );
+     *                       }
+     *                   }
+     *               }
+     *         )
+     *       ->setHasAction(true);
+     * 
+     * @param \Closure $renderer
+     * 
+     * @return Datatable 
+     */
+    public function setRenderer(\Closure $renderer)
+    {
+        $this->renderer = $renderer;
+        return $this;
     }
 
     /**
@@ -214,11 +279,11 @@ class Datatable
      *
      * @return Response 
      */
-    public function execute()
+    public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
         $request = $this->request;
         $iTotalRecords = $this->_getTotalRecords();
-        $data = $this->_getData();
+        $data = $this->_getData($hydration_mode);
         if(!is_null($this->fixed_data))
         {
             $this->fixed_data = array_reverse($this->fixed_data);
@@ -226,6 +291,10 @@ class Datatable
             {
                 array_unshift($data, $item);
             }
+        }
+        if (!is_null($this->renderer))
+        {
+            array_walk($data, $this->renderer);
         }
         $output = array(
 		"sEcho" => intval($request->get('sEcho')),
