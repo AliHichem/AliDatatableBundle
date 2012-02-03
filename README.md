@@ -1,6 +1,8 @@
 Getting Started With DataGridBundle
 ===================================
 
+[![Build Status](https://secure.travis-ci.org/AliHichem/AliDatatableBundle.png?branch=master)](http://travis-ci.org/AliHichem/AliDatatableBundle)
+
 The Datatable bundle for symfony2 allow for easily integration of the [jQuery Datatable plugin](http://datatables.net/) with the doctrine2 entities.
 This bundle provides a way to make a projection of a doctrine2 entity to a powerful jquery datagrid. It mainly includes:
 
