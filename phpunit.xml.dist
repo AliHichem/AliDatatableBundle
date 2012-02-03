@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit bootstrap="./Tests/bootstrap.php" colors="true">
+    
+    <php>
+        <server name="KERNEL_DIR" value="$_SERVER['SYMFONY_VERSION']" />
+    </php>
 
     <testsuites>
         <testsuite name="AliDatatableBundle test suite">
