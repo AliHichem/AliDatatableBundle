@@ -3,7 +3,7 @@
 <phpunit bootstrap="./Tests/bootstrap.php" colors="true">
     
     <php>
-        <server name="KERNEL_DIR" value="$_SERVER['SYMFONY_VERSION']" />
+        <server name="KERNEL_DIR" value="http://github.com/symfony/symfony" />
     </php>
 
     <testsuites>
