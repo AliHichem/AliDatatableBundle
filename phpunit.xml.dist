@@ -3,7 +3,7 @@
 <phpunit bootstrap="./Tests/bootstrap.php" colors="true">
     
     <php>
-        <server name="KERNEL_DIR" value="./vendor" />
+        <!--<server name="KERNEL_DIR" value="./Tests" />-->
     </php>
 
     <testsuites>

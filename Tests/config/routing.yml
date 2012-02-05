@@ -1,0 +1,3 @@
+supercolegio_wizard_homepage:
+    pattern:  /
+    defaults: { _controller: AliDatatableBundle:Default:index }

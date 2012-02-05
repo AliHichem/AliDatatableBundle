@@ -10,7 +10,7 @@ class DatatableTest extends BaseTestCase
 
     protected function __setUp()
     {
-        $client = static::createClient();
+        $client = parent::createClient();
         $crawler = $client->request('GET', '/');
         $this->_container->set('request', $client->getRequest());
         $this->_datatable = $this->_container->get('datatable');

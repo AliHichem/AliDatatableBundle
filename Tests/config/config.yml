@@ -1,0 +1,15 @@
+framework:
+    secret:          test
+    charset:         UTF-8
+    router:          { resource: "%kernel.root_dir%/config/routing.yml" }
+    form:            ~
+    csrf_protection: ~
+    validation:      { enable_annotations: true }
+    templating:      { engines: ['twig','php'] } #assets_version: SomeVersionScheme
+    session:
+        default_locale: en
+        auto_start:     true
+        storage_id:     session.storage.filesystem
+    translator: { fallback: en }
+    test: ~
+    
