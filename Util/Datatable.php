@@ -15,11 +15,12 @@ class Datatable
     private $entity_name;
     private $entity_alias;
     private $fields;
-    private $order_field = NULL;
-    private $order_type = "asc";
-    private $has_action = true; 
-    private $fixed_data = NULL;
-    private $renderer = NULL;
+    private $order_field    = NULL;
+    private $order_type     = "asc";
+    private $where          = NULL;
+    private $has_action     = true; 
+    private $fixed_data     = NULL;
+    private $renderer       = NULL;
     
     /**
      * class constructor 
@@ -163,6 +164,23 @@ class Datatable
     }
     
     /**
+     * set query where
+     * 
+     * @param string $where
+     * @param array  $params
+     * 
+     * @return Datatable 
+     */
+    public function setWhere($where,array $params = array())
+    {
+        $this->where = new \stdClass();
+        $this->where->dql = $where;
+        $this->where->params = $params;
+        return $this;
+    }
+
+        
+    /**
      * get total records
      * 
      * @return integer 
@@ -197,12 +215,22 @@ class Datatable
         }
         $dql .= " from {$this->entity_name} {$this->entity_alias} ";
         
+        if ( $this->where instanceof \stdClass && !is_null($this->where->dql))
+        {
+            $dql .= " where {$this->where->dql} ";
+        }
+        
         if (!is_null($this->order_field))
         {
             $dql .= " order by {$this->order_field} {$request->get('sSortDir_0','asc')} ";
         }
         
         $query = $this->em->createQuery($dql);
+        /* @var $query Query */
+        if ( $this->where instanceof \stdClass && !empty($this->where->params))
+        {
+            $query->setParameters($this->where->params);
+        }
         $iDisplayLength = (int)$request->get('iDisplayLength');
         if ($iDisplayLength > 0)
         {
