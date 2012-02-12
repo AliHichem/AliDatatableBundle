@@ -78,6 +78,10 @@ Assuming for example that you need a grid in your "index" action, create in your
                                 "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
                                 "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                             )
+                    ->setWhere(                                                     // set your dql where statement
+                         'x.adress = :adress',
+                         array('adress' => 'Paris') 
+                    )
                     ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
                     ->setHasAction(true);                                           // you can disable action column from here by setting "false".
     }
@@ -98,7 +102,7 @@ Assuming for example that you need a grid in your "index" action, create in your
      */
     public function indexAction()
     {
-        $datatable = $this->_datatable();                                           // call the datatable config initializer
+        $this->_datatable();                                                        // call the datatable config initializer
         return $this->render('XXXMyBundle:Module:index.html.twig');                 // replace "XXXMyBundle:Module:index.html.twig" by yours
     }
 
@@ -123,6 +127,79 @@ Assuming for example that you need a grid in your "index" action, create in your
             }
         }) | raw
     }}
+
+## Advenced use of datatable
+
+### sql where statement
+
+Assuming the example above, you can add your dql where statement
+
+    /**
+     * set datatable configs
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    private function _datatable()
+    {
+        return $this->get('datatable')
+                    ->setEntity("XXXMyBundle:Entity", "x")                          // replace "XXXMyBundle:Entity" by your entity
+                    ->setFields(
+                            array(
+                                "Name"          => 'x.name',                        // Declaration for fields: 
+                                "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                                "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
+                            )
+                    ->setWhere(                                                     // set your dql where statement
+                         'x.adress = :adress',
+                         array('adress' => 'Paris') 
+                    )
+                    ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
+                    ->setHasAction(true);                                           // you can disable action column from here by setting "false".
+    }
+    
+    
+### custom renderer
+
+Assuming the example above, you can set your custom fields renderer using [PHP Closures](http://php.net/manual/en/class.closure.php).
+
+    /**
+     * set datatable configs
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    private function _datatable()
+    {
+        $controller_instance = $this;
+        return $this->get('datatable')
+                    ->setEntity("XXXMyBundle:Entity", "x")                          // replace "XXXMyBundle:Entity" by your entity
+                    ->setFields(
+                            array(
+                                "Name"          => 'x.name',                        // Declaration for fields: 
+                                "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                                "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
+                            )
+                    ->setRenderer(
+                        function(&$data) use ($controller_instance)
+                        {
+                            foreach ($data as $key => $value)
+                            {
+                                if ($key == 1)                                      // 1 => adress field
+                                {
+                                    $data[$key] = $controller_instance
+                                            ->get('templating')
+                                            ->render(
+                                                   'XXXMyBundle:Module:_grid_entity.html.twig', 
+                                                   array('data' => $value)
+                                            );
+                                }
+                            }
+                        }
+                    )
+                    ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
+                    ->setHasAction(true);                                           // you can disable action column from here by setting "false".
+    }
+
+<div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_02.png"></div>
 
 **Future improvements**: 
 
