@@ -1,7 +1,7 @@
 {% block main %}
 <script type="text/javascript">
     $(document).ready(function(){
-        $('.button-delete').live('click',function(){
+        $('.button-delete').die().live('click',function(){
             if (!confirm('{{ 'ali.common.confirm_delete'|trans()  }}')) {
                 return false;
             }

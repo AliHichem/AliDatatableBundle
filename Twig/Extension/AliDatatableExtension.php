@@ -5,6 +5,7 @@ namespace Ali\DatatableBundle\Twig\Extension;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Ali\DatatableBundle\Util\Datatable ;
 
 class AliDatatableExtension extends \Twig_Extension
 {
@@ -38,8 +39,7 @@ class AliDatatableExtension extends \Twig_Extension
      */
     public function datatable ($options)
     {
-        /* @var $datatable \Ali\DatatableBundle\Util\Datatable */
-        $datatable = $this->container->get('datatable');
+        $datatable = Datatable::getInstance($options['id']); 
         
         $options['js'] = json_encode($options['js']);
         $options['action'] = $datatable->getHasAction();

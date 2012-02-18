@@ -5,6 +5,7 @@ services:
     datatable:
         class: "%datatable.class%"
         arguments: [ @service_container ]
+        scope: prototype
         
     datatable.twig.extension:
         class: Ali\DatatableBundle\Twig\Extension\AliDatatableExtension

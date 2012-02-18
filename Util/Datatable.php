@@ -4,24 +4,29 @@ namespace Ali\DatatableBundle\Util;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\Query;
+use Doctrine\ORM\Query,
+    Doctrine\ORM\Query\Expr\Join;
 
 class Datatable
 {
-    private $container;
-    private $request;
+
+    protected $container;
+    protected $request;
     /* @var Doctrine\ORM\EntityManager $em */
-    private $em;
-    private $entity_name;
-    private $entity_alias;
-    private $fields;
-    private $order_field    = NULL;
-    private $order_type     = "asc";
-    private $where          = NULL;
-    private $has_action     = true; 
-    private $fixed_data     = NULL;
-    private $renderer       = NULL;
-    
+    protected $em;
+    protected $entity_name;
+    protected $entity_alias;
+    protected $fields;
+    protected $order_field = NULL;
+    protected $order_type = "asc";
+    protected $where = NULL;
+    protected $joins = array();
+    protected $has_action = true;
+    protected $fixed_data = NULL;
+    protected $renderer = NULL;
+    protected static $instances = array();
+    protected static $current_instance = NULL;
+
     /**
      * class constructor 
      * 
@@ -32,8 +37,58 @@ class Datatable
         $this->container = $container;
         $this->em = $this->container->get('doctrine.orm.entity_manager');
         $this->request = $this->container->get('request');
+        self::$current_instance = $this;
     }
-    
+
+    /**
+     * set datatable identifier
+     * 
+     * @param string $id
+     * 
+     * @return Datatable 
+     */
+    public function setDatatableId($id)
+    {
+        if (!array_key_exists($id, self::$instances))
+        {
+            self::$instances[$id] = $this;
+        }
+        else
+        {
+            throw new \Exception('Identifer already exists');
+        }
+        return $this;
+    }
+
+    /**
+     * get datatable instance by id
+     *  return current instance if null
+     * 
+     * @param string $id
+     * 
+     * @return Datatable .
+     */
+    public static function getInstance($id)
+    {
+        $instance = NULL;
+        if (array_key_exists($id, self::$instances))
+        {
+            $instance = self::$instances[$id];
+        }
+        else
+        {
+            $instance = self::$current_instance;
+        }
+
+        if (is_null($instance))
+        {
+            throw new \Exception('No instance found for datatable, you should set a datatable id in your
+            action with "setDatatableId" using the id from your view ');
+        }
+
+        return $instance;
+    }
+
     /**
      * set entity
      * 
@@ -42,13 +97,14 @@ class Datatable
      * 
      * @return Datatable 
      */
-    public function setEntity($entity_name, $entity_alias)
+    public function setEntity($entity_name,
+            $entity_alias)
     {
         $this->entity_name = $entity_name;
         $this->entity_alias = $entity_alias;
         return $this;
     }
-    
+
     /**
      * set fields
      * 
@@ -61,7 +117,7 @@ class Datatable
         $this->fields = $fields;
         return $this;
     }
-    
+
     /**
      * get entity name
      * 
@@ -143,13 +199,14 @@ class Datatable
      * 
      * @return Datatable 
      */
-    public function setOrder($order_field, $order_type)
+    public function setOrder($order_field,
+            $order_type)
     {
         $this->order_field = $order_field;
         $this->order_type = $order_type;
         return $this;
     }
-    
+
     /**
      * set fixed data
      * 
@@ -162,7 +219,7 @@ class Datatable
         $this->fixed_data = $data;
         return $this;
     }
-    
+
     /**
      * set query where
      * 
@@ -171,92 +228,128 @@ class Datatable
      * 
      * @return Datatable 
      */
-    public function setWhere($where,array $params = array())
+    public function setWhere($where,
+            array $params = array())
     {
         $this->where = new \stdClass();
         $this->where->dql = $where;
         $this->where->params = $params;
         return $this;
     }
+    
+    /**
+     * add join
+     * 
+     * @example:
+     *      ->setJoin( 
+     *              'r.event', 
+     *              'e', 
+     *              \Doctrine\ORM\Query\Expr\Join::INNER_JOIN, 
+     *              'e.name like %test%') 
+     * 
+     * @param string $join_field
+     * @param string $alias
+     * @param string $type
+     * @param string $cond
+     * 
+     * @return Datatable 
+     */
+    public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
+    {
+        $dql_join = " {$type} join {$join_field} {$alias} ";
+        if ($cond != '')
+        {
+            $dql_join .= " with {$cond} ";
+        }
+        $this->joins[] = $dql_join;
+        return $this;
+    }
 
-        
     /**
      * get total records
      * 
      * @return integer 
      */
-    private function _getTotalRecords()
+    protected function _getTotalRecords()
     {
         $query = $this->em
-                        ->createQuery("select count({$this->fields['_identifier_']}) 
+                ->createQuery("select count({$this->fields['_identifier_']}) 
                                         from {$this->entity_name} {$this->entity_alias}");
         return $query->getSingleScalarResult();
     }
-    
+
     /**
      * get data
      * 
      * @return array
      */
-    private function _getData($hydration_mode)
+    protected function _getData($hydration_mode)
     {
         $request = $this->request;
         $dql_fields = array_values($this->fields);
         $this->order_field = $dql_fields[$request->get('iSortCol_0')];
-        
+
         $dql = "select ";
         if ($hydration_mode == Query::HYDRATE_ARRAY)
         {
-            $dql .= implode(" , ", $this->fields)." ";
+            $dql .= implode(" , ", $this->fields) . " ";
         }
         else
         {
             $dql .= " {$this->entity_alias} ";
         }
         $dql .= " from {$this->entity_name} {$this->entity_alias} ";
+
+        if (!empty($this->joins))
+        {
+            foreach ($this->joins as $join)
+            {
+                $dql .= $join;
+            }
+        }
         
-        if ( $this->where instanceof \stdClass && !is_null($this->where->dql))
+        if ($this->where instanceof \stdClass && !is_null($this->where->dql))
         {
             $dql .= " where {$this->where->dql} ";
         }
-        
+
         if (!is_null($this->order_field))
         {
-            $dql .= " order by {$this->order_field} {$request->get('sSortDir_0','asc')} ";
+            $dql .= " order by {$this->order_field} {$request->get('sSortDir_0', 'asc')} ";
         }
-        
+
         $query = $this->em->createQuery($dql);
         /* @var $query Query */
-        if ( $this->where instanceof \stdClass && !empty($this->where->params))
+        if ($this->where instanceof \stdClass && !empty($this->where->params))
         {
             $query->setParameters($this->where->params);
         }
-        $iDisplayLength = (int)$request->get('iDisplayLength');
+        $iDisplayLength = (int) $request->get('iDisplayLength');
         if ($iDisplayLength > 0)
         {
-            $query->setMaxResults( $iDisplayLength )->setFirstResult( $request->get('iDisplayStart') );
+            $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
         $items = $query->getResult($hydration_mode);
-        $iTotalDisplayRecords = (string)count($items);
+        $iTotalDisplayRecords = (string) count($items);
         $data = array();
         if ($hydration_mode == Query::HYDRATE_ARRAY)
         {
-            foreach ($items as $item) 
+            foreach ($items as $item)
             {
-                $data[]= array_values($item);
+                $data[] = array_values($item);
             }
         }
         else
         {
-            foreach ($items as $item) 
+            foreach ($items as $item)
             {
                 $_data = array();
                 foreach ($this->fields as $field)
                 {
-                    $method = "get".ucfirst(substr($field,strpos($field,'.')+1));
+                    $method = "get" . ucfirst(substr($field, strpos($field, '.') + 1));
                     $_data[] = $item->$method();
                 }
-                $data[]= $_data;
+                $data[] = $_data;
             }
         }
         return $data;
@@ -312,7 +405,7 @@ class Datatable
         $request = $this->request;
         $iTotalRecords = $this->_getTotalRecords();
         $data = $this->_getData($hydration_mode);
-        if(!is_null($this->fixed_data))
+        if (!is_null($this->fixed_data))
         {
             $this->fixed_data = array_reverse($this->fixed_data);
             foreach ($this->fixed_data as $item)
@@ -325,12 +418,12 @@ class Datatable
             array_walk($data, $this->renderer);
         }
         $output = array(
-		"sEcho" => intval($request->get('sEcho')),
-		"iTotalRecords" => $iTotalRecords,
-		"iTotalDisplayRecords" => $iTotalRecords,
-		"aaData" => $data
-	);
+            "sEcho" => intval($request->get('sEcho')),
+            "iTotalRecords" => $iTotalRecords,
+            "iTotalDisplayRecords" => $iTotalRecords,
+            "aaData" => $data
+        );
         return new Response(json_encode($output));
     }
-    
+
 }
