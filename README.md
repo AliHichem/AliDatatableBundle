@@ -148,9 +148,11 @@ Assuming the example above, you can add your joins and where statements
                                 "Name"          => 'x.name',                        // Declaration for fields: 
                                 "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
                                 "Group"         => 'g.name',
+                                "Team"          => 't.name',
                                 "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                             )
-                    ->setJoin('x.group', 'g', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
+                    ->addJoin('x.group', 'g', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
+                    ->addJoin('x.team', 't', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
                     ->setWhere(                                                     // set your dql where statement
                          'x.adress = :adress',
                          array('adress' => 'Paris') 
@@ -205,7 +207,6 @@ Assuming the example above, you can set your custom fields renderer using [PHP C
 
 **Future improvements**: 
 
- * add search
  * add support for doctrine associations
  
 
