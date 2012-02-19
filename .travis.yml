@@ -6,6 +6,7 @@ php:
   
 env:
   - SYMFONY_VERSION=v2.0.7
-  - SYMFONY_VERSION=origin/master
+  - SYMFONY_VERSION=v2.0.8
+  - SYMFONY_VERSION=v2.0.9
   
 before_script: php vendor/vendors.php
