@@ -10,6 +10,7 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * twig extension: for view integration.
  * dynamic pager handler : no need to set your pager.
  * default action link builder: if activated, the bundle generates default edit/delete links. 
+ * support doctrine2 association
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample.png"></div>
 
@@ -17,7 +18,6 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 
 **Limitations**: 
 
- * Do not support doctrine2 associations
  * No search available
  
 Installation
@@ -132,7 +132,7 @@ Assuming for example that you need a grid in your "index" action, create in your
 
 ### sql where statement
 
-Assuming the example above, you can add your dql where statement
+Assuming the example above, you can add your joins and where statements
 
     /**
      * set datatable configs
@@ -147,8 +147,10 @@ Assuming the example above, you can add your dql where statement
                             array(
                                 "Name"          => 'x.name',                        // Declaration for fields: 
                                 "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                                "Group"         => 'g.name',
                                 "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                             )
+                    ->setJoin('x.group', 'g', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
                     ->setWhere(                                                     // set your dql where statement
                          'x.adress = :adress',
                          array('adress' => 'Paris') 
