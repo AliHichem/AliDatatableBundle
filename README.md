@@ -207,6 +207,6 @@ Assuming the example above, you can set your custom fields renderer using [PHP C
 
 **Future improvements**: 
 
- * add support for doctrine associations
+ * add support for search
  
 
