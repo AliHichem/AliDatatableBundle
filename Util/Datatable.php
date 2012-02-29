@@ -287,7 +287,7 @@ class Datatable
     {
         $request = $this->request;
         $dql_fields = array_values($this->fields);
-        $this->order_field = $dql_fields[$request->get('iSortCol_0')];
+        $this->order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
 
         $dql = "select ";
         if ($hydration_mode == Query::HYDRATE_ARRAY)
