@@ -272,9 +272,24 @@ class Datatable
      */
     protected function _getTotalRecords()
     {
+        $dql = "select count({$this->fields['_identifier_']}) 
+                from {$this->entity_name} {$this->entity_alias}";
+        
+        if (!empty($this->joins))
+        {
+            foreach ($this->joins as $join)
+            {
+                $dql .= $join;
+            }
+        }
+        
+        if ($this->where instanceof \stdClass && !is_null($this->where->dql))
+        {
+            $dql .= " where {$this->where->dql} ";
+        }
+
         $query = $this->em
-                ->createQuery("select count({$this->fields['_identifier_']}) 
-                                        from {$this->entity_name} {$this->entity_alias}");
+                ->createQuery($dql);
         return $query->getSingleScalarResult();
     }
 
