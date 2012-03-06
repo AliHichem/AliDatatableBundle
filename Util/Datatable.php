@@ -288,8 +288,13 @@ class Datatable
             $dql .= " where {$this->where->dql} ";
         }
 
-        $query = $this->em
-                ->createQuery($dql);
+        $query = $this->em->createQuery($dql);
+        
+        if ($this->where instanceof \stdClass && !empty($this->where->params))
+        {
+            $query->setParameters($this->where->params);
+        }
+        
         return $query->getSingleScalarResult();
     }
 
