@@ -1,5 +1,5 @@
-Getting Started With DataGridBundle
-===================================
+Getting Started With AliDatatableBundle
+=======================================
 
 [![Build Status](https://secure.travis-ci.org/AliHichem/AliDatatableBundle.png?branch=master)](http://travis-ci.org/AliHichem/AliDatatableBundle)
 
