@@ -19,6 +19,24 @@
             "bLengthChange": true,
             "bSort": true,
             "bFilter": false,
+            "oLanguage": {
+                "sProcessing":     '{{ 'ali.common.sProcessing' | trans() }}',
+                "sLengthMenu":     '{{ 'ali.common.sLengthMenu' | trans() }}',
+                "sZeroRecords":    '{{ 'ali.common.sZeroRecords' | trans() }}',
+                "sInfo":           '{{ 'ali.common.sInfo' | trans() }}',
+                "sInfoEmpty":      '{{ 'ali.common.sInfoEmpty' | trans() }}',
+                "sInfoFiltered":   '{{ 'ali.common.sInfoFiltered' | trans() }}',
+                "sInfoPostFix":    '{{ 'ali.common.sInfoPostFix' | trans() }}',
+                "sSearch":         '{{ 'ali.common.sSearch' | trans() }}',
+                "sLoadingRecords": '{{ 'ali.common.sLoadingRecords' | trans() }}',
+                "sUrl":            "",
+                "oPaginate": {
+                    "sFirst":    '{{ 'ali.common.sFirst' | trans() }}',
+                    "sPrevious": '{{ 'ali.common.sPrevious' | trans() }}',
+                    "sNext":     '{{ 'ali.common.sNext' | trans() }}',
+                    "sLast":     '{{ 'ali.common.sLast' | trans() }}'
+                }
+            }
         };
         $.extend($defaults,$options);
         {% if action %} 

@@ -205,6 +205,34 @@ Assuming the example above, you can set your custom fields renderer using [PHP C
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_02.png"></div>
 
+Translation
+-----------
+
+You can set your own translated labels by adding in your translation catalog entries as below:
+
+    ali:
+        common:
+            action: Actions
+            confirm_delete: 'Are you sure to delete this item ?'
+            delete: delete
+            edit: edit
+            no_action: "(can't remove)"
+            sProcessing: "Processing..."
+            sLengthMenu: "Show _MENU_ entries"
+            sZeroRecords: "No matching records found"
+            sInfo: "Showing _START_ to _END_ of _TOTAL_ entries"
+            sInfoEmpty: "Showing 0 to 0 of 0 entries"
+            sInfoFiltered: "(filtered from _MAX_ total entries)"
+            sInfoPostFix: ""
+            sSearch: "Search:"
+            sLoadingRecords: ""
+            sFirst: "First"
+            sPrevious: "Previous"  
+            sNext: "Next"
+            sLast: "Last"
+            
+To get translated entries for different languages you can follow the [official datatable translation](http://datatables.net/plug-ins/i18n#English)
+
 **Future improvements**: 
 
  * add support for search
