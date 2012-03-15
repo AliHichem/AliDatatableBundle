@@ -1,0 +1,20 @@
+ali:
+    common:
+        action: Azioni
+        confirm_delete: "Sei sicuro di voler eliminare questa voce?"
+        delete: cancellare
+        edit: modificare
+        no_action: "(non può rimuovere)"
+        sProcessing: "Caricamento..."
+        sLengthMenu: "Visualizza _MENU_ elementi"
+        sZeroRecords: "La ricerca non ha portato alcun risultato"
+        sInfo: "Vista da _START_ a _END_ di _TOTAL_ elementi"
+        sInfoEmpty: "Vista da 0 a 0 di 0 elementi"
+        sInfoFiltered: "(filtrati da _MAX_ elementi totali)"
+        sInfoPostFix: ""
+        sSearch: "Cerca:"
+        sLoadingRecords: ""
+        sFirst: "Inizio"
+        sPrevious: "Precedente"  
+        sNext: "Successivo"
+        sLast: "Fine"

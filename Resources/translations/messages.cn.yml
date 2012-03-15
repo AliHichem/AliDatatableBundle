@@ -1,0 +1,19 @@
+ali:
+    common:
+        action: 行动
+        confirm_delete: "你是否确定删除此项目吗？"
+        delete: 删除
+        edit: 编辑
+        no_action: "(不能删除)"
+        sProcessing:   "处理中..."
+        sLengthMenu:   "显示 _MENU_ 项结果"
+        sZeroRecords:  "没有匹配结果"
+        sInfo:         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项"
+        sInfoEmpty:    "显示第 0 至 0 项结果，共 0 项"
+        sInfoFiltered: "(由 _MAX_ 项结果过滤)"
+        sInfoPostFix:  ""
+        sSearch:       "搜索:"
+        sFirst:    "首页"
+        sPrevious: "上页"
+        sNext:     "下页"
+        sLast:     "末页"

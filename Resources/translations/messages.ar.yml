@@ -1,0 +1,20 @@
+ali:
+    common:
+        action: 'الإجراءات'
+        confirm_delete: 'هل أنت متأكد من حذف هذا البند؟'
+        delete: حذف
+        edit: تحرير
+        no_action: "(لا يمكن إزالة)"
+        sProcessing: "...جاري التحميل"
+        sLengthMenu: "أظهر مُدخلات _MENU_"
+        sZeroRecords: "لم يُعثر على أية سجلات"
+        sInfo: "إظهار _START_ إلى _END_ من أصل _TOTAL_ مُدخل"
+        sInfoEmpty: "يعرض 0 إلى 0 من أصل 0 سجلّ"
+        sInfoFiltered: "(منتقاة من مجموع _MAX_ مُدخل)"
+        sInfoPostFix: ""
+        sSearch: "ابحث:"
+        sLoadingRecords: ""
+        sFirst: "الأول"
+        sPrevious: "السابق"  
+        sNext: "التالي"
+        sLast: "الأخير"

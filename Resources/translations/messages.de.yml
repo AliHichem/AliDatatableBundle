@@ -1,0 +1,20 @@
+ali:
+    common:
+        action: Acties
+        confirm_delete: "Weet u zeker dat u dit item wilt verwijderen?"
+        delete: verwijderen
+        edit: bewerk
+        no_action: "(kan niet verwijderen)"
+        sProcessing: "Bezig..."
+        sLengthMenu: "_MENU_ resultaten weergeven"
+        sZeroRecords: "Geen resultaten gevonden"
+        sInfo: "_START_ tot _END_ van _TOTAL_ resultaten"
+        sInfoEmpty: "Geen resultaten om weer te geven"
+        sInfoFiltered: "(gefilterd uit _MAX_ resultaten)"
+        sInfoPostFix: ""
+        sSearch: "Zoeken:"
+        sLoadingRecords: "Een moment geduld aub - bezig met laden..."
+        sFirst: "Eerste"
+        sPrevious: "Vorige"  
+        sNext: "Volgende"
+        sLast: "Laatste"
