@@ -133,8 +133,6 @@ class Datatable
             $dql .= " where {$dql_search} ";
         }
 
-
-
         if (!is_null($this->order_field))
         {
             $dql .= " order by {$this->order_field} {$request->get('sSortDir_0', 'asc')} ";
