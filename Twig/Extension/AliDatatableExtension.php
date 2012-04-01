@@ -45,6 +45,7 @@ class AliDatatableExtension extends \Twig_Extension
         $options['action'] = $datatable->getHasAction();
         $options['fields'] = $datatable->getFields();
         $options['delete_form'] = $this->createDeleteForm('_id_')->createView();
+        $options['search'] = $datatable->getSearch();
         
         return $this->container
                 ->get('templating')

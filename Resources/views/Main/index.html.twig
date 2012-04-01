@@ -18,7 +18,7 @@
             "bPaginate": true,
             "bLengthChange": true,
             "bSort": true,
-            "bFilter": false,
+            "bFilter": true,
             "oLanguage": {
                 "sProcessing":     '{{ 'ali.common.sProcessing' | trans() }}',
                 "sLengthMenu":     '{{ 'ali.common.sLengthMenu' | trans() }}',
@@ -74,22 +74,64 @@
             ]
         });
         {% endif %}
+        eval("var oTable_"+'{{id}}'.split('-').join('_')+"  = $('#{{id}}').dataTable($defaults)");
         
-        oTable = $('#{{id}}').dataTable($defaults);
+        {% if search %}
+        $(".dataTables_filter").remove();
+        search_selector = "#{{id}} input[searchable=true]";
+        $(search_selector).keyup( function (event) {
+            index = $(this).attr('index');
+            oTable = eval('oTable_{{id}}'.split('-').join('_'));
+            if (event.keyCode == '13') {
+                oTable.fnFilter( 
+                    this.value, 
+                    oTable.oApi._fnVisibleToColumnIndex( 
+                        oTable.fnSettings(), 
+                        index 
+                    ) 
+                );
+            }
+        }).each( function (i) {
+            this.initVal = this.value;
+        }).focus( function () {
+            if ( this.className == "search_init" ){
+                this.className = "";
+                this.value = "";
+            }
+        }).blur( function (i) {
+            if ( this.value == "" ){
+                this.className = "search_init";
+                this.value = this.initVal;
+            }
+        });
+        {% endif %}
     });
-</script>    
-<table class="display" id="{{id}}"> 
-    <thead> 
-        <tr> 
+    </script>    
+    <table class="display" id="{{id}}"> 
+        <thead> 
+            <tr> 
             {% for label,key in fields %}
                 {% if label != '_identifier_' %}
-                <th>{{ label }}</th>
+                    <th>{{ label }}</th>
                 {% endif %}
             {% endfor %}
             {% if action %}
                 <th>{{ 'ali.common.action'|trans()  }}</th>
             {% endif %}
-        </tr> 
-    </thead> 
-</table>
+            </tr> 
+        </thead>
+        {% if search %}
+            {% set i = 0 %}
+            <tfoot>
+                <tr>
+                {% for label,key in fields %}
+                    {% if label != '_identifier_' %}
+                    <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                    {% set i = i+1 %}
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            </tfoot>
+        {% endif %}
+        </table>
 {% endblock  %}
