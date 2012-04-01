@@ -227,7 +227,7 @@ You can set your own translated labels by adding in your translation catalog ent
             sPrevious: "Previous"  
             sNext: "Next"
             sLast: "Last"
-	    search: "Search"
+            search: "Search"
             
 This bundle includes nine translation catalogs: Arabic, Chinese, Dutch, English, Spanish, French, Italian, Russian and Turkish
 To get more translated entries, you can follow the [official datatable translation](http://datatables.net/plug-ins/i18n#English)
