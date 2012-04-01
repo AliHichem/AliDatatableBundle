@@ -11,15 +11,12 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * dynamic pager handler : no need to set your pager.
  * default action link builder: if activated, the bundle generates default edit/delete links. 
  * support doctrine2 association
+ * support of column search
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample.png"></div>
 
 **Compatibility**: latest successiful test with Symfony v"2.0.11". Compatibility with higher version of symfony2 is not guaranteed.
 
-**Limitations**: 
-
- * No search available
- 
 Installation
 ------------
 
@@ -202,7 +199,7 @@ Assuming the example above, you can set your custom fields renderer using [PHP C
                     ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
                     ->setHasAction(true);                                           // you can disable action column from here by setting "false".
     }
-
+<br/>
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_02.png"></div>
 
 Translation
@@ -230,12 +227,8 @@ You can set your own translated labels by adding in your translation catalog ent
             sPrevious: "Previous"  
             sNext: "Next"
             sLast: "Last"
+	    search: "Search"
             
 This bundle includes nine translation catalogs: Arabic, Chinese, Dutch, English, Spanish, French, Italian, Russian and Turkish
 To get more translated entries, you can follow the [official datatable translation](http://datatables.net/plug-ins/i18n#English)
-
-**Future improvements**: 
-
- * add support for search
- 
 
