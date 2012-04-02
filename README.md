@@ -20,10 +20,14 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 Wiki
 ----
 
+
 ### [Getting started](https://github.com/AliHichem/AliDatatableBundle/wiki/Getting-Started)
 ### [Installation](https://github.com/AliHichem/AliDatatableBundle/wiki/Installation)
 ### [How to use](https://github.com/AliHichem/AliDatatableBundle/wiki/How-to-use)
 ### [Rendering inside Twig](https://github.com/AliHichem/AliDatatableBundle/wiki/Rendering-inside-Twig)
 ### [Advenced use of datatable](https://github.com/AliHichem/AliDatatableBundle/wiki/Advenced-use-of-datatable)
+### [Use of search filters](https://github.com/AliHichem/AliDatatableBundle/wiki/Use-of-search-filters)
+### API
 ### [Custom renderer](https://github.com/AliHichem/AliDatatableBundle/wiki/Custom-renderer)
 ### [Translation](https://github.com/AliHichem/AliDatatableBundle/wiki/Translation)
+### [Multiple datatable in the same view](https://github.com/AliHichem/AliDatatableBundle/wiki/Multiple-datatable-in-the-same-view)
