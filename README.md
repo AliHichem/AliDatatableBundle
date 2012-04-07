@@ -25,7 +25,7 @@ Wiki
 ### [Getting started](https://github.com/AliHichem/AliDatatableBundle/wiki/Getting-Started)
 ### [Installation](https://github.com/AliHichem/AliDatatableBundle/wiki/Installation)
 ### [How to use ?](https://github.com/AliHichem/AliDatatableBundle/wiki/How-to-use)
-### How to include the use of doctrine query builder
+### [How to include the use of doctrine query builder] (https://github.com/AliHichem/AliDatatableBundle/wiki/How-to-include-the-use-of-doctrine-query-builder)
 ### [Rendering inside Twig](https://github.com/AliHichem/AliDatatableBundle/wiki/Rendering-inside-Twig)
 ### [Advanced use of datatable](https://github.com/AliHichem/AliDatatableBundle/wiki/Advenced-use-of-datatable)
 ### [Use of search filters](https://github.com/AliHichem/AliDatatableBundle/wiki/Use-of-search-filters)
