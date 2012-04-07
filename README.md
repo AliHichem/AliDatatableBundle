@@ -11,11 +11,12 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * dynamic pager handler : no need to set your pager.
  * default action link builder: if activated, the bundle generates default edit/delete links. 
  * support doctrine2 association
+ * support of doctrine query builder
  * support of column search
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_01.png"></div>
 
-**Compatibility**: latest successiful test with Symfony v"2.0.11". Compatibility with higher version of symfony2 is not guaranteed.
+**Compatibility**: latest successful test with Symfony v"2.0.11". Compatibility with higher version of symfony2 is not guaranteed.
 
 Wiki
 ----
@@ -23,9 +24,10 @@ Wiki
 
 ### [Getting started](https://github.com/AliHichem/AliDatatableBundle/wiki/Getting-Started)
 ### [Installation](https://github.com/AliHichem/AliDatatableBundle/wiki/Installation)
-### [How to use](https://github.com/AliHichem/AliDatatableBundle/wiki/How-to-use)
+### [How to use ?](https://github.com/AliHichem/AliDatatableBundle/wiki/How-to-use)
+### How to include the use of doctrine query builder
 ### [Rendering inside Twig](https://github.com/AliHichem/AliDatatableBundle/wiki/Rendering-inside-Twig)
-### [Advenced use of datatable](https://github.com/AliHichem/AliDatatableBundle/wiki/Advenced-use-of-datatable)
+### [Advanced use of datatable](https://github.com/AliHichem/AliDatatableBundle/wiki/Advenced-use-of-datatable)
 ### [Use of search filters](https://github.com/AliHichem/AliDatatableBundle/wiki/Use-of-search-filters)
 ### API
 ### [Custom renderer](https://github.com/AliHichem/AliDatatableBundle/wiki/Custom-renderer)

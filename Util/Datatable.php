@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\Query,
     Doctrine\ORM\Query\Expr\Join;
+use Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder;
 
 class Datatable
 {
@@ -18,18 +19,14 @@ class Datatable
 
     /** @var \Symfony\Component\HttpFoundation\Request */
     protected $request;
-    protected $entity_name;
-    protected $entity_alias;
-    protected $fields;
-    protected $order_field = NULL;
-    protected $order_type  = "asc";
-    protected $where       = NULL;
-    protected $joins       = array();
+
+    /** @var \Ali\DatatableBundle\Util\Factory\Query\QueryInterface */
+    protected $queryBuilder;
     protected $has_action = true;
     protected $fixed_data = NULL;
-    protected $renderer   = NULL;
-    protected $search     = FALSE;
-    protected static $instances  = array();
+    protected $renderer = NULL;
+    protected $search = FALSE;
+    protected static $instances = array();
     protected static $current_instance = NULL;
 
     /**
@@ -42,178 +39,64 @@ class Datatable
         $this->container = $container;
         $this->em = $this->container->get('doctrine.orm.entity_manager');
         $this->request = $this->container->get('request');
+        $this->queryBuilder = new DoctrineBuilder($container);
         self::$current_instance = $this;
     }
 
     /**
-     * get total records
+     * add join
      * 
-     * @return integer 
-     */
-    protected function _getTotalRecords()
-    {
-        $dql = "select count({$this->fields['_identifier_']}) 
-                from {$this->entity_name} {$this->entity_alias}";
-
-        if (!empty($this->joins))
-        {
-            foreach ($this->joins as $join)
-            {
-                $dql .= $join;
-            }
-        }
-
-        $dql_search = $this->_getDqlSearch();
-
-        if ($this->where instanceof \stdClass && !is_null($this->where->dql))
-        {
-            $dql .= " where {$this->where->dql} ";
-            if ($this->search == TRUE )
-            {
-                $dql .= " and {$dql_search} ";
-            }
-        }
-        elseif ($this->search == TRUE )
-        {
-            $dql .= " where {$dql_search} ";
-        }
-
-        $query = $this->em->createQuery($dql);
-
-        if ($this->where instanceof \stdClass && !empty($this->where->params))
-        {
-            $query->setParameters($this->where->params);
-        }
-
-        return $query->getSingleScalarResult();
-    }
-
-    /**
-     * get data
+     * @example:
+     *      ->setJoin( 
+     *              'r.event', 
+     *              'e', 
+     *              \Doctrine\ORM\Query\Expr\Join::INNER_JOIN, 
+     *              'e.name like %test%') 
      * 
-     * @return array
-     */
-    protected function _getData($hydration_mode)
-    {
-        $request    = $this->request;
-        $dql_fields = array_values($this->fields);
-        $this->order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
-
-        $dql = "select ";
-        if ($hydration_mode == Query::HYDRATE_ARRAY)
-        {
-            $dql .= implode(" , ", $this->fields) . " ";
-        }
-        else
-        {
-            $dql .= " {$this->entity_alias} ";
-        }
-        $dql .= " from {$this->entity_name} {$this->entity_alias} ";
-
-        if (!empty($this->joins))
-        {
-            foreach ($this->joins as $join)
-            {
-                $dql .= $join;
-            }
-        }
-
-        $dql_search = $this->_getDqlSearch();
-
-        if ($this->where instanceof \stdClass && !is_null($this->where->dql))
-        {
-            $dql .= " where {$this->where->dql} ";
-            if ($this->search == TRUE )
-            {
-                $dql .= " and {$dql_search} ";
-            }
-        }
-        elseif ($this->search == TRUE )
-        {
-            $dql .= " where {$dql_search} ";
-        }
-
-        if (!is_null($this->order_field))
-        {
-            $dql .= " order by {$this->order_field} {$request->get('sSortDir_0', 'asc')} ";
-        }
-
-        $query = $this->em->createQuery($dql);
-        /* @var $query Query */
-        if ($this->where instanceof \stdClass && !empty($this->where->params))
-        {
-            $query->setParameters($this->where->params);
-        }
-        $iDisplayLength = (int) $request->get('iDisplayLength');
-        if ($iDisplayLength > 0)
-        {
-            $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
-        }
-        $items                = $query->getResult($hydration_mode);
-        $iTotalDisplayRecords = (string) count($items);
-        $data                 = array();
-        if ($hydration_mode == Query::HYDRATE_ARRAY)
-        {
-            foreach ($items as $item)
-            {
-                $data[] = array_values($item);
-            }
-        }
-        else
-        {
-            foreach ($items as $item)
-            {
-                $_data = array();
-                foreach ($this->fields as $field)
-                {
-                    $method  = "get" . ucfirst(substr($field, strpos($field, '.') + 1));
-                    $_data[] = $item->$method();
-                }
-                $data[]  = $_data;
-            }
-        }
-        return $data;
-    }
-
-    /**
-     * get the search dql
-     * 
-     * @return string
-     */
-    public function _getDqlSearch()
-    {
-        if ( $this->search == FALSE )
-        {
-            return '';
-        } 
-        $request = $this->request;
-        $dql     = array();
-        $search_fields = array_values($this->fields);
-        foreach ($search_fields as $i => $search_field)
-        {
-            $dql[] = " $search_field like '%{$request->get("sSearch_{$i}")}%' ";
-        }
-        return implode(' and ', $dql);
-    }
-
-    /**
-     * set datatable identifier
-     * 
-     * @param string $id
+     * @param string $join_field
+     * @param string $alias
+     * @param string $type
+     * @param string $cond
      * 
      * @return Datatable 
      */
-    public function setDatatableId($id)
+    public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
     {
-        if (!array_key_exists($id, self::$instances))
-        {
-            self::$instances[$id] = $this;
-        }
-        else
-        {
-            throw new \Exception('Identifer already exists');
-        }
+        $this->queryBuilder->addJoin($join_field, $alias, $type, $cond);
         return $this;
+    }
+
+    /**
+     * execute
+     * 
+     * @param int $hydration_mode
+     * 
+     * @return Response 
+     */
+    public function execute($hydration_mode = Query::HYDRATE_ARRAY)
+    {
+        $request = $this->request;
+        $iTotalRecords = $this->queryBuilder->getTotalRecords();
+        $data = $this->queryBuilder->getData($hydration_mode);
+        if (!is_null($this->fixed_data))
+        {
+            $this->fixed_data = array_reverse($this->fixed_data);
+            foreach ($this->fixed_data as $item)
+            {
+                array_unshift($data, $item);
+            }
+        }
+        if (!is_null($this->renderer))
+        {
+            array_walk($data, $this->renderer);
+        }
+        $output = array(
+            "sEcho" => intval($request->get('sEcho')),
+            "iTotalRecords" => $iTotalRecords,
+            "iTotalDisplayRecords" => $iTotalRecords,
+            "aaData" => $data
+        );
+        return new Response(json_encode($output));
     }
 
     /**
@@ -246,6 +129,86 @@ class Datatable
     }
 
     /**
+     * get entity name
+     * 
+     * @return string
+     */
+    public function getEntityName()
+    {
+        return $this->queryBuilder->getEntityName();
+    }
+
+    /**
+     * get entity alias
+     * 
+     * @return string
+     */
+    public function getEntityAlias()
+    {
+        return $this->queryBuilder->getEntityAlias();
+    }
+
+    /**
+     * get fields
+     * 
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->queryBuilder->getFields();
+    }
+
+    /**
+     * get order field
+     *
+     * @return string
+     */
+    public function getOrderField()
+    {
+        return $this->queryBuilder->getOrderField();
+    }
+
+    /**
+     * get order type
+     * 
+     * @return string
+     */
+    public function getOrderType()
+    {
+        return $this->queryBuilder->getOrderType();
+    }
+
+    /**
+     * get has_action
+     * 
+     * @return boolean
+     */
+    public function getHasAction()
+    {
+        return $this->has_action;
+    }
+
+    /**
+     * get search
+     * 
+     * @return boolean
+     */
+    public function getSearch()
+    {
+        return $this->search;
+    }
+    
+    /**
+     * get query builder
+     * 
+     * @return QueryInterface 
+     */
+    public function getQueryBuilder()
+    {
+        return $this->queryBuilder;
+    }
+
+        /**
      * set entity
      * 
      * @param type $entity_name
@@ -255,8 +218,7 @@ class Datatable
      */
     public function setEntity($entity_name, $entity_alias)
     {
-        $this->entity_name = $entity_name;
-        $this->entity_alias = $entity_alias;
+        $this->queryBuilder->setEntity($entity_name, $entity_alias);
         return $this;
     }
 
@@ -269,68 +231,8 @@ class Datatable
      */
     public function setFields(array $fields)
     {
-        $this->fields = $fields;
+        $this->queryBuilder->setFields($fields);
         return $this;
-    }
-
-    /**
-     * get entity name
-     * 
-     * @return string
-     */
-    public function getEntityName()
-    {
-        return $this->entity_name;
-    }
-
-    /**
-     * get entity alias
-     * 
-     * @return string
-     */
-    public function getEntityAlias()
-    {
-        return $this->entity_alias;
-    }
-
-    /**
-     * get fields
-     * 
-     * @return array
-     */
-    public function getFields()
-    {
-        return $this->fields;
-    }
-
-    /**
-     * get order field
-     *
-     * @return string
-     */
-    public function getOrderField()
-    {
-        return $this->order_field;
-    }
-
-    /**
-     * get order type
-     * 
-     * @return string
-     */
-    public function getOrderType()
-    {
-        return $this->order_type;
-    }
-
-    /**
-     * get has_action
-     * 
-     * @return boolean
-     */
-    public function getHasAction()
-    {
-        return $this->has_action;
     }
 
     /**
@@ -356,8 +258,7 @@ class Datatable
      */
     public function setOrder($order_field, $order_type)
     {
-        $this->order_field = $order_field;
-        $this->order_type = $order_type;
+        $this->queryBuilder->setOrder($order_field, $order_type);
         return $this;
     }
 
@@ -373,6 +274,16 @@ class Datatable
         $this->fixed_data = $data;
         return $this;
     }
+    
+    /**
+     * set query builder
+     * 
+     * @param QueryInterface $queryBuilder 
+     */
+    public function setQueryBuilder(QueryInterface $queryBuilder)
+    {
+        $this->queryBuilder = $queryBuilder;
+    }
 
     /**
      * set query where
@@ -384,20 +295,8 @@ class Datatable
      */
     public function setWhere($where, array $params = array())
     {
-        $this->where = new \stdClass();
-        $this->where->dql = $where;
-        $this->where->params = $params;
+        $this->queryBuilder->setWhere($where, $params);
         return $this;
-    }
-    
-    /**
-     * get search
-     * 
-     * @return boolean
-     */
-    public function getSearch()
-    {
-        return $this->search;
     }
 
     /**
@@ -410,34 +309,7 @@ class Datatable
     public function setSearch($search)
     {
         $this->search = $search;
-        return $this;
-    }
-
-    /**
-     * add join
-     * 
-     * @example:
-     *      ->setJoin( 
-     *              'r.event', 
-     *              'e', 
-     *              \Doctrine\ORM\Query\Expr\Join::INNER_JOIN, 
-     *              'e.name like %test%') 
-     * 
-     * @param string $join_field
-     * @param string $alias
-     * @param string $type
-     * @param string $cond
-     * 
-     * @return Datatable 
-     */
-    public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
-    {
-        $dql_join = " {$type} join {$join_field} {$alias} ";
-        if ($cond != '')
-        {
-            $dql_join .= " with {$cond} ";
-        }
-        $this->joins[] = $dql_join;
+        $this->queryBuilder->setSearch($search);
         return $this;
     }
 
@@ -482,34 +354,23 @@ class Datatable
     }
 
     /**
-     * execute
-     *
-     * @return Response 
+     * set datatable identifier
+     * 
+     * @param string $id
+     * 
+     * @return Datatable 
      */
-    public function execute($hydration_mode = Query::HYDRATE_ARRAY)
+    public function setDatatableId($id)
     {
-        $request       = $this->request;
-        $iTotalRecords = $this->_getTotalRecords();
-        $data          = $this->_getData($hydration_mode);
-        if (!is_null($this->fixed_data))
+        if (!array_key_exists($id, self::$instances))
         {
-            $this->fixed_data = array_reverse($this->fixed_data);
-            foreach ($this->fixed_data as $item)
-            {
-                array_unshift($data, $item);
-            }
+            self::$instances[$id] = $this;
         }
-        if (!is_null($this->renderer))
+        else
         {
-            array_walk($data, $this->renderer);
+            throw new \Exception('Identifer already exists');
         }
-        $output = array(
-            "sEcho"                => intval($request->get('sEcho')),
-            "iTotalRecords"        => $iTotalRecords,
-            "iTotalDisplayRecords" => $iTotalRecords,
-            "aaData"               => $data
-        );
-        return new Response(json_encode($output));
+        return $this;
     }
 
 }
