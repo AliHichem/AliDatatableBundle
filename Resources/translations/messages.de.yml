@@ -1,21 +1,21 @@
 ali:
     common:
-        action: Acties
-        confirm_delete: "Weet u zeker dat u dit item wilt verwijderen?"
-        delete: verwijderen
-        edit: bewerk
-        no_action: "(kan niet verwijderen)"
-        sProcessing: "Bezig..."
-        sLengthMenu: "_MENU_ resultaten weergeven"
-        sZeroRecords: "Geen resultaten gevonden"
-        sInfo: "_START_ tot _END_ van _TOTAL_ resultaten"
-        sInfoEmpty: "Geen resultaten om weer te geven"
-        sInfoFiltered: "(gefilterd uit _MAX_ resultaten)"
+        action: Aktionen
+        confirm_delete: "Möchten Sie diesen Eintrag wirklich löschen?"
+        delete: löschen
+        edit: editieren
+        no_action: "(kann nicht löschen)"
+        sProcessing: "Bearbeite..."
+        sLengthMenu: "Zeige _MENU_ Einträge"
+        sZeroRecords: "Kein Eintrag gefunden"
+        sInfo: "Zeige _START_ bis _END_ von _TOTAL_ Einträgen"
+        sInfoEmpty: "Zeige 0 bis 0 von 0 Einträgen"
+        sInfoFiltered: "(gefiltert von _MAX_ Einträgen)"
         sInfoPostFix: ""
-        sSearch: "Zoeken:"
-        sLoadingRecords: "Een moment geduld aub - bezig met laden..."
-        sFirst: "Eerste"
-        sPrevious: "Vorige"  
-        sNext: "Volgende"
-        sLast: "Laatste"
-        search: "zoeken"
+        sSearch: "Suchen:"
+        sLoadingRecords: "Ein Moment Geduld..."
+        sFirst: "Erste"
+        sPrevious: "Vorrige"  
+        sNext: "Folgende"
+        sLast: "Letzte"
+        search: "suchen"
