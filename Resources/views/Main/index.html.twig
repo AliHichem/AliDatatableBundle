@@ -39,7 +39,7 @@
             }
         };
         $.extend($defaults,$options);
-        {% if action %} 
+        {% if action and not action_twig %} 
         $.extend($defaults,{
             "aoColumnDefs": [ 
                 {

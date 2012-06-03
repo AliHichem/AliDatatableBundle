@@ -16,7 +16,7 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_01.png"></div>
 
-**Compatibility**: latest successful test with Symfony v"2.0.11". Compatibility with higher version of symfony2 is not guaranteed.
+**Compatibility**: latest successful test with Symfony v"2.0.12". Compatibility with higher version of symfony2 is not guaranteed.
 
 Wiki
 ----

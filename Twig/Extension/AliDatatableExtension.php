@@ -27,7 +27,7 @@ class AliDatatableExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'datatable' => new \Twig_Function_Method($this, 'datatable')
+            'datatable' => new \Twig_Function_Method($this, 'datatable', array("is_safe" => array("html")))
         );
     }
     
@@ -43,6 +43,7 @@ class AliDatatableExtension extends \Twig_Extension
         
         $options['js'] = json_encode($options['js']);
         $options['action'] = $datatable->getHasAction();
+        $options['action_twig'] = $datatable->getHasRendererAction();
         $options['fields'] = $datatable->getFields();
         $options['delete_form'] = $this->createDeleteForm('_id_')->createView();
         $options['search'] = $datatable->getSearch();

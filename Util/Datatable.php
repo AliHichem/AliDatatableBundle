@@ -2,11 +2,13 @@
 
 namespace Ali\DatatableBundle\Util;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface,
+    Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\Query,
     Doctrine\ORM\Query\Expr\Join;
-use Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder;
+use Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
+    Ali\DatatableBundle\Util\Formatter\Renderer,
+    Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder ;
 
 class Datatable
 {
@@ -22,10 +24,28 @@ class Datatable
 
     /** @var \Ali\DatatableBundle\Util\Factory\Query\QueryInterface */
     protected $queryBuilder;
+    
+    /** @var boolean */
     protected $has_action = true;
+ 
+    /** @var boolean */
+    protected $has_renderer_action = false;
+    
+    /** @var array */
     protected $fixed_data = NULL;
+    
+    /** @var closure */
     protected $renderer = NULL;
+    
+    /** @var array */
+    protected $renderers = NULL;
+    
+    /** @var Renderer */
+    protected $renderer_obj = null;
+
+    /** @var boolean */
     protected $search = FALSE;
+    
     protected static $instances = array();
     protected static $current_instance = NULL;
 
@@ -90,6 +110,12 @@ class Datatable
         {
             array_walk($data, $this->renderer);
         }
+        
+        if (!is_null($this->renderer_obj))
+        {
+            $this->renderer_obj->applyTo($data);
+        }
+        
         $output = array(
             "sEcho" => intval($request->get('sEcho')),
             "iTotalRecords" => $iTotalRecords,
@@ -159,6 +185,27 @@ class Datatable
     }
 
     /**
+     * get has_action
+     * 
+     * @return boolean
+     */
+    public function getHasAction()
+    {
+        return $this->has_action;
+    }
+
+    
+    /**
+     * retrun true if the actions column is overridden by twig renderer
+     * 
+     * @return boolean
+     */
+    public function getHasRendererAction()
+    {
+        return $this->has_renderer_action;
+    }
+        
+    /**
      * get order field
      *
      * @return string
@@ -179,23 +226,15 @@ class Datatable
     }
 
     /**
-     * get has_action
+     * create raw prototype
+     *
+     * @param string $type
      * 
-     * @return boolean
+     * @return PrototypeBuilder 
      */
-    public function getHasAction()
+    public function getPrototype($type)
     {
-        return $this->has_action;
-    }
-
-    /**
-     * get search
-     * 
-     * @return boolean
-     */
-    public function getSearch()
-    {
-        return $this->search;
+        return new PrototypeBuilder($this->container,$type);
     }
     
     /**
@@ -208,7 +247,17 @@ class Datatable
         return $this->queryBuilder;
     }
 
-        /**
+    /**
+     * get search
+     * 
+     * @return boolean
+     */
+    public function getSearch()
+    {
+        return $this->search;
+    }
+
+    /**
      * set entity
      * 
      * @param type $entity_name
@@ -286,34 +335,6 @@ class Datatable
     }
 
     /**
-     * set query where
-     * 
-     * @param string $where
-     * @param array  $params
-     * 
-     * @return Datatable 
-     */
-    public function setWhere($where, array $params = array())
-    {
-        $this->queryBuilder->setWhere($where, $params);
-        return $this;
-    }
-
-    /**
-     * set search
-     * 
-     * @param bool $search
-     * 
-     * @return Datatable
-     */
-    public function setSearch($search)
-    {
-        $this->search = $search;
-        $this->queryBuilder->setSearch($search);
-        return $this;
-    }
-
-    /**
      * set a php closure as renderer
      * 
      * @example:
@@ -350,6 +371,78 @@ class Datatable
     public function setRenderer(\Closure $renderer)
     {
         $this->renderer = $renderer;
+        return $this;
+    }
+    
+    /**
+     * set renderers as twig views
+     * 
+     * @example: To override the actions column
+     * 
+     *      ->setFields(
+     *          array(
+     *             "field label 1" => 'x.field1',
+     *             "field label 2" => 'x.field2',
+     *             "_identifier_"  => 'x.id'
+     *          )
+     *      )
+     *      ->setRenderers(
+     *          array(
+     *             2 => array(
+     *               'view' => 'AliDatatableBundle:Renderers:_actions.html.twig',
+     *               'params' => array(
+     *                  'edit_route'    => 'matche_edit',
+     *                  'delete_route'  => 'matche_delete',
+     *                  'delete_form_prototype'   => $datatable->getPrototype('delete_form')
+     *               ),
+     *             ),
+     *          )
+     *       )
+     * 
+     * @param array $renderers
+     * 
+     * @return Datatable 
+     */
+    public function setRenderers(array $renderers)
+    {
+        $this->renderers = $renderers;
+        if (!empty($this->renderers))
+        {
+            $this->renderer_obj = new Renderer($this->container, $this->renderers, $this->getFields());
+        }
+        $actions_index = array_search('_identifier_',array_keys($this->getFields()));
+        if ( $actions_index != FALSE && isset($renderers[$actions_index]) )
+        {
+            $this->has_renderer_action = true;
+        }
+        return $this;
+    }
+
+    /**
+     * set query where
+     * 
+     * @param string $where
+     * @param array  $params
+     * 
+     * @return Datatable 
+     */
+    public function setWhere($where, array $params = array())
+    {
+        $this->queryBuilder->setWhere($where, $params);
+        return $this;
+    }
+
+    /**
+     * set search
+     * 
+     * @param bool $search
+     * 
+     * @return Datatable
+     */
+    public function setSearch($search)
+    {
+        $this->search = $search;
+        $this->queryBuilder->setSearch($search);
         return $this;
     }
 
