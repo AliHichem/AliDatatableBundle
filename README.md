@@ -10,17 +10,17 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * twig extension: for view integration.
  * dynamic pager handler : no need to set your pager.
  * default action link builder: if activated, the bundle generates default edit/delete links. 
- * support doctrine2 association
- * support of doctrine query builder
- * support of column search
+ * support doctrine2 association.
+ * support of doctrine query builder.
+ * support of column search.
+ * support of custom twig/phpClosure renderers.
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_01.png"></div>
 
-**Compatibility**: latest successful test with Symfony v"2.0.12". Compatibility with higher version of symfony2 is not guaranteed.
+**Compatibility**: latest successful test with Symfony v"2.0.15". Compatibility with higher version of symfony2 is not guaranteed.
 
 Wiki
 ----
-
 
 ### [Getting started](https://github.com/AliHichem/AliDatatableBundle/wiki/Getting-Started)
 ### [Installation](https://github.com/AliHichem/AliDatatableBundle/wiki/Installation)
