@@ -44,9 +44,11 @@ class Renderer
      */
     public function _applyView($view_path, array $params)
     {
-        return $this->_container
+        $out = $this->_container
                         ->get('templating')
                         ->render($view_path, $params);
+        $out = html_entity_decode($out);
+        return $out;
     }
 
     /**
