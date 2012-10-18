@@ -1,6 +1,6 @@
 {
     "name": "ali/datatable",
-    "type": "bundle",
+    "type": "symfony-bundle",
     "description": "Symfony2 Ajax Datagrid Bundle for doctrine2 entities",
     "keywords": ["symfony2","jquery","datatable"],
     "homepage": "https://github.com/AliHichem/AliDatatableBundle.git",
