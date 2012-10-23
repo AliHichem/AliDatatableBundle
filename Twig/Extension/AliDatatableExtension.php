@@ -1,22 +1,22 @@
 <?php
 
-
 namespace Ali\DatatableBundle\Twig\Extension;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Ali\DatatableBundle\Util\Datatable ;
+use Ali\DatatableBundle\Util\Datatable;
 
 class AliDatatableExtension extends \Twig_Extension
 {
+
     private $container;
-    
+
     /**
      * class constructor 
      * 
      * @param ContainerInterface $container 
      */
-    public function __construct( ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -30,28 +30,33 @@ class AliDatatableExtension extends \Twig_Extension
             'datatable' => new \Twig_Function_Method($this, 'datatable', array("is_safe" => array("html")))
         );
     }
-    
+
     /**
      * Converts a string to time
      * 
      * @param string $string
      * @return int 
      */
-    public function datatable ($options)
+    public function datatable($options)
     {
-        $datatable = Datatable::getInstance($options['id']); 
-        
-        $options['js'] = json_encode($options['js']);
-        $options['action'] = $datatable->getHasAction();
+        $datatable = Datatable::getInstance($options['id']);
+
+        $options['js']          = json_encode($options['js']);
+        $options['action']      = $datatable->getHasAction();
         $options['action_twig'] = $datatable->getHasRendererAction();
-        $options['fields'] = $datatable->getFields();
+        $options['fields']      = $datatable->getFields();
         $options['delete_form'] = $this->createDeleteForm('_id_')->createView();
-        $options['search'] = $datatable->getSearch();
-        
+        $options['search']      = $datatable->getSearch();
+        $main_template          = 'AliDatatableBundle:Main:index.html.twig';
+        if (isset($options['main_template']))
+        {
+            $main_template = $options['main_template'];
+        }
+
         return $this->container
-                ->get('templating')
-                ->render(
-                        'AliDatatableBundle:Main:index.html.twig', $options);
+                        ->get('templating')
+                        ->render(
+                                $main_template, $options);
     }
 
     /**
@@ -66,7 +71,7 @@ class AliDatatableExtension extends \Twig_Extension
                         ->add('id', 'hidden')
                         ->getForm();
     }
-    
+
     /**
      * create form builder
      * 
@@ -78,7 +83,7 @@ class AliDatatableExtension extends \Twig_Extension
     {
         return $this->container->get('form.factory')->createBuilder('form', $data, $options);
     }
-    
+
     /**
      * Returns the name of the extension.
      *
@@ -88,4 +93,5 @@ class AliDatatableExtension extends \Twig_Extension
     {
         return 'DatatableBundle';
     }
+
 }
