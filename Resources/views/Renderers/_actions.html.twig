@@ -1,3 +1,7 @@
+{% if view_route is defined %}
+    <a href="{{ path(view_route,{'id':dt_item}) }}">view</a>
+{% endif %}
+
 {% if edit_route is defined %}
     <a href="{{ path(edit_route,{'id':dt_item}) }}">edit</a>
 {% endif %}

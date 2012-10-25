@@ -24,35 +24,35 @@ class Datatable
 
     /** @var \Ali\DatatableBundle\Util\Factory\Query\QueryInterface */
     protected $queryBuilder;
-    
+
     /** @var boolean */
     protected $has_action = true;
- 
+
     /** @var boolean */
     protected $has_renderer_action = false;
-    
+
     /** @var array */
     protected $fixed_data = NULL;
-    
+
     /** @var closure */
     protected $renderer = NULL;
-    
+
     /** @var array */
     protected $renderers = NULL;
-    
+
     /** @var Renderer */
     protected $renderer_obj = null;
 
     /** @var boolean */
     protected $search = FALSE;
-    
+
     protected static $instances = array();
     protected static $current_instance = NULL;
 
     /**
-     * class constructor 
-     * 
-     * @param ContainerInterface $container 
+     * class constructor
+     *
+     * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
@@ -65,20 +65,20 @@ class Datatable
 
     /**
      * add join
-     * 
+     *
      * @example:
-     *      ->setJoin( 
-     *              'r.event', 
-     *              'e', 
-     *              \Doctrine\ORM\Query\Expr\Join::INNER_JOIN, 
-     *              'e.name like %test%') 
-     * 
+     *      ->setJoin(
+     *              'r.event',
+     *              'e',
+     *              \Doctrine\ORM\Query\Expr\Join::INNER_JOIN,
+     *              'e.name like %test%')
+     *
      * @param string $join_field
      * @param string $alias
      * @param string $type
      * @param string $cond
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
     {
@@ -88,10 +88,10 @@ class Datatable
 
     /**
      * execute
-     * 
+     *
      * @param int $hydration_mode
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
     public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
@@ -110,12 +110,12 @@ class Datatable
         {
             array_walk($data, $this->renderer);
         }
-        
+
         if (!is_null($this->renderer_obj))
         {
             $this->renderer_obj->applyTo($data);
         }
-        
+
         $output = array(
             "sEcho" => intval($request->get('sEcho')),
             "iTotalRecords" => $iTotalRecords,
@@ -128,9 +128,9 @@ class Datatable
     /**
      * get datatable instance by id
      *  return current instance if null
-     * 
+     *
      * @param string $id
-     * 
+     *
      * @return Datatable .
      */
     public static function getInstance($id)
@@ -156,7 +156,7 @@ class Datatable
 
     /**
      * get entity name
-     * 
+     *
      * @return string
      */
     public function getEntityName()
@@ -166,7 +166,7 @@ class Datatable
 
     /**
      * get entity alias
-     * 
+     *
      * @return string
      */
     public function getEntityAlias()
@@ -176,7 +176,7 @@ class Datatable
 
     /**
      * get fields
-     * 
+     *
      * @return array
      */
     public function getFields()
@@ -186,7 +186,7 @@ class Datatable
 
     /**
      * get has_action
-     * 
+     *
      * @return boolean
      */
     public function getHasAction()
@@ -194,17 +194,17 @@ class Datatable
         return $this->has_action;
     }
 
-    
+
     /**
      * retrun true if the actions column is overridden by twig renderer
-     * 
+     *
      * @return boolean
      */
     public function getHasRendererAction()
     {
         return $this->has_renderer_action;
     }
-        
+
     /**
      * get order field
      *
@@ -217,7 +217,7 @@ class Datatable
 
     /**
      * get order type
-     * 
+     *
      * @return string
      */
     public function getOrderType()
@@ -229,18 +229,18 @@ class Datatable
      * create raw prototype
      *
      * @param string $type
-     * 
-     * @return PrototypeBuilder 
+     *
+     * @return PrototypeBuilder
      */
     public function getPrototype($type)
     {
         return new PrototypeBuilder($this->container,$type);
     }
-    
+
     /**
      * get query builder
-     * 
-     * @return QueryInterface 
+     *
+     * @return QueryInterface
      */
     public function getQueryBuilder()
     {
@@ -249,7 +249,7 @@ class Datatable
 
     /**
      * get search
-     * 
+     *
      * @return boolean
      */
     public function getSearch()
@@ -259,11 +259,11 @@ class Datatable
 
     /**
      * set entity
-     * 
+     *
      * @param type $entity_name
      * @param type $entity_alias
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setEntity($entity_name, $entity_alias)
     {
@@ -273,10 +273,10 @@ class Datatable
 
     /**
      * set fields
-     * 
+     *
      * @param array $fields
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setFields(array $fields)
     {
@@ -286,9 +286,9 @@ class Datatable
 
     /**
      * set has action
-     * 
+     *
      * @param type $has_action
-     * 
+     *
      * @return Datatable
      */
     public function setHasAction($has_action)
@@ -299,11 +299,11 @@ class Datatable
 
     /**
      * set order
-     * 
+     *
      * @param type $order_field
      * @param type $order_type
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setOrder($order_field, $order_type)
     {
@@ -313,21 +313,21 @@ class Datatable
 
     /**
      * set fixed data
-     * 
+     *
      * @param type $data
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setFixedData($data)
     {
         $this->fixed_data = $data;
         return $this;
     }
-    
+
     /**
      * set query builder
-     * 
-     * @param QueryInterface $queryBuilder 
+     *
+     * @param QueryInterface $queryBuilder
      */
     public function setQueryBuilder(QueryInterface $queryBuilder)
     {
@@ -336,9 +336,9 @@ class Datatable
 
     /**
      * set a php closure as renderer
-     * 
+     *
      * @example:
-     * 
+     *
      *  $controller_instance = $this;
      *  $datatable = $this->get('datatable')
      *       ->setEntity("AliBaseBundle:Entity", "e")
@@ -363,22 +363,22 @@ class Datatable
      *               }
      *         )
      *       ->setHasAction(true);
-     * 
+     *
      * @param \Closure $renderer
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setRenderer(\Closure $renderer)
     {
         $this->renderer = $renderer;
         return $this;
     }
-    
+
     /**
      * set renderers as twig views
-     * 
+     *
      * @example: To override the actions column
-     * 
+     *
      *      ->setFields(
      *          array(
      *             "field label 1" => 'x.field1',
@@ -391,6 +391,7 @@ class Datatable
      *             2 => array(
      *               'view' => 'AliDatatableBundle:Renderers:_actions.html.twig',
      *               'params' => array(
+     *                  'view_route'    => 'matche_view',
      *                  'edit_route'    => 'matche_edit',
      *                  'delete_route'  => 'matche_delete',
      *                  'delete_form_prototype'   => $datatable->getPrototype('delete_form')
@@ -398,10 +399,10 @@ class Datatable
      *             ),
      *          )
      *       )
-     * 
+     *
      * @param array $renderers
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setRenderers(array $renderers)
     {
@@ -420,11 +421,11 @@ class Datatable
 
     /**
      * set query where
-     * 
+     *
      * @param string $where
      * @param array  $params
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setWhere($where, array $params = array())
     {
@@ -434,9 +435,9 @@ class Datatable
 
     /**
      * set search
-     * 
+     *
      * @param bool $search
-     * 
+     *
      * @return Datatable
      */
     public function setSearch($search)
@@ -448,10 +449,10 @@ class Datatable
 
     /**
      * set datatable identifier
-     * 
+     *
      * @param string $id
-     * 
-     * @return Datatable 
+     *
+     * @return Datatable
      */
     public function setDatatableId($id)
     {

@@ -46,6 +46,17 @@
                     "fnRender": function ( oObj ) {
                         var $out = '';
 
+                        {% if view_route is defined %}
+                            var $view_url = strtr(
+                                "{{ path(view_route , { 'id': "xx" }) }}",
+                                { "xx": oObj.aData[{{fields|length}}-1] }
+                            );
+                            var $link_view = "<a  style='float:right; margin-right:10px' class='dialog' title='view'";
+                            $link_view += "href='"+$view_url+"'>";
+                            $link_view += "{{ 'ali.common.view'|trans()}}</a>";
+                            $out += $link_view;
+                        {% endif %}
+
                         {% if edit_route is defined %}
                             var $edit_url = strtr(
                                 "{{ path(edit_route , { 'id': "xx" }) }}",
