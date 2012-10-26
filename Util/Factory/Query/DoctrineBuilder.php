@@ -106,20 +106,16 @@ class DoctrineBuilder implements QueryInterface
     }
 
     /**
-     * get data
-     *
-     * @param int $hydration_mode
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function getData($hydration_mode)
+    public function getQuery($hydration_mode)
     {
         $request     = $this->request;
         $dql_fields  = array_values($this->fields);
         $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
         $qb          = clone $this->queryBuilder;
 
-        if (!is_null($order_field)) {
+        if (! is_null($order_field)) {
             $qb->orderBy($order_field, $request->get('sSortDir_0', 'asc'));
         }
 
@@ -137,13 +133,23 @@ class DoctrineBuilder implements QueryInterface
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
 
-        $items                = $query->getResult($hydration_mode);
-        $iTotalDisplayRecords = (string) count($items);
-        $data                 = array();
+        return $query;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData($hydration_mode)
+    {
+        $data  = array();
+        $items = $this->getQuery($hydration_mode)
+            ->getResult($hydration_mode);
+
+        $data['iTotalDisplayRecords'] = (string) count($items);
 
         if ($hydration_mode == Query::HYDRATE_ARRAY) {
             foreach ($items as $item) {
-                $data[] = array_values($item);
+                $data['data'][] = array_values($item);
             }
         } else {
             foreach ($items as $item) {
@@ -152,7 +158,7 @@ class DoctrineBuilder implements QueryInterface
                     $_data[] = $this->getValue($item, $field);
                 }
 
-                $data[] = $_data;
+                $data['data'][] = $_data;
             }
         }
 

@@ -8,11 +8,10 @@ use Doctrine\ORM\Query,
     Doctrine\ORM\Query\Expr\Join;
 use Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
     Ali\DatatableBundle\Util\Formatter\Renderer,
-    Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder ;
+    Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder;
 
 class Datatable
 {
-
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
     protected $container;
 
@@ -45,7 +44,6 @@ class Datatable
 
     /** @var boolean */
     protected $search = FALSE;
-
     protected static $instances = array();
     protected static $current_instance = NULL;
 
@@ -95,33 +93,32 @@ class Datatable
      */
     public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
-        $request = $this->request;
+        $request       = $this->request;
         $iTotalRecords = $this->queryBuilder->getTotalRecords();
-        $data = $this->queryBuilder->getData($hydration_mode);
-        if (!is_null($this->fixed_data))
-        {
+        $data          = $this->queryBuilder->getData($hydration_mode);
+
+        if (! is_null($this->fixed_data)) {
             $this->fixed_data = array_reverse($this->fixed_data);
-            foreach ($this->fixed_data as $item)
-            {
+            foreach ($this->fixed_data as $item) {
                 array_unshift($data, $item);
             }
         }
-        if (!is_null($this->renderer))
-        {
+
+        if (! is_null($this->renderer)) {
             array_walk($data, $this->renderer);
         }
 
-        if (!is_null($this->renderer_obj))
-        {
+        if (! is_null($this->renderer_obj)) {
             $this->renderer_obj->applyTo($data);
         }
 
         $output = array(
-            "sEcho" => intval($request->get('sEcho')),
-            "iTotalRecords" => $iTotalRecords,
-            "iTotalDisplayRecords" => $iTotalRecords,
-            "aaData" => $data
+            'sEcho'                => intval($request->get('sEcho')),
+            'iTotalRecords'        => $iTotalRecords,
+            'iTotalDisplayRecords' => $data['iTotalDisplayRecords'],
+            'aaData'               => $data['data']
         );
+
         return new Response(json_encode($output));
     }
 
@@ -136,17 +133,14 @@ class Datatable
     public static function getInstance($id)
     {
         $instance = NULL;
-        if (array_key_exists($id, self::$instances))
-        {
+
+        if (array_key_exists($id, self::$instances)) {
             $instance = self::$instances[$id];
-        }
-        else
-        {
+        } else {
             $instance = self::$current_instance;
         }
 
-        if (is_null($instance))
-        {
+        if (is_null($instance)) {
             throw new \Exception('No instance found for datatable, you should set a datatable id in your
             action with "setDatatableId" using the id from your view ');
         }
@@ -194,7 +188,6 @@ class Datatable
         return $this->has_action;
     }
 
-
     /**
      * retrun true if the actions column is overridden by twig renderer
      *
@@ -234,7 +227,7 @@ class Datatable
      */
     public function getPrototype($type)
     {
-        return new PrototypeBuilder($this->container,$type);
+        return new PrototypeBuilder($this->container, $type);
     }
 
     /**
@@ -407,15 +400,15 @@ class Datatable
     public function setRenderers(array $renderers)
     {
         $this->renderers = $renderers;
-        if (!empty($this->renderers))
-        {
+        if (!empty($this->renderers)) {
             $this->renderer_obj = new Renderer($this->container, $this->renderers, $this->getFields());
         }
-        $actions_index = array_search('_identifier_',array_keys($this->getFields()));
-        if ( $actions_index != FALSE && isset($renderers[$actions_index]) )
-        {
+
+        $actions_index = array_search('_identifier_', array_keys($this->getFields()));
+        if ($actions_index != FALSE && isset($renderers[$actions_index])) {
             $this->has_renderer_action = true;
         }
+
         return $this;
     }
 
@@ -444,6 +437,7 @@ class Datatable
     {
         $this->search = $search;
         $this->queryBuilder->setSearch($search);
+
         return $this;
     }
 
@@ -456,15 +450,12 @@ class Datatable
      */
     public function setDatatableId($id)
     {
-        if (!array_key_exists($id, self::$instances))
-        {
+        if (!array_key_exists($id, self::$instances)) {
             self::$instances[$id] = $this;
-        }
-        else
-        {
+        } else {
             throw new \Exception('Identifer already exists');
         }
+
         return $this;
     }
-
 }
