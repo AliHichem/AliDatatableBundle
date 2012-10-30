@@ -247,7 +247,7 @@ class DoctrineBuilder implements QueryInterface
      *
      * @param array $fields
      *
-     * @return Datatable
+     * @return DoctrineBuilder
      */
     public function setFields(array $fields)
     {
@@ -339,8 +339,13 @@ class DoctrineBuilder implements QueryInterface
      */
     public function getValue($entity, $field)
     {
-        $entityField = ucfirst(substr($field, strpos($field, '.') + 1));
-        $method = 'get'.$entityField;
+        $entityField = $field;
+        $pos = strpos($field, '.');
+        if ($pos) {
+            $entityField = substr($field, $pos + 1);
+        }
+
+        $method = 'get'.ucfirst($entityField);
         if (method_exists($entity, $method)) {
             return $entity->$method();
         }
