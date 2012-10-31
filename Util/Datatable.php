@@ -96,7 +96,7 @@ class Datatable
         $request       = $this->request;
         $iTotalRecords = $this->queryBuilder->getTotalRecords();
         $result        = $this->queryBuilder->getData($hydration_mode);
-        $data          = $result['data'];
+        $data          = empty($result['data']) ? array() : $result['data'];
 
         if (! is_null($this->fixed_data)) {
             $this->fixed_data = array_reverse($this->fixed_data);
