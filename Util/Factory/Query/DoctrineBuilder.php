@@ -145,11 +145,9 @@ class DoctrineBuilder implements QueryInterface
         $items = $this->getQuery($hydration_mode)
             ->getResult($hydration_mode);
 
-        $data['iTotalDisplayRecords'] = (string) count($items);
-
         if ($hydration_mode == Query::HYDRATE_ARRAY) {
             foreach ($items as $item) {
-                $data['data'][] = array_values($item);
+                $data[] = array_values($item);
             }
         } else {
             foreach ($items as $item) {
@@ -158,7 +156,7 @@ class DoctrineBuilder implements QueryInterface
                     $_data[] = $this->getValue($item, $field);
                 }
 
-                $data['data'][] = $_data;
+                $data[] = $_data;
             }
         }
 
