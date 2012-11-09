@@ -40,14 +40,15 @@ class AliDatatableExtension extends \Twig_Extension
     {
         $datatable = Datatable::getInstance($options['id']);
 
-        $options['js']               = json_encode($options['js']);
-        $options['action']           = $datatable->getHasAction();
-        $options['action_twig']      = $datatable->getHasRendererAction();
-        $options['fields']           = $datatable->getFields();
-        $options['delete_form']      = $this->createDeleteForm('_id_')->createView();
-        $options['search']           = $datatable->getSearch();
-        $options['columnSortStatus'] = $datatable->getColumnSortStatus();
-        $main_template               = 'AliDatatableBundle:Main:index.html.twig';
+        $options['js']                     = json_encode($options['js']);
+        $options['action']                 = $datatable->getHasAction();
+        $options['action_twig']            = $datatable->getHasRendererAction();
+        $options['fields']                 = $datatable->getFields();
+        $options['delete_form']            = $this->createDeleteForm('_id_')->createView();
+        $options['search']                 = $datatable->getSearch();
+        $options['columnSortStatus']       = $datatable->getColumnSortStatus();
+        $options['columnVisibilityStatus'] = $datatable->getColumnVisibilityStatus();
+        $main_template                     = 'AliDatatableBundle:Main:index.html.twig';
 
         if (isset($options['main_template'])) {
             $main_template = $options['main_template'];

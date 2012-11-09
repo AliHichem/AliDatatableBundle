@@ -50,6 +50,14 @@
                         },
                     {% endfor %}
                 {% endif %}
+                {% if columnVisibilityStatus is defined %}
+                    {% for key, value in columnVisibilityStatus %}
+                        {
+                            'bVisible': {% if value %}true{% else %}false{% endif %},
+                            'aTargets': [ {{key}} ]
+                        },
+                    {% endfor %}
+                {% endif %}
                 {
                     "fnRender": function ( oObj ) {
                         var $out = '';

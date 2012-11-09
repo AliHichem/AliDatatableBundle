@@ -55,6 +55,13 @@ class Datatable
     protected $columnSortStatus = array();
 
     /**
+     * Individual column visibility statuses.
+     *
+     * @var array
+     */
+    protected $columnVisibilityStatus = array();
+
+    /**
      * class constructor
      *
      * @param ContainerInterface $container
@@ -265,6 +272,16 @@ class Datatable
     public function getColumnSortStatus()
     {
         return $this->columnSortStatus;
+    }
+
+    /**
+     * Get individual column visibility statuses.
+     *
+     * @return array
+     */
+    public function getColumnVisibilityStatus()
+    {
+        return $this->columnVisibilityStatus;
     }
 
     /**
@@ -491,6 +508,25 @@ class Datatable
         }
 
         $this->columnSortStatus = $sortable;
+
+        return $this;
+    }
+
+    /**
+     * Set individual column visibility statuses.
+     *
+     * @param array $columnVisibilityStatus Default sort statuses.
+     *
+     * @return DoctrineBuilder
+     */
+    public function setColumnVisibilityStatus($columnVisibilityStatus)
+    {
+        $visible = array();
+        foreach($columnVisibilityStatus as $key => $value) {
+            $visible[$key] = (bool)$value;
+        }
+
+        $this->columnVisibilityStatus = $visible;
 
         return $this;
     }
