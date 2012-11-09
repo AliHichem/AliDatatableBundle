@@ -48,6 +48,13 @@ class Datatable
     protected static $current_instance = NULL;
 
     /**
+     * Individual column sort statuses.
+     *
+     * @var array
+     */
+    protected $columnSortStatus = array();
+
+    /**
      * class constructor
      *
      * @param ContainerInterface $container
@@ -251,6 +258,16 @@ class Datatable
     }
 
     /**
+     * Get individual column sort statuses.
+     *
+     * @return array
+     */
+    public function getColumnSortStatus()
+    {
+        return $this->columnSortStatus;
+    }
+
+    /**
      * set entity
      *
      * @param type $entity_name
@@ -400,7 +417,7 @@ class Datatable
     public function setRenderers(array $renderers)
     {
         $this->renderers = $renderers;
-        if (!empty($this->renderers)) {
+        if (! empty($this->renderers)) {
             $this->renderer_obj = new Renderer($this->container, $this->renderers, $this->getFields());
         }
 
@@ -450,11 +467,30 @@ class Datatable
      */
     public function setDatatableId($id)
     {
-        if (!array_key_exists($id, self::$instances)) {
+        if (! array_key_exists($id, self::$instances)) {
             self::$instances[$id] = $this;
         } else {
             throw new \Exception('Identifer already exists');
         }
+
+        return $this;
+    }
+
+    /**
+     * Set individual column sort statuses.
+     *
+     * @param array $columnSortStatus Default sort statuses.
+     *
+     * @return DoctrineBuilder
+     */
+    public function setColumnSortStatus($columnSortStatus)
+    {
+        $sortable = array();
+        foreach($columnSortStatus as $key => $value) {
+            $sortable[$key] = (bool)$value;
+        }
+
+        $this->columnSortStatus = $sortable;
 
         return $this;
     }

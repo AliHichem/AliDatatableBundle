@@ -42,6 +42,14 @@
         {% if action and not action_twig %}
         $.extend($defaults,{
             "aoColumnDefs": [
+                {% if columnSortStatus is defined %}
+                    {% for key, value in columnSortStatus %}
+                        {
+                            'bSortable': {% if value %}true{% else %}false{% endif %},
+                            'aTargets': [ {{key}} ]
+                        },
+                    {% endfor %}
+                {% endif %}
                 {
                     "fnRender": function ( oObj ) {
                         var $out = '';
