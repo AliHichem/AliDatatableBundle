@@ -12,3 +12,9 @@ services:
         arguments: [ '@service_container' ]
         tags:
             -  { name: twig.extension }
+
+    datatable.twig.routing.extension:
+        class: Ali\DatatableBundle\Twig\Extension\RoutingNoRequirementsExtension
+        arguments: [ '@datatable.router' ]
+        tags:
+            -  { name: twig.extension }
