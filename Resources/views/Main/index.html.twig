@@ -39,32 +39,67 @@
             }
         };
         $.extend($defaults,$options);
-        {% if action and not action_twig %} 
+        {% if action and not action_twig %}
         $.extend($defaults,{
-            "aoColumnDefs": [ 
+            "aoColumnDefs": [
+                {% if columnSortStatus is defined %}
+                    {% for key, value in columnSortStatus %}
+                        {
+                            'bSortable': {% if value %}true{% else %}false{% endif %},
+                            'aTargets': [ {{key}} ]
+                        },
+                    {% endfor %}
+                {% endif %}
+                {% if columnVisibilityStatus is defined %}
+                    {% for key, value in columnVisibilityStatus %}
+                        {
+                            'bVisible': {% if value %}true{% else %}false{% endif %},
+                            'aTargets': [ {{key}} ]
+                        },
+                    {% endfor %}
+                {% endif %}
                 {
                     "fnRender": function ( oObj ) {
-                        var $edit_url = strtr(
-                            "{{ path(edit_route , { 'id': "xx" }) }}",
-                            { "xx": oObj.aData[{{fields|length}}-1] }
-                        );
-                        var $link_edit = "<a  style='float:right; margin-right:10px' class='dialog' title='edit'";
-                        $link_edit += "href='"+$edit_url+"'>";
-                        $link_edit += "{{ 'ali.common.edit'|trans()}}</a>";
-                        var $delete_url = strtr(
-                            "{{ path(delete_route, { 'id': "xx" }) }}",
-                            { "xx": oObj.aData[{{fields|length}}-1] }
-                        );
-                        var $link_delete = "<form style='float:right' class='form' action='"+$delete_url+"' method='post'>";
-                        $link_delete += strtr(
-                                            '{{ form_widget(delete_form) }}',
-                                            { "_id_": oObj.aData[{{fields|length}}-1] }
-                                        );
-                        $link_delete += "<button class='button-delete' type='submit'>{{ 'ali.common.delete'|trans() }}</button>";
-                        $link_delete += " </form>";
-                        var $out = $link_delete+ " " + $link_edit ;
-                        if (oObj.aData[{{fields|length}}-1] == null )
-                        {
+                        var $out = '';
+
+                        {% if view_route is defined %}
+                            var $view_url = strtr(
+                                "{{ path(view_route , { 'id': '00' }) }}",
+                                { '00': oObj.aData[{{fields|length}}-1] }
+                            );
+                            var $link_view = "<a  style='float:right; margin-right:10px' class='dialog' title='view'";
+                            $link_view += "href='"+$view_url+"'>";
+                            $link_view += "{{ 'ali.common.view'|trans()}}</a>";
+                            $out += $link_view;
+                        {% endif %}
+
+                        {% if edit_route is defined %}
+                            var $edit_url = strtr(
+                                "{{ path(edit_route , { 'id': '00' }) }}",
+                                { '00': oObj.aData[{{fields|length}}-1] }
+                            );
+                            var $link_edit = "<a  style='float:right; margin-right:10px' class='dialog' title='edit'";
+                            $link_edit += "href='"+$edit_url+"'>";
+                            $link_edit += "{{ 'ali.common.edit'|trans()}}</a>";
+                            $out += $link_edit;
+                        {% endif %}
+
+                        {% if delete_route is defined %}
+                            var $delete_url = strtr(
+                                "{{ path(delete_route, { 'id': '00' }) }}",
+                                { '00': oObj.aData[{{fields|length}}-1] }
+                            );
+                            var $link_delete = "<form style='float:right' class='form' action='"+$delete_url+"' method='post'>";
+                            $link_delete += strtr(
+                                '{{ form_widget(delete_form) }}',
+                                { "_id_": oObj.aData[{{fields|length}}-1] }
+                            );
+                            $link_delete += "<button class='button-delete' type='submit'>{{ 'ali.common.delete'|trans() }}</button>";
+                            $link_delete += " </form>";
+                            $out += $link_delete;
+                        {% endif %}
+
+                        if (oObj.aData[{{fields|length}}-1] == null ) {
                             $out = "<div style='float:right'>{{ 'ali.common.no_action'|trans() }}</div>";
                         }
                         return $out
@@ -75,7 +110,7 @@
         });
         {% endif %}
         eval("var oTable_"+'{{id}}'.split('-').join('_')+"  = $('#{{id}}').dataTable($defaults)");
-        
+
         {% if search %}
         $(".dataTables_filter").remove();
         search_selector = "#{{id}} input[searchable=true]";
@@ -83,12 +118,12 @@
             index = $(this).attr('index');
             oTable = eval('oTable_{{id}}'.split('-').join('_'));
             if (event.keyCode == '13') {
-                oTable.fnFilter( 
-                    this.value, 
-                    oTable.oApi._fnVisibleToColumnIndex( 
-                        oTable.fnSettings(), 
-                        index 
-                    ) 
+                oTable.fnFilter(
+                    this.value,
+                    oTable.oApi._fnVisibleToColumnIndex(
+                        oTable.fnSettings(),
+                        index
+                    )
                 );
             }
         }).each( function (i) {
@@ -106,10 +141,10 @@
         });
         {% endif %}
     });
-    </script>    
-    <table class="display" id="{{id}}"> 
-        <thead> 
-            <tr> 
+    </script>
+    <table class="display" id="{{id}}">
+        <thead>
+            <tr>
             {% for label,key in fields %}
                 {% if label != '_identifier_' %}
                     <th>{{ label }}</th>
@@ -118,7 +153,7 @@
             {% if action %}
                 <th>{{ 'ali.common.action'|trans()  }}</th>
             {% endif %}
-            </tr> 
+            </tr>
         </thead>
         {% if search %}
             {% set i = 0 %}

@@ -8,13 +8,12 @@ use Ali\DatatableBundle\Util\Datatable;
 
 class AliDatatableExtension extends \Twig_Extension
 {
-
-    private $container;
+    protected $container;
 
     /**
-     * class constructor 
-     * 
-     * @param ContainerInterface $container 
+     * class constructor
+     *
+     * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)
     {
@@ -27,57 +26,58 @@ class AliDatatableExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'datatable' => new \Twig_Function_Method($this, 'datatable', array("is_safe" => array("html")))
+            'datatable' => new \Twig_Function_Method($this, 'datatable', array('is_safe' => array('html')))
         );
     }
 
     /**
      * Converts a string to time
-     * 
+     *
      * @param string $string
-     * @return int 
+     * @return int
      */
     public function datatable($options)
     {
         $datatable = Datatable::getInstance($options['id']);
 
-        $options['js']          = json_encode($options['js']);
-        $options['action']      = $datatable->getHasAction();
-        $options['action_twig'] = $datatable->getHasRendererAction();
-        $options['fields']      = $datatable->getFields();
-        $options['delete_form'] = $this->createDeleteForm('_id_')->createView();
-        $options['search']      = $datatable->getSearch();
-        $main_template          = 'AliDatatableBundle:Main:index.html.twig';
-        if (isset($options['main_template']))
-        {
+        $options['js']                     = json_encode($options['js']);
+        $options['action']                 = $datatable->getHasAction();
+        $options['action_twig']            = $datatable->getHasRendererAction();
+        $options['fields']                 = $datatable->getFields();
+        $options['delete_form']            = $this->createDeleteForm('_id_')->createView();
+        $options['search']                 = $datatable->getSearch();
+        $options['columnSortStatus']       = $datatable->getColumnSortStatus();
+        $options['columnVisibilityStatus'] = $datatable->getColumnVisibilityStatus();
+        $main_template                     = 'AliDatatableBundle:Main:index.html.twig';
+
+        if (isset($options['main_template'])) {
             $main_template = $options['main_template'];
         }
 
         return $this->container
-                        ->get('templating')
-                        ->render(
-                                $main_template, $options);
+            ->get('templating')
+            ->render($main_template, $options);
     }
 
     /**
      * create delete form
-     * 
+     *
      * @param type $id
-     * @return type 
+     * @return type
      */
-    private function createDeleteForm($id)
+    protected function createDeleteForm($id)
     {
         return $this->createFormBuilder(array('id' => $id))
-                        ->add('id', 'hidden')
-                        ->getForm();
+            ->add('id', 'hidden')
+            ->getForm();
     }
 
     /**
      * create form builder
-     * 
+     *
      * @param type $data
      * @param array $options
-     * @return type 
+     * @return type
      */
     public function createFormBuilder($data = null, array $options = array())
     {
@@ -93,5 +93,4 @@ class AliDatatableExtension extends \Twig_Extension
     {
         return 'DatatableBundle';
     }
-
 }

@@ -1,5 +1,14 @@
-<form action="{{ path(delete_route , { 'id': dt_item }) }}" method="post" style="float:right">
-    {{ delete_form_prototype | replace ({'@id':dt_item}) | raw  }}
-    <button type="submit">Delete</button>
-</form>
-<a href="{{ path(edit_route,{'id':dt_item}) }}">edit</a>
+{% if view_route is defined %}
+    <a href="{{ path(view_route,{'id':dt_item}) }}">view</a>
+{% endif %}
+
+{% if edit_route is defined %}
+    <a href="{{ path(edit_route,{'id':dt_item}) }}">edit</a>
+{% endif %}
+
+{% if delete_route is defined %}
+    <form action="{{ path(delete_route , { 'id': dt_item }) }}" method="post" style="float:right">
+        {{ delete_form_prototype | replace ({'@id':dt_item}) | raw  }}
+        <button type="submit">delete</button>
+    </form>
+{% endif %}

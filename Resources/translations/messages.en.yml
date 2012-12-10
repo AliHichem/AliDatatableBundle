@@ -4,6 +4,7 @@ ali:
         confirm_delete: "Are you sure to delete this item ?"
         delete: delete
         edit: edit
+        view: view
         no_action: "(can't remove)"
         sProcessing: "Processing..."
         sLengthMenu: "Show _MENU_ entries"
@@ -15,7 +16,7 @@ ali:
         sSearch: "Search:"
         sLoadingRecords: ""
         sFirst: "First"
-        sPrevious: "Previous"  
+        sPrevious: "Previous"
         sNext: "Next"
         sLast: "Last"
         search: "Search"
