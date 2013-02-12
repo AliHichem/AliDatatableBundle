@@ -105,6 +105,7 @@ class DoctrineBuilder implements QueryInterface
         $qb = clone $this->queryBuilder;
         $this->_addSearch($qb);
         $qb->select(" count({$this->fields['_identifier_']}) ");
+        $qb->resetDQLPart('orderBy');
         return $qb->getQuery()->getSingleScalarResult();
     }
 
@@ -119,11 +120,17 @@ class DoctrineBuilder implements QueryInterface
     {
         $request = $this->request;
         $dql_fields = array_values($this->fields);
-        $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
+        if($request->get('iSortCol_0')!= null){
+            $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
+        }else{
+            $order_field = null;
+        }
         $qb = clone $this->queryBuilder;
         if (!is_null($order_field))
         {
             $qb->orderBy($order_field, $request->get('sSortDir_0', 'asc'));
+        }else{
+            $qb->resetDQLPart('orderBy');
         }
         if ($hydration_mode == Query::HYDRATE_ARRAY)
         {
