@@ -2,9 +2,9 @@ ali:
     common:
         action: Eylemler
         confirm_delete: "Bu öğeyi silmek istediğinizden emin misiniz?"
-        delete: silmek
-        edit: düzenleme
-        no_action: "(silemezsiniz)"
+        delete: Sil
+        edit: Düzenle
+        no_action: "(Silemezsiniz)"
         sProcessing:   "İşleniyor..."
         sLengthMenu:   "Sayfada _MENU_ Kayıt Göster"
         sZeroRecords:  "Eşleşen Kayıt Bulunmadı"
@@ -17,4 +17,4 @@ ali:
         sPrevious: "Önceki"
         sNext:     "Sonraki"
         sLast:     "Son"
-        search:   "arama"
+        search:   "Arama"
