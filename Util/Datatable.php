@@ -6,7 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface,
     Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\Query,
     Doctrine\ORM\Query\Expr\Join;
-use Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
+use Ali\DatatableBundle\Util\Factory\Query\QueryInterface,
+    Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
     Ali\DatatableBundle\Util\Formatter\Renderer,
     Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder ;
 
