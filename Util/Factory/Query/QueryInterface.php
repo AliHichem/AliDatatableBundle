@@ -105,6 +105,15 @@ interface QueryInterface
     function setWhere($where, array $params = array());
 
     /**
+     * set search
+     *
+     * @param bool $search
+     *
+     * @return Datatable
+     */
+    function setSearch($search); 
+
+    /**
      * add join
      * 
      * @example:
