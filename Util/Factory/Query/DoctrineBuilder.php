@@ -308,6 +308,19 @@ class DoctrineBuilder implements QueryInterface
     }
 
     /**
+     * set query group
+     * 
+     * @param string $group
+     * 
+     * @return Datatable 
+     */
+    public function setGroupBy($group)
+    {
+        $this->queryBuilder->groupBy($group);
+        return $this;
+    }
+
+    /**
      * set search
      * 
      * @param bool $search
