@@ -42,13 +42,12 @@ class Renderer
      * 
      * @return string
      */
-    public function _applyView($view_path, array $params)
+    public function applyView($view_path, array $params)
     {
         $out = $this->_container
                         ->get('templating')
                         ->render($view_path, $params);
-        $out = html_entity_decode($out);
-        return $out;
+        return html_entity_decode($out);
     }
 
     /**
@@ -86,7 +85,7 @@ class Renderer
                     $view = 'AliDatatableBundle:Renderers:_default.html.twig';
                 }
                 $params = array_merge($params, array('dt_item' => $data[$row_index][$column_index]));
-                $data[$row_index][$column_index] = $this->_applyView(
+                $data[$row_index][$column_index] = $this->applyView(
                         $view, $params
                 );
             }

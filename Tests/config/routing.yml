@@ -1,3 +1,9 @@
-supercolegio_wizard_homepage:
+_homepage:
     pattern:  /
-    defaults: { _controller: AliDatatableBundle:Default:index }
+    defaults: { _controller: AliDatatableBundle:Test:index }
+_delete:
+    pattern:  /
+    defaults: { _controller: AliDatatableBundle:Test:delete }
+_edit:
+    pattern:  /
+    defaults: { _controller: AliDatatableBundle:Test:edit }

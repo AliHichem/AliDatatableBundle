@@ -20,17 +20,39 @@ class DoctrineBuilder implements QueryInterface
 
     /** @var \Doctrine\ORM\QueryBuilder */
     protected $queryBuilder;
+
+    /** @var string */
     protected $entity_name;
+
+    /** @var string */
     protected $entity_alias;
+
+    /** @var array */
     protected $fields;
+
+    /** @var string */
     protected $order_field = NULL;
-    protected $order_type = "asc";
-    protected $where = NULL;
-    protected $joins = array();
-    protected $has_action = true;
-    protected $fixed_data = NULL;
-    protected $renderer = NULL;
-    protected $search = FALSE;
+
+    /** @var string */
+    protected $order_type  = "asc";
+
+    /** @var string */
+    protected $where       = NULL;
+
+    /** @var array */
+    protected $joins       = array();
+
+    /** @var boolean */
+    protected $has_action  = true;
+
+    /** @var array */
+    protected $fixed_data  = NULL;
+
+    /** @var closure */
+    protected $renderer    = NULL;
+
+    /** @var boolean */
+    protected $search      = FALSE;
 
     /**
      * class constructor 
@@ -39,9 +61,9 @@ class DoctrineBuilder implements QueryInterface
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
-        $this->em = $this->container->get('doctrine.orm.entity_manager');
-        $this->request = $this->container->get('request');
+        $this->container    = $container;
+        $this->em           = $this->container->get('doctrine.orm.entity_manager');
+        $this->request      = $this->container->get('request');
         $this->queryBuilder = $this->em->createQueryBuilder();
     }
 
@@ -54,11 +76,12 @@ class DoctrineBuilder implements QueryInterface
     {
         if ($this->search == TRUE)
         {
-            $request = $this->request;
+            $request       = $this->request;
             $search_fields = array_values($this->fields);
             foreach ($search_fields as $i => $search_field)
             {
-                if($request->get("sSearch_{$i}")){ 
+                if ($request->get("sSearch_{$i}"))
+                {
                     $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
                 }
             }
@@ -88,9 +111,7 @@ class DoctrineBuilder implements QueryInterface
         {
             $cond = " with {$cond} ";
         }
-        $join_method = $type == Join::INNER_JOIN
-                ? "innerJoin"
-                : "leftJoin";
+        $join_method = $type == Join::INNER_JOIN ? "innerJoin" : "leftJoin";
         $this->queryBuilder->$join_method($join_field, $alias, null, $cond);
         return $this;
     }
@@ -118,18 +139,23 @@ class DoctrineBuilder implements QueryInterface
      */
     public function getData($hydration_mode)
     {
-        $request = $this->request;
+        $request    = $this->request;
         $dql_fields = array_values($this->fields);
-        if($request->get('iSortCol_0')!= null){
+        if ($request->get('iSortCol_0') != null)
+        {
             $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
-        }else{
+        }
+        else
+        {
             $order_field = null;
         }
         $qb = clone $this->queryBuilder;
         if (!is_null($order_field))
         {
             $qb->orderBy($order_field, $request->get('sSortDir_0', 'asc'));
-        }else{
+        }
+        else
+        {
             $qb->resetDQLPart('orderBy');
         }
         if ($hydration_mode == Query::HYDRATE_ARRAY)
@@ -141,15 +167,15 @@ class DoctrineBuilder implements QueryInterface
             $qb->select($this->entity_alias);
         }
         $this->_addSearch($qb);
-        $query = $qb->getQuery();
+        $query          = $qb->getQuery();
         $iDisplayLength = (int) $request->get('iDisplayLength');
         if ($iDisplayLength > 0)
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
-        $items = $query->getResult($hydration_mode);
+        $items                = $query->getResult($hydration_mode);
         $iTotalDisplayRecords = (string) count($items);
-        $data = array();
+        $data                 = array();
         if ($hydration_mode == Query::HYDRATE_ARRAY)
         {
             foreach ($items as $item)
@@ -164,7 +190,7 @@ class DoctrineBuilder implements QueryInterface
                 $_data = array();
                 foreach ($this->fields as $field)
                 {
-                    $method = "get" . ucfirst(substr($field, strpos($field, '.') + 1));
+                    $method  = "get" . ucfirst(substr($field, strpos($field, '.') + 1));
                     $_data[] = $item->$method();
                 }
                 $data[] = $_data;
@@ -222,7 +248,7 @@ class DoctrineBuilder implements QueryInterface
     {
         return $this->order_type;
     }
-    
+
     /**
      * get doctrine query builder
      * 
@@ -232,7 +258,7 @@ class DoctrineBuilder implements QueryInterface
     {
         return $this->queryBuilder;
     }
-    
+
     /**
      * set entity
      * 
@@ -243,7 +269,7 @@ class DoctrineBuilder implements QueryInterface
      */
     public function setEntity($entity_name, $entity_alias)
     {
-        $this->entity_name = $entity_name;
+        $this->entity_name  = $entity_name;
         $this->entity_alias = $entity_alias;
         $this->queryBuilder->from($entity_name, $entity_alias);
         return $this;
@@ -274,7 +300,7 @@ class DoctrineBuilder implements QueryInterface
     public function setOrder($order_field, $order_type)
     {
         $this->order_field = $order_field;
-        $this->order_type = $order_type;
+        $this->order_type  = $order_type;
         $this->queryBuilder->orderBy($order_field, $order_type);
         return $this;
     }
@@ -332,5 +358,5 @@ class DoctrineBuilder implements QueryInterface
         $this->queryBuilder = $queryBuilder;
         return $this;
     }
-    
+
 }
