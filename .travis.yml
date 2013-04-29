@@ -10,9 +10,9 @@ matrix:
     - php: 5.5
 
 env:
-  - SYMFONY_VERSION=v2.0.15
-  - SYMFONY_VERSION=v2.1.*
-  - SYMFONY_VERSION=v2.2.*
-  - SYMFONY_VERSION=origin/master
+  - SYMFONY_VERSION=2.0.15
+  - SYMFONY_VERSION=2.1.*
+  - SYMFONY_VERSION=2.2.*
+  - SYMFONY_VERSION=dev-master
   
-before_script: php vendor/vendors.php
+before_script: composer install --dev  
