@@ -125,9 +125,14 @@
             <tfoot>
                 <tr>
                 {% for label,key in fields %}
-                    {% if label != '_identifier_' %}
-                    <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
-                    {% set i = i+1 %}
+                    {% if search_columns is not empty %}
+                        {% if label in search_columns %}
+                            <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                            {% set i = i+1 %}
+                        {% endif %}
+                    {% elseif label != '_identifier_' %}
+                        <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                        {% set i = i+1 %}
                     {% endif %}
                 {% endfor %}
                 </tr>

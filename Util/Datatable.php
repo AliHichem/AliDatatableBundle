@@ -259,6 +259,16 @@ class Datatable
     }
 
     /**
+     * Gets the search columns
+     *
+     * @return array the searchcolumns
+     */
+    public function getSearchColumns()
+    {
+        return $this->searchColumns;
+    }
+
+    /**
      * set entity
      * 
      * @param type $entity_name
@@ -444,6 +454,17 @@ class Datatable
     {
         $this->search = $search;
         $this->queryBuilder->setSearch($search);
+        return $this;
+    }
+
+    /**
+     * Set columns that should have search enabled
+     *
+     * @param array $searchColumns The searchable columns
+     */
+    public function setSearchColumns($searchColumns)
+    {
+        $this->searchColumns = $searchColumns;
         return $this;
     }
 
