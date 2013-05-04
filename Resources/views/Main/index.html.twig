@@ -1,7 +1,7 @@
 {% block main %}
 <script type="text/javascript">
     $(document).ready(function(){
-        $('.button-delete').die().live('click',function(){
+        $(document).on('click','.button-delete',function(){
             if (!confirm('{{ 'ali.common.confirm_delete'|trans()  }}')) {
                 return false;
             }
@@ -126,9 +126,11 @@
                 <tr>
                 {% for label,key in fields %}
                     {% if label != '_identifier_' %}
-                    <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
-                    {% set i = i+1 %}
+                        <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                    {% elseif label == '_identifier_'and action and not action_twig %}
+                        <td></td>
                     {% endif %}
+                    {% set i = i+1 %}
                 {% endfor %}
                 </tr>
             </tfoot>

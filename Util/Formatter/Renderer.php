@@ -30,7 +30,7 @@ class Renderer
     {
         $this->_container = $container;
         $this->_renderers = $renderers;
-        $this->_fields = $fields;
+        $this->_fields    = $fields;
         $this->_prepare();
     }
 
@@ -45,8 +45,8 @@ class Renderer
     public function applyView($view_path, array $params)
     {
         $out = $this->_container
-                        ->get('templating')
-                        ->render($view_path, $params);
+                ->get('templating')
+                ->render($view_path, $params);
         return html_entity_decode($out);
     }
 
@@ -77,14 +77,18 @@ class Renderer
                 $params = array();
                 if (array_key_exists($column_index, $this->_renderers))
                 {
-                    $view = $this->_renderers[$column_index]['view'];
-                    $params = $this->_renderers[$column_index]['params'];
+                    $view   = $this->_renderers[$column_index]['view'];
+                    $params = isset($this->_renderers[$column_index]['params']) ? $this->_renderers[$column_index]['params'] : array();
                 }
                 else
                 {
                     $view = 'AliDatatableBundle:Renderers:_default.html.twig';
                 }
-                $params = array_merge($params, array('dt_item' => $data[$row_index][$column_index]));
+                $params                          = array_merge($params, array(
+                    'dt_item' => $data[$row_index][$column_index],
+                    'dt_id'   => $data[$row_index][$this->_identifier_index]
+                        )
+                );
                 $data[$row_index][$column_index] = $this->applyView(
                         $view, $params
                 );
