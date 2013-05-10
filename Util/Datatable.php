@@ -15,6 +15,9 @@ class Datatable
 {
 
     /** @var array */
+    protected $_fixed_data = NULL;
+
+    /** @var array */
     protected $_config;
 
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
@@ -23,41 +26,41 @@ class Datatable
     /** @var \Doctrine\ORM\EntityManager */
     protected $_em;
 
-    /** @var \Symfony\Component\HttpFoundation\Request */
-    protected $_request;
-
-    /** @var \Ali\DatatableBundle\Util\Factory\Query\QueryInterface */
-    protected $queryBuilder;
+    /** @var boolean */
+    protected $_has_action;
 
     /** @var boolean */
-    protected $has_action;
-
-    /** @var boolean */
-    protected $has_renderer_action = false;
-
-    /** @var array */
-    protected $fixed_data = NULL;
-
-    /** @var closure */
-    protected $renderer = NULL;
-
-    /** @var array */
-    protected $renderers = NULL;
-
-    /** @var Renderer */
-    protected $renderer_obj = null;
-
-    /** @var boolean */
-    protected $search;
+    protected $_has_renderer_action = false;
 
     /** @var array */
     protected $_multiple;
 
+    /** @var \Ali\DatatableBundle\Util\Factory\Query\QueryInterface */
+    protected $_queryBuilder;
+
+    /** @var \Symfony\Component\HttpFoundation\Request */
+    protected $_request;
+
+    /** @var closure */
+    protected $_renderer = NULL;
+
     /** @var array */
-    protected static $instances = array();
+    protected $_renderers = NULL;
+
+    /** @var Renderer */
+    protected $_renderer_obj = null;
+
+    /** @var boolean */
+    protected $_search;
+
+    /** @var array */
+    protected $_search_fields = array();
+    
+    /** @var array */
+    protected static $_instances = array();
 
     /** @var Datatable */
-    protected static $current_instance = NULL;
+    protected static $_current_instance = NULL;
 
     /**
      * class constructor 
@@ -70,8 +73,8 @@ class Datatable
         $this->_config      = $this->_container->getParameter('ali_datatable');
         $this->_em          = $this->_container->get('doctrine.orm.entity_manager');
         $this->_request      = $this->_container->get('request');
-        $this->queryBuilder = new DoctrineBuilder($container);
-        self::$current_instance = $this;
+        $this->_queryBuilder = new DoctrineBuilder($container);
+        self::$_current_instance = $this;
         $this->_applyDefaults();
     }
 
@@ -86,8 +89,8 @@ class Datatable
         {
             
         }
-        $this->has_action = $this->_config['all']['action'];
-        $this->search     = $this->_config['all']['search'];
+        $this->_has_action = $this->_config['all']['action'];
+        $this->_search     = $this->_config['all']['search'];
     }
 
     /**
@@ -109,7 +112,7 @@ class Datatable
      */
     public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
     {
-        $this->queryBuilder->addJoin($join_field, $alias, $type, $cond);
+        $this->_queryBuilder->addJoin($join_field, $alias, $type, $cond);
         return $this;
     }
 
@@ -123,28 +126,28 @@ class Datatable
     public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
         $request       = $this->_request;
-        $iTotalRecords = $this->queryBuilder->getTotalRecords();
-        $data          = $this->queryBuilder->getData($hydration_mode);
+        $iTotalRecords = $this->_queryBuilder->getTotalRecords();
+        $data          = $this->_queryBuilder->getData($hydration_mode);
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
                     $ids[$key] = $val[$id_index];
                 });
-        if (!is_null($this->fixed_data))
+        if (!is_null($this->_fixed_data))
         {
-            $this->fixed_data = array_reverse($this->fixed_data);
-            foreach ($this->fixed_data as $item)
+            $this->_fixed_data = array_reverse($this->_fixed_data);
+            foreach ($this->_fixed_data as $item)
             {
                 array_unshift($data, $item);
             }
         }
-        if (!is_null($this->renderer))
+        if (!is_null($this->_renderer))
         {
-            array_walk($data, $this->renderer);
+            array_walk($data, $this->_renderer);
         }
-        if (!is_null($this->renderer_obj))
+        if (!is_null($this->_renderer_obj))
         {
-            $this->renderer_obj->applyTo($data);
+            $this->_renderer_obj->applyTo($data);
         }
         if (!empty($this->_multiple))
         {
@@ -173,13 +176,13 @@ class Datatable
     public static function getInstance($id)
     {
         $instance = NULL;
-        if (array_key_exists($id, self::$instances))
+        if (array_key_exists($id, self::$_instances))
         {
-            $instance = self::$instances[$id];
+            $instance = self::$_instances[$id];
         }
         else
         {
-            $instance = self::$current_instance;
+            $instance = self::$_current_instance;
         }
 
         if (is_null($instance))
@@ -198,7 +201,7 @@ class Datatable
      */
     public function getEntityName()
     {
-        return $this->queryBuilder->getEntityName();
+        return $this->_queryBuilder->getEntityName();
     }
 
     /**
@@ -208,7 +211,7 @@ class Datatable
      */
     public function getEntityAlias()
     {
-        return $this->queryBuilder->getEntityAlias();
+        return $this->_queryBuilder->getEntityAlias();
     }
 
     /**
@@ -218,7 +221,7 @@ class Datatable
      */
     public function getFields()
     {
-        return $this->queryBuilder->getFields();
+        return $this->_queryBuilder->getFields();
     }
 
     /**
@@ -228,7 +231,7 @@ class Datatable
      */
     public function getHasAction()
     {
-        return $this->has_action;
+        return $this->_has_action;
     }
 
     /**
@@ -238,7 +241,7 @@ class Datatable
      */
     public function getHasRendererAction()
     {
-        return $this->has_renderer_action;
+        return $this->_has_renderer_action;
     }
 
     /**
@@ -248,7 +251,7 @@ class Datatable
      */
     public function getOrderField()
     {
-        return $this->queryBuilder->getOrderField();
+        return $this->_queryBuilder->getOrderField();
     }
 
     /**
@@ -258,7 +261,7 @@ class Datatable
      */
     public function getOrderType()
     {
-        return $this->queryBuilder->getOrderType();
+        return $this->_queryBuilder->getOrderType();
     }
 
     /**
@@ -280,7 +283,7 @@ class Datatable
      */
     public function getQueryBuilder()
     {
-        return $this->queryBuilder;
+        return $this->_queryBuilder;
     }
 
     /**
@@ -290,7 +293,7 @@ class Datatable
      */
     public function getSearch()
     {
-        return $this->search;
+        return $this->_search;
     }
 
     /**
@@ -303,7 +306,7 @@ class Datatable
      */
     public function setEntity($entity_name, $entity_alias)
     {
-        $this->queryBuilder->setEntity($entity_name, $entity_alias);
+        $this->_queryBuilder->setEntity($entity_name, $entity_alias);
         return $this;
     }
 
@@ -316,7 +319,7 @@ class Datatable
      */
     public function setFields(array $fields)
     {
-        $this->queryBuilder->setFields($fields);
+        $this->_queryBuilder->setFields($fields);
         return $this;
     }
 
@@ -329,7 +332,7 @@ class Datatable
      */
     public function setHasAction($has_action)
     {
-        $this->has_action = $has_action;
+        $this->_has_action = $has_action;
         return $this;
     }
 
@@ -343,7 +346,7 @@ class Datatable
      */
     public function setOrder($order_field, $order_type)
     {
-        $this->queryBuilder->setOrder($order_field, $order_type);
+        $this->_queryBuilder->setOrder($order_field, $order_type);
         return $this;
     }
 
@@ -356,7 +359,7 @@ class Datatable
      */
     public function setFixedData($data)
     {
-        $this->fixed_data = $data;
+        $this->_fixed_data = $data;
         return $this;
     }
 
@@ -367,7 +370,7 @@ class Datatable
      */
     public function setQueryBuilder(QueryInterface $queryBuilder)
     {
-        $this->queryBuilder = $queryBuilder;
+        $this->_queryBuilder = $queryBuilder;
     }
 
     /**
@@ -406,7 +409,7 @@ class Datatable
      */
     public function setRenderer(\Closure $renderer)
     {
-        $this->renderer = $renderer;
+        $this->_renderer = $renderer;
         return $this;
     }
 
@@ -441,15 +444,15 @@ class Datatable
      */
     public function setRenderers(array $renderers)
     {
-        $this->renderers = $renderers;
-        if (!empty($this->renderers))
+        $this->_renderers = $renderers;
+        if (!empty($this->_renderers))
         {
-            $this->renderer_obj = new Renderer($this->_container, $this->renderers, $this->getFields());
+            $this->_renderer_obj = new Renderer($this->_container, $this->_renderers, $this->getFields());
         }
         $actions_index = array_search('_identifier_', array_keys($this->getFields()));
         if ($actions_index != FALSE && isset($renderers[$actions_index]))
         {
-            $this->has_renderer_action = true;
+            $this->_has_renderer_action = true;
         }
         return $this;
     }
@@ -464,7 +467,7 @@ class Datatable
      */
     public function setWhere($where, array $params = array())
     {
-        $this->queryBuilder->setWhere($where, $params);
+        $this->_queryBuilder->setWhere($where, $params);
         return $this;
     }
 
@@ -477,8 +480,8 @@ class Datatable
      */
     public function setSearch($search)
     {
-        $this->search = $search;
-        $this->queryBuilder->setSearch($search);
+        $this->_search = $search;
+        $this->_queryBuilder->setSearch($search);
         return $this;
     }
 
@@ -491,9 +494,9 @@ class Datatable
      */
     public function setDatatableId($id)
     {
-        if (!array_key_exists($id, self::$instances))
+        if (!array_key_exists($id, self::$_instances))
         {
-            self::$instances[$id] = $this;
+            self::$_instances[$id] = $this;
         }
         else
         {
@@ -538,5 +541,34 @@ class Datatable
     {
         return $this->_config;
     }
+    
+    /**
+     * get search field
+     * 
+     * @return array
+     */
+    public function getSearchFields()
+    {
+        return $this->_search_fields;
+    }
+
+    /**
+     * set search fields
+     * 
+     * @example 
+     * 
+     *      ->setSearchFields(array(0,2,5))
+     * 
+     * @param array $search_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setSearchFields(array $search_fields)
+    {
+        $this->_search_fields = $search_fields;
+        return $this;
+    }
+
+
     
 }

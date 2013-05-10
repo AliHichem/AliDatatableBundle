@@ -44,17 +44,18 @@ class AliDatatableExtension extends \Twig_Extension
         {
             $options['id'] = 'ali-dta_' . md5(rand(1, 100));
         }
-        $datatable              = Datatable::getInstance($options['id']);
-        $config                 = $datatable->getConfiguration();
-        $options['js_conf']     = json_encode($config['js']);
-        $options['js']          = json_encode($options['js']);
-        $options['action']      = $datatable->getHasAction();
-        $options['action_twig'] = $datatable->getHasRendererAction();
-        $options['fields']      = $datatable->getFields();
-        $options['delete_form'] = $this->createDeleteForm('_id_')->createView();
-        $options['search']      = $datatable->getSearch();
-        $options['multiple']    = $datatable->getMultiple();
-        $main_template          = 'AliDatatableBundle:Main:index.html.twig';
+        $datatable                = Datatable::getInstance($options['id']);
+        $config                   = $datatable->getConfiguration();
+        $options['js_conf']       = json_encode($config['js']);
+        $options['js']            = json_encode($options['js']);
+        $options['action']        = $datatable->getHasAction();
+        $options['action_twig']   = $datatable->getHasRendererAction();
+        $options['fields']        = $datatable->getFields();
+        $options['delete_form']   = $this->createDeleteForm('_id_')->createView();
+        $options['search']        = $datatable->getSearch();
+        $options['search_fields'] = $datatable->getSearchFields();
+        $options['multiple']      = $datatable->getMultiple();
+        $main_template            = 'AliDatatableBundle:Main:index.html.twig';
         if (isset($options['main_template']))
         {
             $main_template = $options['main_template'];

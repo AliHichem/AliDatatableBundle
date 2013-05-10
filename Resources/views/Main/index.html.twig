@@ -16,7 +16,7 @@
                             <option value="{{ path(item.route) }}">{{item.title}}</option>\
                             {% endfor %}\
                         </select>\
-                        <button class="btn-datatable-multiple">OK</button>\
+                        <button class="btn-datatable-multiple" >OK</button>\
                     <span>\
                     </label>';
         {% endif %}
@@ -115,7 +115,10 @@
         if (multiple===true) { 
             var chbox =  'input:checkbox[name="dataTables[actions][]"]';
             var chbox_all = 'input:checkbox[name="datatable_action_all"]';
-            $(s).on('click','.btn-datatable-multiple',function(e){
+            $(s).on('click','.btn-datatable-multiple:not(.search_init)',function(e){
+                if($('input:focus',$(s)).length > 0){
+                    return false;
+                }
                 e.preventDefault();
                 if($(chbox+':checked').length > 0){
                     if (!confirm('Are you sure ?')) {
@@ -209,7 +212,15 @@
                 {% endif %}
                 {% for label,key in fields %}
                     {% if label != '_identifier_' %}
-                        <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                        {% if search_fields is not empty %}
+                            {% if i in search_fields %}
+                            <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                            {% else %}
+                            <td></td>
+                            {% endif %}
+                        {% else %}
+                        <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                        {% endif %}
                     {% elseif label == '_identifier_'and action and not action_twig %}
                         <td></td>
                     {% endif %}
