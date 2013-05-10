@@ -1,14 +1,70 @@
 {% block main %}
 <script type="text/javascript">
     $(document).ready(function(){
-        $(document).on('click','.button-delete',function(){
-            if (!confirm('{{ 'ali.common.confirm_delete'|trans()  }}')) {
-                return false;
+        function getId() { return "{{id}}"; };
+        function getWrapper() { return  "#{{id}}_wrapper"; };
+        var s = getWrapper();
+        var multiple = {% if multiple %} true {% else %} false {% endif %};
+        var multiple_rawhtml = '';
+        {% if multiple %}
+            var multiple_rawhtml = '\
+                    <label class="dataTables_multiple">\
+                    <span style="margin:0 40px 0 0px;">\
+                        Execute\
+                        <select name="dataTables[select]">\
+                            {% for key,item in multiple %}\
+                            <option value="{{ path(item.route) }}">{{item.title}}</option>\
+                            {% endfor %}\
+                        </select>\
+                        <button class="btn-datatable-multiple">OK</button>\
+                    <span>\
+                    </label>';
+        {% endif %}
+        var $js_conf = {{ js_conf | raw }};
+        var $js = {};
+        for(key in $js_conf) { 
+            if ($js_conf.hasOwnProperty(key)) {
+                eval ( ' $js["'+key+'"] = ' + $js_conf[key]+ ' ; ' ); 
             }
+        }
+        var $options = {{ js | raw }};
+        var $aoColumnDefs = new Array();
+        {% if multiple %}
+        $aoColumnDefs.push({ 'bSortable': false, 'aTargets': [ 0 ] });
+        {% endif %}
+        {% if action and not action_twig %} 
+        $aoColumnDefs.push({
+            "fnRender": function ( oObj ) {
+                var $edit_url = strtr(
+                    "{{ path(edit_route , { 'id': "xx" }) }}",
+                    { "xx": oObj.aData[{{fields|length}}-1] }
+                );
+                var $link_edit = "<a  style='float:right; margin-right:10px' class='dialog' title='edit'";
+                $link_edit += "href='"+$edit_url+"'>";
+                $link_edit += "{{ 'ali.common.edit'|trans()}}</a>";
+                var $delete_url = strtr(
+                    "{{ path(delete_route, { 'id': "xx" }) }}",
+                    { "xx": oObj.aData[{{fields|length}}-1] }
+                );
+                var $link_delete = "<form style='float:right' class='form' action='"+$delete_url+"' method='post'>";
+                $link_delete += strtr(
+                                    '{{ form_widget(delete_form) }}',
+                                    { "_id_": oObj.aData[{{fields|length}}-1] }
+                                );
+                $link_delete += "<a class='button-delete' href='#' type='submit'>{{ 'ali.common.delete'|trans() }}</a>";
+                $link_delete += " </form>";
+                var $out = $link_delete+ " " + $link_edit ;
+                if (oObj.aData[{{fields|length}}-1] == null )
+                {
+                    $out = "<div style='float:right'>{{ 'ali.common.no_action'|trans() }}</div>";
+                }
+                return $out
+            },
+            "aTargets": [ multiple ? {{fields|length}} : ({{fields|length}} -1)  ]
         });
-        $options = {{ js | raw }}
-        $defaults = {
-            "bJQueryUI": true,
+        {% endif %} 
+        var $defaults = {
+            "bJQueryUI": false,
             "sPaginationType": "full_numbers",
             "aLengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
             "iDisplayLength": 10,
@@ -17,6 +73,13 @@
             "sAjaxSource": null,
             "bPaginate": true,
             "bLengthChange": true,
+            "aoColumnDefs": $aoColumnDefs,
+            "fnDrawCallback": function(oSettings) {
+                var s = getWrapper();
+                if( multiple && $('.dataTables_multiple',$(s)).length==0){
+                    $(s+' .dataTables_length').prepend(multiple_rawhtml);
+                }
+            },
             "bSort": true,
             "bFilter": {% if search %} true {% else %} false {% endif %},
             "oLanguage": {
@@ -36,52 +99,63 @@
                     "sNext":     '{{ 'ali.common.sNext' | trans() }}',
                     "sLast":     '{{ 'ali.common.sLast' | trans() }}'
                 }
-            }
+            },
+            "bAutoWidth" : false
         };
+        $.extend($defaults,$js);
         $.extend($defaults,$options);
-        {% if action and not action_twig %} 
-        $.extend($defaults,{
-            "aoColumnDefs": [ 
-                {
-                    "fnRender": function ( oObj ) {
-                        var $edit_url = strtr(
-                            "{{ path(edit_route , { 'id': "xx" }) }}",
-                            { "xx": oObj.aData[{{fields|length}}-1] }
-                        );
-                        var $link_edit = "<a  style='float:right; margin-right:10px' class='dialog' title='edit'";
-                        $link_edit += "href='"+$edit_url+"'>";
-                        $link_edit += "{{ 'ali.common.edit'|trans()}}</a>";
-                        var $delete_url = strtr(
-                            "{{ path(delete_route, { 'id': "xx" }) }}",
-                            { "xx": oObj.aData[{{fields|length}}-1] }
-                        );
-                        var $link_delete = "<form style='float:right' class='form' action='"+$delete_url+"' method='post'>";
-                        $link_delete += strtr(
-                                            '{{ form_widget(delete_form) }}',
-                                            { "_id_": oObj.aData[{{fields|length}}-1] }
-                                        );
-                        $link_delete += "<button class='button-delete' type='submit'>{{ 'ali.common.delete'|trans() }}</button>";
-                        $link_delete += " </form>";
-                        var $out = $link_delete+ " " + $link_edit ;
-                        if (oObj.aData[{{fields|length}}-1] == null )
-                        {
-                            $out = "<div style='float:right'>{{ 'ali.common.no_action'|trans() }}</div>";
-                        }
-                        return $out
-                    },
-                    "aTargets": [ {{fields|length}}-1  ]
-                }
-            ]
+        eval("var "+ "oTable_"+'{{id}}'.split('-').join('_') + "  = $('#{{id}}').dataTable($defaults)");
+        $(s).on('click','.button-delete:parent',function(e){
+            if (!confirm('{{ 'ali.common.confirm_delete'|trans()  }}')) {
+                return false;
+            }
+            $(this).parents('form:eq(0)').submit();
         });
-        {% endif %}
-        eval("var oTable_"+'{{id}}'.split('-').join('_')+"  = $('#{{id}}').dataTable($defaults)");
-        
+
+        if (multiple===true) { 
+            var chbox =  'input:checkbox[name="dataTables[actions][]"]';
+            var chbox_all = 'input:checkbox[name="datatable_action_all"]';
+            $(s).on('click','.btn-datatable-multiple',function(e){
+                e.preventDefault();
+                if($(chbox+':checked').length > 0){
+                    if (!confirm('Are you sure ?')) {
+                        return false;
+                    }
+                    var form = $(this).parents('form:eq(0)');
+                    var action = $('select[name="dataTables[select]"]',$(s)).val();
+                    $.ajax({
+                        type: "POST",
+                        url: action,
+                        data: form.serialize(),
+                        success: function(msg) {
+                            $('#'+getId()).dataTable().fnDraw();
+                            $.unblockpage();
+                        },
+                        beforeSend: function() {
+                            $.blockpage({
+                                msg: 'saving data'
+                            });
+                        }
+                    });
+                } else {
+                    alert('You need to select at least one element.');
+                }
+            });
+            $(s).on('click',chbox_all,function(e){
+                if($(this).is(':checked')) {
+                    $(chbox,$(s)).attr("checked",false).click();
+                } else {
+                    $(chbox,$(s)).attr("checked",true).click();
+                }
+            });
+        }
+
         {% if search %}
         $(".dataTables_filter").remove();
-        search_selector = "#{{id}} input[searchable=true]";
+        var search_selector = "#{{id}} input[searchable=true]";
         $(search_selector).keyup( function (event) {
-            index = $(this).attr('index');
-            oTable = eval('oTable_{{id}}'.split('-').join('_'));
+            var index = $(this).attr('index');
+            var oTable = eval('oTable_{{id}}'.split('-').join('_'));
             if (event.keyCode == '13') {
                 oTable.fnFilter( 
                     this.value, 
@@ -106,10 +180,16 @@
         });
         {% endif %}
     });
-    </script>    
-    <table class="display" id="{{id}}"> 
+</script>
+{% if multiple %}
+<form name="frm-{{id}}">
+{% endif %}
+    <table class="display table table-bordered" id="{{id}}"> 
         <thead> 
             <tr> 
+            {% if multiple %}
+                <th width="1%" ><input type="checkbox" name="datatable_action_all" /></th>
+            {% endif %}
             {% for label,key in fields %}
                 {% if label != '_identifier_' %}
                     <th>{{ label }}</th>
@@ -121,9 +201,12 @@
             </tr> 
         </thead>
         {% if search %}
-            {% set i = 0 %}
-            <tfoot>
-                <tr>
+        {% set i = 0 %}
+        <tfoot>
+            <tr>
+                {% if multiple %}
+                <th></th>
+                {% endif %}
                 {% for label,key in fields %}
                     {% if label != '_identifier_' %}
                         <td><input index="{{i}}" searchable="true" type="text" value="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
@@ -132,8 +215,11 @@
                     {% endif %}
                     {% set i = i+1 %}
                 {% endfor %}
-                </tr>
-            </tfoot>
+            </tr>
+        </tfoot>
         {% endif %}
-        </table>
+    </table>
+{% if multiple %}
+</form>
+{% endif %}
 {% endblock  %}

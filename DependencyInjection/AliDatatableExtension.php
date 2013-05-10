@@ -14,15 +14,41 @@ use Symfony\Component\DependencyInjection\Loader;
  */
 class AliDatatableExtension extends Extension
 {
+
     /**
      * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
-
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $conf   = new Configuration();
+        $config = $this->processConfiguration($conf, $configs);
+        $container->setParameter('ali_datatable', $config);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__ . '/../Resources/config/schema';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getNamespace()
+    {
+        return 'http://symfony.com/schema/dic/doctrine';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($container->getParameter('kernel.debug'));
+    }
+
 }

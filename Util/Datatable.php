@@ -9,45 +9,54 @@ use Doctrine\ORM\Query,
 use Ali\DatatableBundle\Util\Factory\Query\QueryInterface,
     Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
     Ali\DatatableBundle\Util\Formatter\Renderer,
-    Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder ;
+    Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder;
 
 class Datatable
 {
 
+    /** @var array */
+    protected $_config;
+
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
-    protected $container;
+    protected $_container;
 
     /** @var \Doctrine\ORM\EntityManager */
-    protected $em;
+    protected $_em;
 
     /** @var \Symfony\Component\HttpFoundation\Request */
-    protected $request;
+    protected $_request;
 
     /** @var \Ali\DatatableBundle\Util\Factory\Query\QueryInterface */
     protected $queryBuilder;
-    
+
     /** @var boolean */
-    protected $has_action = true;
- 
+    protected $has_action;
+
     /** @var boolean */
     protected $has_renderer_action = false;
-    
+
     /** @var array */
     protected $fixed_data = NULL;
-    
+
     /** @var closure */
     protected $renderer = NULL;
-    
+
     /** @var array */
     protected $renderers = NULL;
-    
+
     /** @var Renderer */
     protected $renderer_obj = null;
 
     /** @var boolean */
-    protected $search = FALSE;
-    
+    protected $search;
+
+    /** @var array */
+    protected $_multiple;
+
+    /** @var array */
     protected static $instances = array();
+
+    /** @var Datatable */
     protected static $current_instance = NULL;
 
     /**
@@ -57,11 +66,28 @@ class Datatable
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
-        $this->em = $this->container->get('doctrine.orm.entity_manager');
-        $this->request = $this->container->get('request');
+        $this->_container   = $container;
+        $this->_config      = $this->_container->getParameter('ali_datatable');
+        $this->_em          = $this->_container->get('doctrine.orm.entity_manager');
+        $this->_request      = $this->_container->get('request');
         $this->queryBuilder = new DoctrineBuilder($container);
         self::$current_instance = $this;
+        $this->_applyDefaults();
+    }
+
+    /**
+     * apply default value from datatable config
+     * 
+     * @return void
+     */
+    protected function _applyDefaults()
+    {
+        if (!isset($this->_config['all']))
+        {
+            
+        }
+        $this->has_action = $this->_config['all']['action'];
+        $this->search     = $this->_config['all']['search'];
     }
 
     /**
@@ -96,9 +122,14 @@ class Datatable
      */
     public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
-        $request = $this->request;
+        $request       = $this->_request;
         $iTotalRecords = $this->queryBuilder->getTotalRecords();
-        $data = $this->queryBuilder->getData($hydration_mode);
+        $data          = $this->queryBuilder->getData($hydration_mode);
+        $id_index      = array_search('_identifier_', array_keys($this->getFields()));
+        $ids           = array();
+        array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
+                    $ids[$key] = $val[$id_index];
+                });
         if (!is_null($this->fixed_data))
         {
             $this->fixed_data = array_reverse($this->fixed_data);
@@ -111,17 +142,22 @@ class Datatable
         {
             array_walk($data, $this->renderer);
         }
-        
         if (!is_null($this->renderer_obj))
         {
             $this->renderer_obj->applyTo($data);
         }
-        
+        if (!empty($this->_multiple))
+        {
+            array_walk($data, function($val, $key) use(&$data, $ids) {
+                        array_unshift($val, "<input type='checkbox' name='dataTables[actions][]' value='{$ids[$key]}' />");
+                        $data[$key] = $val;
+                    });
+        }
         $output = array(
-            "sEcho" => intval($request->get('sEcho')),
-            "iTotalRecords" => $iTotalRecords,
+            "sEcho"                => intval($request->get('sEcho')),
+            "iTotalRecords"        => $iTotalRecords,
             "iTotalDisplayRecords" => $iTotalRecords,
-            "aaData" => $data
+            "aaData"               => $data
         );
         return new Response(json_encode($output));
     }
@@ -195,7 +231,6 @@ class Datatable
         return $this->has_action;
     }
 
-    
     /**
      * retrun true if the actions column is overridden by twig renderer
      * 
@@ -205,7 +240,7 @@ class Datatable
     {
         return $this->has_renderer_action;
     }
-        
+
     /**
      * get order field
      *
@@ -235,9 +270,9 @@ class Datatable
      */
     public function getPrototype($type)
     {
-        return new PrototypeBuilder($this->container,$type);
+        return new PrototypeBuilder($this->_container, $type);
     }
-    
+
     /**
      * get query builder
      * 
@@ -324,7 +359,7 @@ class Datatable
         $this->fixed_data = $data;
         return $this;
     }
-    
+
     /**
      * set query builder
      * 
@@ -374,7 +409,7 @@ class Datatable
         $this->renderer = $renderer;
         return $this;
     }
-    
+
     /**
      * set renderers as twig views
      * 
@@ -409,10 +444,10 @@ class Datatable
         $this->renderers = $renderers;
         if (!empty($this->renderers))
         {
-            $this->renderer_obj = new Renderer($this->container, $this->renderers, $this->getFields());
+            $this->renderer_obj = new Renderer($this->_container, $this->renderers, $this->getFields());
         }
-        $actions_index = array_search('_identifier_',array_keys($this->getFields()));
-        if ( $actions_index != FALSE && isset($renderers[$actions_index]) )
+        $actions_index = array_search('_identifier_', array_keys($this->getFields()));
+        if ($actions_index != FALSE && isset($renderers[$actions_index]))
         {
             $this->has_renderer_action = true;
         }
@@ -467,4 +502,41 @@ class Datatable
         return $this;
     }
 
+    /**
+     * get multiple
+     * 
+     * @return array
+     */
+    public function getMultiple()
+    {
+        return $this->_multiple;
+    }
+
+    /**
+     * set multiple
+     * 
+     * @example
+     * 
+     *  ->setMultiple('delete' => array ('title' => "Delete", 'route' => 'route_to_delete' ));
+     * 
+     * @param array $multiple
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setMultiple(array $multiple)
+    {
+        $this->_multiple = $multiple;
+        return $this;
+    }
+
+    /**
+     * get global configuration ( read it from config.yml under ali_datatable)
+     * 
+     * @return array
+     */
+    public function getConfiguration()
+    {
+        return $this->_config;
+    }
+    
 }

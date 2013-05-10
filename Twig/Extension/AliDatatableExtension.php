@@ -9,7 +9,8 @@ use Ali\DatatableBundle\Util\Datatable;
 class AliDatatableExtension extends \Twig_Extension
 {
 
-    private $container;
+    /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
+    protected $_container;
 
     /**
      * class constructor 
@@ -18,7 +19,7 @@ class AliDatatableExtension extends \Twig_Extension
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
+        $this->_container = $container;
     }
 
     /**
@@ -43,21 +44,23 @@ class AliDatatableExtension extends \Twig_Extension
         {
             $options['id'] = 'ali-dta_' . md5(rand(1, 100));
         }
-        $datatable = Datatable::getInstance($options['id']);
-
+        $datatable              = Datatable::getInstance($options['id']);
+        $config                 = $datatable->getConfiguration();
+        $options['js_conf']     = json_encode($config['js']);
         $options['js']          = json_encode($options['js']);
         $options['action']      = $datatable->getHasAction();
         $options['action_twig'] = $datatable->getHasRendererAction();
         $options['fields']      = $datatable->getFields();
         $options['delete_form'] = $this->createDeleteForm('_id_')->createView();
         $options['search']      = $datatable->getSearch();
+        $options['multiple']    = $datatable->getMultiple();
         $main_template          = 'AliDatatableBundle:Main:index.html.twig';
         if (isset($options['main_template']))
         {
             $main_template = $options['main_template'];
         }
 
-        return $this->container
+        return $this->_container
                         ->get('templating')
                         ->render(
                                 $main_template, $options);
@@ -85,7 +88,7 @@ class AliDatatableExtension extends \Twig_Extension
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+        return $this->_container->get('form.factory')->createBuilder('form', $data, $options);
     }
 
     /**
