@@ -18,4 +18,4 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_01.png"></div>
 
-Go to the [documentation](https://github.com/AliHichem/AliDatatableBundle/blob/master/Resources/doc/index.rst).
+Go to the [documentation](https://github.com/AliHichem/AliDatatableBundle/blob/master/Resources/doc/index.md).
