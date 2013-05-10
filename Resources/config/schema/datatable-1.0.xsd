@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/dic/doctrine"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema/dic/doctrine"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="all" type="all" minOccurs="0" maxOccurs="1" />
+                <xsd:element name="js" type="js" minOccurs="0" maxOccurs="1" />
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="all">
+        <xsd:attribute name="has_action" type="xsd:string" use="required" default="false" />
+    </xsd:complexType>
+
+</xsd:schema>
