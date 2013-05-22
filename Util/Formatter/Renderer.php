@@ -72,6 +72,7 @@ class Renderer
     {
         foreach ($data as $row_index => $row)
         {
+            $identifier_raw = $data[$row_index][$this->_identifier_index];
             foreach ($row as $column_index => $column)
             {
                 $params = array();
@@ -86,7 +87,7 @@ class Renderer
                 }
                 $params                          = array_merge($params, array(
                     'dt_item' => $data[$row_index][$column_index],
-                    'dt_id'   => $data[$row_index][$this->_identifier_index]
+                    'dt_id'   => $identifier_raw
                         )
                 );
                 $data[$row_index][$column_index] = $this->applyView(
