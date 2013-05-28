@@ -125,9 +125,17 @@ class DoctrineBuilder implements QueryInterface
     {
         $qb = clone $this->queryBuilder;
         $this->_addSearch($qb);
-        $qb->select(" count({$this->fields['_identifier_']}) ");
         $qb->resetDQLPart('orderBy');
-        return $qb->getQuery()->getSingleScalarResult();
+
+        $gb = $qb->getDQLPart('groupBy');
+        if (empty($gb) || !in_array($this->fields['_identifier_'], $gb)) {
+            $qb->select(" count({$this->fields['_identifier_']}) ");
+            return $qb->getQuery()->getSingleScalarResult();
+        } else {
+            $qb->resetDQLPart('groupBy');
+            $qb->select(" count(distinct {$this->fields['_identifier_']}) ");
+            return $qb->getQuery()->getSingleScalarResult();
+        }
     }
 
     /**
@@ -330,6 +338,19 @@ class DoctrineBuilder implements QueryInterface
     {
         $this->queryBuilder->where($where);
         $this->queryBuilder->setParameters($params);
+        return $this;
+    }
+
+    /**
+     * set query group
+     * 
+     * @param string $group
+     * 
+     * @return Datatable 
+     */
+    public function setGroupBy($group)
+    {
+        $this->queryBuilder->groupBy($group);
         return $this;
     }
 

@@ -472,6 +472,18 @@ class Datatable
     }
 
     /**
+     * set query group
+     * 
+     * @param string $groupbywhere
+     * 
+     * @return Datatable 
+     */
+    public function setGroupBy($groupby) {
+        $this->queryBuilder->setGroupBy($groupby);
+        return $this;
+    }
+    
+    /**
      * set search
      * 
      * @param bool $search
