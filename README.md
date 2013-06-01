@@ -38,7 +38,7 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 ##### [Multiple actions](#-multiple-actions) (new) 
 ##### [Custom renderer](#-custom-renderer)
 ##### [Translation](#-translation)
-##### [Multiple datatable in the same view](#-doctrine-query-builder)
+##### [Multiple datatable in the same view](#-multiple-datatable-in-the-same-view)
 
 ---------------------------------------
 
