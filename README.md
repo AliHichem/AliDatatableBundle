@@ -526,7 +526,7 @@ protected function _datatable()
 {
     // ...
     return $this->get('datatable')
-                ->setDatatableId(dta-unique-id_1')
+                ->setDatatableId('dta-unique-id_1')
                 ->setEntity("XXXMyBundle:Entity", "x")
     // ...
 }
@@ -535,7 +535,7 @@ protected function _datatableSecond()
 {
     // ...
     return $this->get('datatable')
-                ->setDatatableId(dta-unique-id_2')
+                ->setDatatableId('dta-unique-id_2')
                 ->setEntity("YYYMyBundle:Entity", "y")
     // ...
 }
