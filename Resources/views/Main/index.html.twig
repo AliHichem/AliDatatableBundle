@@ -104,6 +104,7 @@
         };
         $.extend($defaults,$js);
         $.extend($defaults,$options);
+        $('#{{id}}').trigger('datatables_init', $defaults );
         eval("var "+ "oTable_"+'{{id}}'.split('-').join('_') + "  = $('#{{id}}').dataTable($defaults)");
         $(s).on('click','.button-delete:parent',function(e){
             if (!confirm('{{ 'ali.common.confirm_delete'|trans()  }}')) {
