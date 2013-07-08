@@ -479,7 +479,7 @@ class Datatable
      * @return Datatable 
      */
     public function setGroupBy($groupby) {
-        $this->queryBuilder->setGroupBy($groupby);
+        $this->_queryBuilder->setGroupBy($groupby);
         return $this;
     }
     
