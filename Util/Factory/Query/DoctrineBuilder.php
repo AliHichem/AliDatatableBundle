@@ -168,10 +168,11 @@ class DoctrineBuilder implements QueryInterface
         }
         if ($hydration_mode == Query::HYDRATE_ARRAY)
         {
-            foreach($this->fields as &$field){
-                $field = $field . ' as ' . str_replace('.', '_', $field);
+            $selectFields = $this->fields;
+            foreach($selectFields as &$field){
+                $field = $field. ' as ' . str_replace('.', '_', $field);
             }
-            $qb->select(implode(" , ", $this->fields));
+            $qb->select(implode(" , ", $selectFields));
         }
         else
         {
