@@ -1,0 +1,21 @@
+ali:
+    common:
+        action: Akcje
+        confirm_delete: "Czy na pewno usunąć ten wpis?"
+        delete: usuń
+        edit: edytuj
+        no_action: "(nie można usunąć)"
+        sProcessing: "Przetwarzanie ..."
+        sLengthMenu: "Pokaż _MENU_ wpisów"
+        sZeroRecords: "Brak pasujących rekordów"
+        sInfo: "_START_ - _END_ z _TOTAL_"
+        sInfoEmpty: "Brak wpisów"
+        sInfoFiltered: "(przefiltrowano z _MAX_ wpisów)"
+        sInfoPostFix: ""
+        sSearch: "Szukaj:"
+        sLoadingRecords: ""
+        sFirst: "Pierwszy"
+        sPrevious: "Poprzedni"  
+        sNext: "Następny"
+        sLast: "Ostatni"
+        search: "Szukaj"
