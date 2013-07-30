@@ -80,7 +80,7 @@ class DoctrineBuilder implements QueryInterface
             $search_fields = array_values($this->fields);
             foreach ($search_fields as $i => $search_field)
             {
-                if ($request->get("sSearch_{$i}"))
+                if ($request->get("sSearch_{$i}") !== false)
                 {
                     $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
                 }
