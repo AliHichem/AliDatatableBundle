@@ -171,7 +171,7 @@ class DoctrineBuilder implements QueryInterface
         {
             $selectFields = $this->fields;
             foreach($selectFields as &$field){
-                $field = $field. ' as ' . str_replace('.', '_', $field);
+                $field = $field. ' as ' . str_replace('.', '_', $field) . '_' . substr(md5(rand()), 0, 8);
             }
             $qb->select(implode(" , ", $selectFields));
         }
