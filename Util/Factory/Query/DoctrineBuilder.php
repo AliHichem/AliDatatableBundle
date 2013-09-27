@@ -34,25 +34,25 @@ class DoctrineBuilder implements QueryInterface
     protected $order_field = NULL;
 
     /** @var string */
-    protected $order_type  = "asc";
+    protected $order_type = "asc";
 
     /** @var string */
-    protected $where       = NULL;
+    protected $where = NULL;
 
     /** @var array */
-    protected $joins       = array();
+    protected $joins = array();
 
     /** @var boolean */
-    protected $has_action  = true;
+    protected $has_action = true;
 
     /** @var array */
-    protected $fixed_data  = NULL;
+    protected $fixed_data = NULL;
 
     /** @var closure */
-    protected $renderer    = NULL;
+    protected $renderer = NULL;
 
     /** @var boolean */
-    protected $search      = FALSE;
+    protected $search = FALSE;
 
     /**
      * class constructor 
@@ -129,10 +129,13 @@ class DoctrineBuilder implements QueryInterface
         $qb->resetDQLPart('orderBy');
 
         $gb = $qb->getDQLPart('groupBy');
-        if (empty($gb) || !in_array($this->fields['_identifier_'], $gb)) {
+        if (empty($gb) || !in_array($this->fields['_identifier_'], $gb))
+        {
             $qb->select(" count({$this->fields['_identifier_']}) ");
             return $qb->getQuery()->getSingleScalarResult();
-        } else {
+        }
+        else
+        {
             $qb->resetDQLPart('groupBy');
             $qb->select(" count(distinct {$this->fields['_identifier_']}) ");
             return $qb->getQuery()->getSingleScalarResult();
@@ -170,8 +173,12 @@ class DoctrineBuilder implements QueryInterface
         if ($hydration_mode == Query::HYDRATE_ARRAY)
         {
             $selectFields = $this->fields;
-            foreach($selectFields as &$field){
-                $field = $field. ' as ' . str_replace('.', '_', $field);
+            foreach ($selectFields as &$field)
+            {
+                if (!preg_match('~as~', $field))
+                {
+                    $field = $field . ' as ' . str_replace('.', '_', $field);
+                }
             }
             $qb->select(implode(" , ", $selectFields));
         }

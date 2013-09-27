@@ -85,12 +85,11 @@ class Datatable
      */
     protected function _applyDefaults()
     {
-        if (!isset($this->_config['all']))
+        if (isset($this->_config['all']))
         {
-            
+            $this->_has_action = $this->_config['all']['action'];
+            $this->_search     = $this->_config['all']['search'];
         }
-        $this->_has_action = $this->_config['all']['action'];
-        $this->_search     = $this->_config['all']['search'];
     }
 
     /**
@@ -279,7 +278,7 @@ class Datatable
     /**
      * get query builder
      * 
-     * @return QueryInterface 
+     * @return QueryInterface
      */
     public function getQueryBuilder()
     {
