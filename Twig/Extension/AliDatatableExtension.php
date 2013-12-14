@@ -44,17 +44,19 @@ class AliDatatableExtension extends \Twig_Extension
         {
             $options['id'] = 'ali-dta_' . md5(rand(1, 100));
         }
-        $datatable                = Datatable::getInstance($options['id']);
-        $config                   = $datatable->getConfiguration();
+        $dt                       = Datatable::getInstance($options['id']);
+        $config                   = $dt->getConfiguration();
         $options['js_conf']       = json_encode($config['js']);
         $options['js']            = json_encode($options['js']);
-        $options['action']        = $datatable->getHasAction();
-        $options['action_twig']   = $datatable->getHasRendererAction();
-        $options['fields']        = $datatable->getFields();
+        $options['action']        = $dt->getHasAction();
+        $options['action_twig']   = $dt->getHasRendererAction();
+        $options['fields']        = $dt->getFields();
         $options['delete_form']   = $this->createDeleteForm('_id_')->createView();
-        $options['search']        = $datatable->getSearch();
-        $options['search_fields'] = $datatable->getSearchFields();
-        $options['multiple']      = $datatable->getMultiple();
+        $options['search']        = $dt->getSearch();
+        $options['search_fields'] = $dt->getSearchFields();
+        $options['multiple']      = $dt->getMultiple();
+        $options['sort']          = is_null($dt->getOrderField()) ? NULL : [array_search(
+                    $dt->getOrderField(), array_values($dt->getFields())), $dt->getOrderType()];
         $main_template            = 'AliDatatableBundle:Main:index.html.twig';
         if (isset($options['main_template']))
         {

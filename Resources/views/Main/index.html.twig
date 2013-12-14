@@ -72,6 +72,9 @@
             "bProcessing": true,
             "sAjaxSource": null,
             "bPaginate": true,
+            {% if sort %}
+            "aaSorting": [[ {{sort[0]}}, "{{sort[1]}}" ]],
+            {% endif %}
             "bLengthChange": true,
             "aoColumnDefs": $aoColumnDefs,
             "fnDrawCallback": function(oSettings) {
