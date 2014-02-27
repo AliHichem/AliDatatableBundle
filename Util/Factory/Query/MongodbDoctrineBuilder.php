@@ -3,22 +3,21 @@
 namespace Ali\DatatableBundle\Util\Factory\Query;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\ORM\Query,
-    Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query;
 
-class DoctrineBuilder implements QueryInterface
+class MongodbDoctrineBuilder implements QueryInterface
 {
 
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
     protected $container;
 
-    /** @var \Doctrine\ORM\EntityManager */
-    protected $em;
+    /** @var \Doctrine\ODM\MongoDB\DocumentManager */
+    protected $dm;
 
     /** @var \Symfony\Component\HttpFoundation\Request */
     protected $request;
 
-    /** @var \Doctrine\ORM\QueryBuilder */
+    /** @var \Doctrine\ODM\MongoDB\QueryBuilder */
     protected $queryBuilder;
 
     /** @var string */
@@ -62,9 +61,9 @@ class DoctrineBuilder implements QueryInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container    = $container;
-        $this->em           = $this->container->get('doctrine')->getManager();
+        $this->dm           = $this->container->get('doctrine_mongodb')->getManager();
         $this->request      = $this->container->get('request');
-        $this->queryBuilder = $this->em->createQueryBuilder();
+        $this->queryBuilder = $this->dm->createQueryBuilder();
     }
 
     /**
@@ -72,8 +71,9 @@ class DoctrineBuilder implements QueryInterface
      * 
      * @return string
      */
-    protected function _addSearch(\Doctrine\ORM\QueryBuilder $queryBuilder)
+    protected function _addSearch(\Doctrine\ODM\MongoDB\Query\Builder $queryBuilder)
     {
+        throw new \Exception('ODM search not implemented');
         if ($this->search == TRUE)
         {
             $request       = $this->request;
@@ -108,6 +108,7 @@ class DoctrineBuilder implements QueryInterface
      */
     public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
     {
+        throw new \Exception('ODM join not supported');
         if ($cond != '')
         {
             $cond = " with {$cond} ";
@@ -125,21 +126,21 @@ class DoctrineBuilder implements QueryInterface
     public function getTotalRecords()
     {
         $qb = clone $this->queryBuilder;
-        $this->_addSearch($qb);
-        $qb->resetDQLPart('orderBy');
+        //$this->_addSearch($qb);
+//        $qb->resetDQLPart('orderBy');
 
-        $gb = $qb->getDQLPart('groupBy');
+//        $gb = $qb->getDQLPart('groupBy');
         if (empty($gb) || !in_array($this->fields['_identifier_'], $gb))
         {
-            $qb->select(" count({$this->fields['_identifier_']}) ");
-            return $qb->getQuery()->getSingleScalarResult();
+//            $qb->select(" count({$this->fields['_identifier_']}) ");
+            return $qb->count()->getQuery()->execute();
         }
-        else
-        {
-            $qb->resetDQLPart('groupBy');
-            $qb->select(" count(distinct {$this->fields['_identifier_']}) ");
-            return $qb->getQuery()->getSingleScalarResult();
-        }
+//        else
+//        {
+//            $qb->resetDQLPart('groupBy');
+//            $qb->select(" count(distinct {$this->fields['_identifier_']}) ");
+//            return $qb->getQuery()->getSingleScalarResult();
+//        }
     }
 
     /**
@@ -164,7 +165,7 @@ class DoctrineBuilder implements QueryInterface
         $qb = clone $this->queryBuilder;
         if (!is_null($order_field))
         {
-            $qb->orderBy($order_field, $request->get('sSortDir_0', 'asc'));
+            $qb->sort($order_field, $request->get('sSortDir_0', 'asc'));
         }
         else
         {
@@ -175,25 +176,29 @@ class DoctrineBuilder implements QueryInterface
             $selectFields = $this->fields;
             foreach ($selectFields as &$field)
             {
-                if (!preg_match('~as~', $field))
+                if (preg_match('~as~', $field))
                 {
-                    $field = $field . ' as ' . str_replace('.', '_', $field);
+                    throw new \Exception(sprintf('cannot use "as" keyword with Mongodb driver'));
                 }
             }
-            $qb->select(implode(" , ", $selectFields));
+            $qb->select($selectFields);
         }
         else
         {
             $qb->select($this->entity_alias);
         }
-        $this->_addSearch($qb);
+//        $this->_addSearch($qb);
+        if ($hydration_mode == Query::HYDRATE_ARRAY)
+        {
+            $qb->hydrate(false);
+        }
         $query          = $qb->getQuery();
         $iDisplayLength = (int) $request->get('iDisplayLength');
         if ($iDisplayLength > 0)
         {
-            $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
+            $qb->limit($iDisplayLength)->skip($request->get('iDisplayStart'));
         }
-        $items                = $query->getResult($hydration_mode);
+        $items                = $query->execute()->toArray();
         $iTotalDisplayRecords = (string) count($items);
         $data                 = array();
         if ($hydration_mode == Query::HYDRATE_ARRAY)
@@ -291,7 +296,7 @@ class DoctrineBuilder implements QueryInterface
     {
         $this->entity_name  = $entity_name;
         $this->entity_alias = $entity_alias;
-        $this->queryBuilder->from($entity_name, $entity_alias);
+        $this->queryBuilder->find($entity_name);
         return $this;
     }
 
@@ -319,9 +324,10 @@ class DoctrineBuilder implements QueryInterface
      */
     public function setOrder($order_field, $order_type)
     {
-        $this->order_field = $order_field;
-        $this->order_type  = $order_type;
-        $this->queryBuilder->orderBy($order_field, $order_type);
+        $this->order_field = strtolower($order_field);
+        $this->order_type  = strtolower($order_type);
+//        $this->queryBuilder->sort($order_field, ($order_field == 'asc' ? 1 : 0));
+        $this->queryBuilder->sort($order_field, $order_type);
         return $this;
     }
 

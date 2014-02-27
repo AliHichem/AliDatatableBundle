@@ -2,17 +2,21 @@
 
 namespace Ali\DatatableBundle\Util;
 
-use Symfony\Component\DependencyInjection\ContainerInterface,
-    Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\Query,
-    Doctrine\ORM\Query\Expr\Join;
-use Ali\DatatableBundle\Util\Factory\Query\QueryInterface,
-    Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
-    Ali\DatatableBundle\Util\Formatter\Renderer,
-    Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
+use Ali\DatatableBundle\Util\Factory\Query\QueryInterface;
+use Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder;
+use Ali\DatatableBundle\Util\Factory\Query\MongodbDoctrineBuilder;
+use Ali\DatatableBundle\Util\Formatter\Renderer;
+use Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder;
 
 class Datatable
 {
+
+    /** @var string */
+    protected $_driver = NULL;
 
     /** @var array */
     protected $_fixed_data = NULL;
@@ -55,7 +59,7 @@ class Datatable
 
     /** @var array */
     protected $_search_fields = array();
-    
+
     /** @var array */
     protected static $_instances = array();
 
@@ -69,9 +73,9 @@ class Datatable
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->_container   = $container;
-        $this->_config      = $this->_container->getParameter('ali_datatable');
-        $this->_em          = $this->_container->get('doctrine.orm.entity_manager');
+        $this->_container    = $container;
+        $this->_config       = $this->_container->getParameter('ali_datatable');
+        $this->_em           = $this->_container->get('doctrine.orm.entity_manager');
         $this->_request      = $this->_container->get('request');
         $this->_queryBuilder = new DoctrineBuilder($container);
         self::$_current_instance = $this;
@@ -90,6 +94,30 @@ class Datatable
             $this->_has_action = $this->_config['all']['action'];
             $this->_search     = $this->_config['all']['search'];
         }
+    }
+
+    /**
+     * set the database driver (orm/mongodb)
+     * 
+     * @param string $driver
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function driver($driver = 'orm')
+    {
+        $this->_driver = $driver;
+        switch ($driver)
+        {
+            case 'orm':
+                $this->_queryBuilder = new DoctrineBuilder($this->_container);
+                break;
+            case 'mongodb':
+                $this->_queryBuilder = new MongodbDoctrineBuilder($this->_container);
+                break;
+            default:
+                throw new \Exception(sprintf('Unknown driver [%s], supported drivers are : %s ', $driver, 'orm|mongodb'));
+        }
+        return $this;
     }
 
     /**
@@ -130,8 +158,8 @@ class Datatable
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
-                    $ids[$key] = $val[$id_index];
-                });
+            $ids[$key] = $val[$id_index];
+        });
         if (!is_null($this->_fixed_data))
         {
             $this->_fixed_data = array_reverse($this->_fixed_data);
@@ -151,9 +179,9 @@ class Datatable
         if (!empty($this->_multiple))
         {
             array_walk($data, function($val, $key) use(&$data, $ids) {
-                        array_unshift($val, "<input type='checkbox' name='dataTables[actions][]' value='{$ids[$key]}' />");
-                        $data[$key] = $val;
-                    });
+                array_unshift($val, "<input type='checkbox' name='dataTables[actions][]' value='{$ids[$key]}' />");
+                $data[$key] = $val;
+            });
         }
         $output = array(
             "sEcho"                => intval($request->get('sEcho')),
@@ -307,6 +335,20 @@ class Datatable
     {
         $this->_queryBuilder->setEntity($entity_name, $entity_alias);
         return $this;
+    }
+
+    /**
+     * Proxy to setEntity
+     * 
+     * @see setEntity
+     * 
+     * @param string $document_name
+     * 
+     * @return Datatable
+     */
+    public function setDocument($document_name)
+    {
+        return $this->setEntity($document_name, NULL);
     }
 
     /**
@@ -477,11 +519,12 @@ class Datatable
      * 
      * @return Datatable 
      */
-    public function setGroupBy($groupby) {
+    public function setGroupBy($groupby)
+    {
         $this->_queryBuilder->setGroupBy($groupby);
         return $this;
     }
-    
+
     /**
      * set search
      * 
@@ -552,7 +595,7 @@ class Datatable
     {
         return $this->_config;
     }
-    
+
     /**
      * get search field
      * 
@@ -580,6 +623,4 @@ class Datatable
         return $this;
     }
 
-
-    
 }
