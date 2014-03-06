@@ -28,7 +28,9 @@ class AliDatatableExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'datatable' => new \Twig_Function_Method($this, 'datatable', array("is_safe" => array("html")))
+            'datatable' => new \Twig_Function_Method($this, 'datatable', array("is_safe" => array("html"))),
+            'datatable_html' => new \Twig_Function_Method($this, 'datatableHtml', array("is_safe" => array("html"))),
+            'datatable_js' => new \Twig_Function_Method($this, 'datatableJs', array("is_safe" => array("html")))
         );
     }
 
@@ -61,6 +63,82 @@ class AliDatatableExtension extends \Twig_Extension
         if (isset($options['main_template']))
         {
             $main_template = $options['main_template'];
+        }
+
+        return $this->_container
+                        ->get('templating')
+                        ->render(
+                                $main_template, $options);
+    }
+    
+    /**
+     * Converts a string to time
+     * 
+     * @param string $string
+     * @return int 
+     */
+    public function datatableJs($options)
+    {
+        if (!isset($options['id']))
+        {
+            $options['id'] = 'ali-dta_' . md5(rand(1, 100));
+        }
+        $dt                             = Datatable::getInstance($options['id']);
+        $config                         = $dt->getConfiguration();
+        $options['js_conf']             = json_encode($config['js']);
+        $options['js']                  = json_encode($options['js']);
+        $options['action']              = $dt->getHasAction();
+        $options['action_twig']         = $dt->getHasRendererAction();
+        $options['fields']              = $dt->getFields();
+        $options['delete_form']         = $this->createDeleteForm('_id_')->createView();
+        $options['search']              = $dt->getSearch();
+        $options['search_fields']       = $dt->getSearchFields();
+        $options['not_filterable_fields']   = $dt->getNotFilterableFields();
+        $options['hidden_fields']       = $dt->getHiddenFields();
+        $options['multiple']            = $dt->getMultiple();
+        $options['sort']                = is_null($dt->getOrderField()) ? NULL : [array_search(
+                    $dt->getOrderField(), array_values($dt->getFields())), $dt->getOrderType()];
+        $main_template            = 'AliDatatableBundle:Main:datatableJs.html.twig';
+        if (isset($options['js_template']))
+        {
+            $main_template = $options['js_template'];
+        }
+
+        return $this->_container
+                        ->get('templating')
+                        ->render(
+                                $main_template, $options);
+    }
+    
+    /**
+     * Converts a string to time
+     * 
+     * @param string $string
+     * @return int 
+     */
+    public function datatableHtml($options)
+    {
+        if (!isset($options['id']))
+        {
+            $options['id'] = 'ali-dta_' . md5(rand(1, 100));
+        }
+        $dt                       = Datatable::getInstance($options['id']);
+        $config                   = $dt->getConfiguration();
+//        $options['js_conf']       = json_encode($config['js']);
+//        $options['js']            = json_encode($options['js']);
+        $options['action']        = $dt->getHasAction();
+        $options['action_twig']   = $dt->getHasRendererAction();
+        $options['fields']        = $dt->getFields();
+//        $options['delete_form']   = $this->createDeleteForm('_id_')->createView();
+        $options['search']        = $dt->getSearch();
+        $options['search_fields'] = $dt->getSearchFields();
+        $options['multiple']      = $dt->getMultiple();
+//        $options['sort']          = is_null($dt->getOrderField()) ? NULL : [array_search(
+//                    $dt->getOrderField(), array_values($dt->getFields())), $dt->getOrderType()];
+        $main_template            = 'AliDatatableBundle:Main:datatableHtml.html.twig';
+        if (isset($options['html_template']))
+        {
+            $main_template = $options['html_template'];
         }
 
         return $this->_container

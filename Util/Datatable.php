@@ -57,6 +57,12 @@ class Datatable
     protected $_search_fields = array();
     
     /** @var array */
+    protected $_not_filterable_fields = array();
+    
+    /** @var array */
+    protected $_hidden_fields = array();
+    
+    /** @var array */
     protected static $_instances = array();
 
     /** @var Datatable */
@@ -126,6 +132,7 @@ class Datatable
     {
         $request       = $this->_request;
         $iTotalRecords = $this->_queryBuilder->getTotalRecords();
+        $iTotalDisplayRecords = $this->_queryBuilder->getTotalDisplayRecords();
         $data          = $this->_queryBuilder->getData($hydration_mode);
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
@@ -158,7 +165,7 @@ class Datatable
         $output = array(
             "sEcho"                => intval($request->get('sEcho')),
             "iTotalRecords"        => $iTotalRecords,
-            "iTotalDisplayRecords" => $iTotalRecords,
+            "iTotalDisplayRecords" => $iTotalDisplayRecords,
             "aaData"               => $data
         );
         return new Response(json_encode($output));
@@ -578,6 +585,60 @@ class Datatable
     {
         $this->_search_fields = $search_fields;
         return $this;
+    }
+
+    /**
+     * set not filterable fields
+     * 
+     * @example 
+     * 
+     *      ->setNotFilterableFields(array(0,2,5))
+     * 
+     * @param array $not_filterable_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setNotFilterableFields(array $not_filterable_fields)
+    {
+        $this->_not_filterable_fields = $not_filterable_fields;
+        return $this;
+    }
+    
+    /**
+     * get filterable field
+     * 
+     * @return array
+     */
+    public function getNotFilterableFields()
+    {
+        return $this->_not_filterable_fields;
+    }
+    
+    /**
+     * set hidden fields
+     * 
+     * @example 
+     * 
+     *      ->setHiddenFields(array(0,2,5))
+     * 
+     * @param array $hidden_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setHiddenFields(array $hidden_fields)
+    {
+        $this->_hidden_fields = $hidden_fields;
+        return $this;
+    }
+    
+    /**
+     * get hidden field
+     * 
+     * @return array
+     */
+    public function getHiddenFields()
+    {
+        return $this->_hidden_fields;
     }
 
 

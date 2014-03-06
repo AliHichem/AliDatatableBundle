@@ -78,14 +78,31 @@ class DoctrineBuilder implements QueryInterface
         {
             $request       = $this->request;
             $search_fields = array_values($this->fields);
+            $global_search = $request->query->get('sSearch');
+            $orExpr = $queryBuilder->expr()->orX();
             foreach ($search_fields as $i => $search_field)
             {
+                // Global filtering
+                if(!empty($global_search)){
+                    
+                    if ($request->query->get('bSearchable_'.$i) && $request->query->get('bSearchable_'.$i) == "true") {
+                        $qbParam = "sSearch_global_{$i}";
+                        $orExpr->add($queryBuilder->expr()->like(
+                            $search_field,
+                            ":$qbParam"
+                        ));
+                        $queryBuilder->setParameter($qbParam, "%" . $global_search . "%");
+                    }
+                }
+                
+                // Individual filtering
                 $search_param = $request->get("sSearch_{$i}");
                 if ($request->get("sSearch_{$i}") !== false && !empty($search_param))
                 {
                     $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
                 }
             }
+            $queryBuilder->andWhere($orExpr);
         }
     }
 
@@ -123,6 +140,31 @@ class DoctrineBuilder implements QueryInterface
      * @return integer 
      */
     public function getTotalRecords()
+    {
+        $qb = clone $this->queryBuilder;
+//        $this->_addSearch($qb);
+        $qb->resetDQLPart('orderBy');
+
+        $gb = $qb->getDQLPart('groupBy');
+        if (empty($gb) || !in_array($this->fields['_identifier_'], $gb))
+        {
+            $qb->select(" count({$this->fields['_identifier_']}) ");
+            return $qb->getQuery()->getSingleScalarResult();
+        }
+        else
+        {
+            $qb->resetDQLPart('groupBy');
+            $qb->select(" count(distinct {$this->fields['_identifier_']}) ");
+            return $qb->getQuery()->getSingleScalarResult();
+        }
+    }
+    
+    /**
+     * get total records after filtering
+     * 
+     * @return integer 
+     */
+    public function getTotalDisplayRecords()
     {
         $qb = clone $this->queryBuilder;
         $this->_addSearch($qb);
