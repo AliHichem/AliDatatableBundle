@@ -57,6 +57,12 @@ class Datatable
     protected $_search_fields = array();
 
     /** @var array */
+    protected $_not_filterable_fields = array();
+    
+    /** @var array */
+    protected $_hidden_fields = array();
+    
+    /** @var array */
     protected static $_instances = array();
 
     /** @var Datatable */
@@ -126,7 +132,8 @@ class Datatable
     {
         $request       = $this->_request;
         $iTotalRecords = $this->_queryBuilder->getTotalRecords();
-        list($data, $objects) = $this->_queryBuilder->getData($hydration_mode);
+        $iTotalDisplayRecords = $this->_queryBuilder->getTotalDisplayRecords();
+        $data          = $this->_queryBuilder->getData($hydration_mode);
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
@@ -158,7 +165,7 @@ class Datatable
         $output = array(
             "sEcho"                => intval($request->get('sEcho')),
             "iTotalRecords"        => $iTotalRecords,
-            "iTotalDisplayRecords" => $iTotalRecords,
+            "iTotalDisplayRecords" => $iTotalDisplayRecords,
             "aaData"               => $data
         );
         return new Response(json_encode($output));
@@ -580,5 +587,4 @@ class Datatable
         $this->_search_fields = $search_fields;
         return $this;
     }
-
 }
