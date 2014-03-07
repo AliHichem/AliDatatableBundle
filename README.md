@@ -164,12 +164,12 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                      //      "label" => "alias.field_attribute_for_dql"
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setWhere(                                                     // set your dql where statement
-                     'x.adress = :adress',
-                     array('adress' => 'Paris') 
+                     'x.address = :address',
+                     array('address' => 'Paris') 
                 )
                 ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
                 ->setHasAction(true);                                           // you can disable action column from here by setting "false".
@@ -239,7 +239,7 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                      //      "label" => "alias.field_attribute_for_dql"
                             "Group"         => 'g.name',
                             "Team"          => 't.name',
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
@@ -247,8 +247,8 @@ private function _datatable()
                 ->addJoin('x.group', 'g', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
                 ->addJoin('x.team', 't', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
                 ->setWhere(                                                     // set your dql where statement
-                     'x.adress = :adress',
-                     array('adress' => 'Paris') 
+                     'x.address = :address',
+                     array('address' => 'Paris') 
                 )
                 ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
                 ->setHasAction(true);                                           // you can disable action column from here by setting "false".
@@ -401,7 +401,7 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                      //      "label" => "alias.field_attribute_for_dql"
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setRenderer(
@@ -409,7 +409,7 @@ private function _datatable()
                     {
                         foreach ($data as $key => $value)
                         {
-                            if ($key == 1)                                      // 1 => adress field
+                            if ($key == 1)                                      // 1 => address field
                             {
                                 $data[$key] = $controller_instance
                                         ->get('templating')
