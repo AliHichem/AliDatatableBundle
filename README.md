@@ -164,7 +164,7 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Address"        => 'x.address',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setWhere(                                                     // set your dql where statement
@@ -239,7 +239,7 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Address"        => 'x.address',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
                             "Group"         => 'g.name',
                             "Team"          => 't.name',
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
@@ -401,7 +401,7 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Address"        => 'x.address',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setRenderer(
