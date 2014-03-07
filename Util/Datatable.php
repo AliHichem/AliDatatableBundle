@@ -60,6 +60,9 @@ class Datatable
     protected $_not_filterable_fields = array();
     
     /** @var array */
+    protected $_not_sortable_fields = array();
+    
+    /** @var array */
     protected $_hidden_fields = array();
     
     /** @var array */
@@ -605,13 +608,40 @@ class Datatable
     }
     
     /**
-     * get filterable field
+     * get not filterable field
      * 
      * @return array
      */
     public function getNotFilterableFields()
     {
         return $this->_not_filterable_fields;
+    }
+    
+    /**
+     * set not sortable fields
+     * 
+     * @example 
+     * 
+     *      ->setNotSortableFields(array(0,2,5))
+     * 
+     * @param array $not_sortable_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setNotSortableFields(array $not_sortable_fields)
+    {
+        $this->_not_sortable_fields = $not_sortable_fields;
+        return $this;
+    }
+    
+    /**
+     * get not sortable field
+     * 
+     * @return array
+     */
+    public function getNotSortableFields()
+    {
+        return $this->_not_sortable_fields;
     }
     
     /**

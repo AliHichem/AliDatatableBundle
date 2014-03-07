@@ -35,12 +35,11 @@
         {% set i = 0 %}
         {% for label,key in fields %}
             {% if label != '_identifier_' %}
-                {% if not_filterable_fields is not empty and i in not_filterable_fields %}
-                    $aoColumnDefs.push({ 'bSearchable': false, 'aTargets': [ {{i}} ] });
+                {% if (not_filterable_fields is not empty and i in not_filterable_fields) or (not_sortable_fields is not empty and i in not_sortable_fields) or (hidden_fields is not empty and i in hidden_fields) %}
+                $aoColumnDefs.push({ {{ hidden_fields is not empty and i in hidden_fields ? "'bVisible': false," : "" }} {{ not_sortable_fields is not empty and i in not_sortable_fields ? "'bSortable': false," : "" }} {{ not_filterable_fields is not empty and i in not_filterable_fields ? "'bSearchable': false," : "" }} 'aTargets': [ {{i}} ] });
                 {% endif %}
-                {% if hidden_fields is not empty and i in hidden_fields %}
-                    $aoColumnDefs.push({ 'bVisible': false, 'aTargets': [ {{i}} ] });
-                {% endif %}
+            {% elseif action %}
+                $aoColumnDefs.push({ 'bSortable': false, 'bSearchable': false, 'aTargets': [ {{i}} ] });
             {% endif %}
             {% set i = i+1 %}
         {% endfor %}

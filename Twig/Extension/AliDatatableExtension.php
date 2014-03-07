@@ -83,20 +83,21 @@ class AliDatatableExtension extends \Twig_Extension
         {
             $options['id'] = 'ali-dta_' . md5(rand(1, 100));
         }
-        $dt                             = Datatable::getInstance($options['id']);
-        $config                         = $dt->getConfiguration();
-        $options['js_conf']             = json_encode($config['js']);
-        $options['js']                  = json_encode($options['js']);
-        $options['action']              = $dt->getHasAction();
-        $options['action_twig']         = $dt->getHasRendererAction();
-        $options['fields']              = $dt->getFields();
-        $options['delete_form']         = $this->createDeleteForm('_id_')->createView();
-        $options['search']              = $dt->getSearch();
-        $options['search_fields']       = $dt->getSearchFields();
+        $dt                                 = Datatable::getInstance($options['id']);
+        $config                             = $dt->getConfiguration();
+        $options['js_conf']                 = json_encode($config['js']);
+        $options['js']                      = json_encode($options['js']);
+        $options['action']                  = $dt->getHasAction();
+        $options['action_twig']             = $dt->getHasRendererAction();
+        $options['fields']                  = $dt->getFields();
+        $options['delete_form']             = $this->createDeleteForm('_id_')->createView();
+        $options['search']                  = $dt->getSearch();
+        $options['search_fields']           = $dt->getSearchFields();
         $options['not_filterable_fields']   = $dt->getNotFilterableFields();
-        $options['hidden_fields']       = $dt->getHiddenFields();
-        $options['multiple']            = $dt->getMultiple();
-        $options['sort']                = is_null($dt->getOrderField()) ? NULL : [array_search(
+        $options['not_sortable_fields']     = $dt->getNotSortableFields();
+        $options['hidden_fields']           = $dt->getHiddenFields();
+        $options['multiple']                = $dt->getMultiple();
+        $options['sort']                    = is_null($dt->getOrderField()) ? NULL : [array_search(
                     $dt->getOrderField(), array_values($dt->getFields())), $dt->getOrderType()];
         $main_template            = 'AliDatatableBundle:Main:datatableJs.html.twig';
         if (isset($options['js_template']))
@@ -132,6 +133,7 @@ class AliDatatableExtension extends \Twig_Extension
 //        $options['delete_form']   = $this->createDeleteForm('_id_')->createView();
         $options['search']        = $dt->getSearch();
         $options['search_fields'] = $dt->getSearchFields();
+        $options['not_sortable_fields']     = $dt->getNotSortableFields();
         $options['multiple']      = $dt->getMultiple();
 //        $options['sort']          = is_null($dt->getOrderField()) ? NULL : [array_search(
 //                    $dt->getOrderField(), array_values($dt->getFields())), $dt->getOrderType()];
