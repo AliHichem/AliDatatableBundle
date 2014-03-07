@@ -60,6 +60,9 @@ class Datatable
     protected $_not_filterable_fields = array();
     
     /** @var array */
+    protected $_not_sortable_fields = array();
+    
+    /** @var array */
     protected $_hidden_fields = array();
     
     /** @var array */
@@ -587,4 +590,86 @@ class Datatable
         $this->_search_fields = $search_fields;
         return $this;
     }
+
+    /**
+     * set not filterable fields
+     * 
+     * @example 
+     * 
+     *      ->setNotFilterableFields(array(0,2,5))
+     * 
+     * @param array $not_filterable_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setNotFilterableFields(array $not_filterable_fields)
+    {
+        $this->_not_filterable_fields = $not_filterable_fields;
+        return $this;
+    }
+    
+    /**
+     * get not filterable field
+     * 
+     * @return array
+     */
+    public function getNotFilterableFields()
+    {
+        return $this->_not_filterable_fields;
+    }
+    
+    /**
+     * set not sortable fields
+     * 
+     * @example 
+     * 
+     *      ->setNotSortableFields(array(0,2,5))
+     * 
+     * @param array $not_sortable_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setNotSortableFields(array $not_sortable_fields)
+    {
+        $this->_not_sortable_fields = $not_sortable_fields;
+        return $this;
+    }
+    
+    /**
+     * get not sortable field
+     * 
+     * @return array
+     */
+    public function getNotSortableFields()
+    {
+        return $this->_not_sortable_fields;
+    }
+    
+    /**
+     * set hidden fields
+     * 
+     * @example 
+     * 
+     *      ->setHiddenFields(array(0,2,5))
+     * 
+     * @param array $hidden_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setHiddenFields(array $hidden_fields)
+    {
+        $this->_hidden_fields = $hidden_fields;
+        return $this;
+    }
+    
+    /**
+     * get hidden field
+     * 
+     * @return array
+     */
+    public function getHiddenFields()
+    {
+        return $this->_hidden_fields;
+    }
+
 }
