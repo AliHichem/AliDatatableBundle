@@ -74,19 +74,6 @@ class MongodbDoctrineBuilder implements QueryInterface
     protected function _addSearch(\Doctrine\ODM\MongoDB\Query\Builder $queryBuilder)
     {
         throw new \Exception('ODM search not implemented');
-        if ($this->search == TRUE)
-        {
-            $request       = $this->request;
-            $search_fields = array_values($this->fields);
-            foreach ($search_fields as $i => $search_field)
-            {
-                $search_param = $request->get("sSearch_{$i}");
-                if ($request->get("sSearch_{$i}") !== false && !empty($search_param))
-                {
-                    $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
-                }
-            }
-        }
     }
 
     /**
@@ -109,13 +96,6 @@ class MongodbDoctrineBuilder implements QueryInterface
     public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
     {
         throw new \Exception('ODM join not supported');
-        if ($cond != '')
-        {
-            $cond = " with {$cond} ";
-        }
-        $join_method = $type == Join::INNER_JOIN ? "innerJoin" : "leftJoin";
-        $this->queryBuilder->$join_method($join_field, $alias, null, $cond);
-        return $this;
     }
 
     /**
@@ -127,20 +107,10 @@ class MongodbDoctrineBuilder implements QueryInterface
     {
         $qb = clone $this->queryBuilder;
         //$this->_addSearch($qb);
-//        $qb->resetDQLPart('orderBy');
-
-//        $gb = $qb->getDQLPart('groupBy');
         if (empty($gb) || !in_array($this->fields['_identifier_'], $gb))
         {
-//            $qb->select(" count({$this->fields['_identifier_']}) ");
             return $qb->count()->getQuery()->execute();
         }
-//        else
-//        {
-//            $qb->resetDQLPart('groupBy');
-//            $qb->select(" count(distinct {$this->fields['_identifier_']}) ");
-//            return $qb->getQuery()->getSingleScalarResult();
-//        }
     }
 
     /**
@@ -152,6 +122,10 @@ class MongodbDoctrineBuilder implements QueryInterface
      */
     public function getData($hydration_mode)
     {
+        if ($hydration_mode !== Query::HYDRATE_ARRAY)
+        {
+            throw new \Exception(sprintf('Only array hydration mode is support for datatable'));
+        }
         $request    = $this->request;
         $dql_fields = array_values($this->fields);
         if ($request->get('iSortCol_0') != null)
@@ -167,31 +141,17 @@ class MongodbDoctrineBuilder implements QueryInterface
         {
             $qb->sort($order_field, $request->get('sSortDir_0', 'asc'));
         }
-        else
+        $selectFields = $this->fields;
+        foreach ($selectFields as &$field)
         {
-            $qb->resetDQLPart('orderBy');
-        }
-        if ($hydration_mode == Query::HYDRATE_ARRAY)
-        {
-            $selectFields = $this->fields;
-            foreach ($selectFields as &$field)
+            if (preg_match('~as~', $field))
             {
-                if (preg_match('~as~', $field))
-                {
-                    throw new \Exception(sprintf('cannot use "as" keyword with Mongodb driver'));
-                }
+                throw new \Exception(sprintf('cannot use "as" keyword with Mongodb driver'));
             }
-            $qb->select($selectFields);
         }
-        else
-        {
-            $qb->select($this->entity_alias);
-        }
+//        $qb->select($selectFields);
 //        $this->_addSearch($qb);
-        if ($hydration_mode == Query::HYDRATE_ARRAY)
-        {
-            $qb->hydrate(false);
-        }
+        $qb->hydrate(false);
         $query          = $qb->getQuery();
         $iDisplayLength = (int) $request->get('iDisplayLength');
         if ($iDisplayLength > 0)
@@ -201,27 +161,16 @@ class MongodbDoctrineBuilder implements QueryInterface
         $items                = $query->execute()->toArray();
         $iTotalDisplayRecords = (string) count($items);
         $data                 = array();
-        if ($hydration_mode == Query::HYDRATE_ARRAY)
+        foreach ($items as $item)
         {
-            foreach ($items as $item)
+            $_item = [];
+            foreach ($selectFields as $key => $value)
             {
-                $data[] = array_values($item);
+                $_item[$value] = isset($item[$value]) ? $item[$value] : NULL;
             }
+            $data[] = array_values($_item);
         }
-        else
-        {
-            foreach ($items as $item)
-            {
-                $_data = array();
-                foreach ($this->fields as $field)
-                {
-                    $method  = "get" . ucfirst(substr($field, strpos($field, '.') + 1));
-                    $_data[] = $item->$method();
-                }
-                $data[] = $_data;
-            }
-        }
-        return $data;
+        return [$data, $items];
     }
 
     /**
@@ -297,6 +246,7 @@ class MongodbDoctrineBuilder implements QueryInterface
         $this->entity_name  = $entity_name;
         $this->entity_alias = $entity_alias;
         $this->queryBuilder->find($entity_name);
+//        $this->queryBuilder = $this->dm->createQueryBuilder($entity_name);
         return $this;
     }
 
@@ -310,7 +260,7 @@ class MongodbDoctrineBuilder implements QueryInterface
     public function setFields(array $fields)
     {
         $this->fields = $fields;
-        $this->queryBuilder->select(implode(', ', $fields));
+//        $this->queryBuilder->select(implode(', ', $fields));
         return $this;
     }
 
@@ -354,9 +304,7 @@ class MongodbDoctrineBuilder implements QueryInterface
      */
     public function setWhere($where, array $params = array())
     {
-        $this->queryBuilder->where($where);
-        $this->queryBuilder->setParameters($params);
-        return $this;
+        throw new \Exception('ODM where statement not supported');
     }
 
     /**
@@ -368,8 +316,7 @@ class MongodbDoctrineBuilder implements QueryInterface
      */
     public function setGroupBy($group)
     {
-        $this->queryBuilder->groupBy($group);
-        return $this;
+        throw new \Exception('ODM groupby statement not supported');
     }
 
     /**

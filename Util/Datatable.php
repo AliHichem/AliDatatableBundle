@@ -154,7 +154,7 @@ class Datatable
     {
         $request       = $this->_request;
         $iTotalRecords = $this->_queryBuilder->getTotalRecords();
-        $data          = $this->_queryBuilder->getData($hydration_mode);
+        list($data, $raw) = $this->_queryBuilder->getData($hydration_mode);
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
@@ -174,7 +174,7 @@ class Datatable
         }
         if (!is_null($this->_renderer_obj))
         {
-            $this->_renderer_obj->applyTo($data);
+            $this->_renderer_obj->applyTo($data,$raw);
         }
         if (!empty($this->_multiple))
         {

@@ -25,6 +25,16 @@ class AliDatatableExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
+    public function getFilters()
+    {
+        return array(
+            new \Twig_SimpleFilter('mongodate', array($this, 'convertMongoDateFilter')),
+        );
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function getFunctions()
     {
         return array(
@@ -32,6 +42,17 @@ class AliDatatableExtension extends \Twig_Extension
         );
     }
 
+    /**
+     * convert MongoDate to DateTime
+     * 
+     * @param \MongoDate $mongoDate
+     * @return \DateTime
+     */
+    public function convertMongoDateFilter(\MongoDate $mongoDate)
+    {
+        return new \DateTime('@' . $mongoDate->sec);
+    }
+    
     /**
      * Converts a string to time
      * 

@@ -403,6 +403,7 @@
 					var aTargets = aoColDefs[i].aTargets;
 					if ( !$.isArray( aTargets ) )
 					{
+                                            console.log('aTargets',aTargets);
 						_fnLog( oSettings, 1, 'aTargets must be an array of targets, not a '+(typeof aTargets) );
 					}
 		
