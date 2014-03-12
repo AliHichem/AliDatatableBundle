@@ -139,9 +139,11 @@
                             $.unblockpage();
                         },
                         beforeSend: function() {
-                            $.blockpage({
-                                msg: 'saving data'
-                            });
+                            if ($.isFunction($.fn.blockpage)){
+                                $.blockpage({
+                                    msg: 'saving data'
+                                });
+                            }
                         }
                     });
                 } else {
