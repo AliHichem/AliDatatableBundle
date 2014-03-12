@@ -28,6 +28,19 @@
             }
         }
         var $options = {{ js | raw }};
+        var $opts = {};
+        for(key in $options) { 
+            if ($options.hasOwnProperty(key)) {
+                $opts[key] = $options[key];
+                try{
+                    var type = typeof (eval (' tmp = ' + $options[key] + ' ; '));
+                    if (type == 'object' || type == 'function'){
+                        eval (' $opts["' + key + '"] = ' + $options[key] + ' ; ');
+                    }
+                }catch (e){ }
+            }
+        }
+        $options = $opts;
         var $aoColumnDefs = new Array();
         {% if multiple %}
         $aoColumnDefs.push({ 'bSortable': false, 'aTargets': [ 0 ] });
