@@ -48,26 +48,27 @@
         {% if action and not action_twig %} 
         $aoColumnDefs.push({
             "fnRender": function ( oObj ) {
+                var itemId = multiple ? (oObj.aData[{{fields|length}}]) : (oObj.aData[{{fields|length}}-1]);
                 var $edit_url = strtr(
                     "{{ path(edit_route , { 'id': "xx" }) }}",
-                    { "xx": oObj.aData[{{fields|length}}-1] }
+                    { "xx": itemId }
                 );
                 var $link_edit = "<a  style='float:right; margin-right:10px' class='dialog' title='edit'";
                 $link_edit += "href='"+$edit_url+"'>";
                 $link_edit += "{{ 'ali.common.edit'|trans()}}</a>";
                 var $delete_url = strtr(
                     "{{ path(delete_route, { 'id': "xx" }) }}",
-                    { "xx": oObj.aData[{{fields|length}}-1] }
+                    { "xx": itemId }
                 );
                 var $link_delete = "<form style='float:right' class='form' action='"+$delete_url+"' method='post'>";
                 $link_delete += strtr(
                                     '{{ form_widget(delete_form) }}',
-                                    { "_id_": oObj.aData[{{fields|length}}-1] }
+                                    { "_id_": itemId }
                                 );
                 $link_delete += "<a class='button-delete' href='#' type='submit'>{{ 'ali.common.delete'|trans() }}</a>";
                 $link_delete += " </form>";
                 var $out = $link_delete+ " " + $link_edit ;
-                if (oObj.aData[{{fields|length}}-1] == null )
+                if (itemId == null )
                 {
                     $out = "<div style='float:right'>{{ 'ali.common.no_action'|trans() }}</div>";
                 }
