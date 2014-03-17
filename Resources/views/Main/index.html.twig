@@ -149,12 +149,16 @@
                         data: form.serialize(),
                         success: function(msg) {
                             $('#'+getId()).dataTable().fnDraw();
-                            $.unblockpage();
+                            if ($.isFunction($.fn.unblockpage)){
+                                $.unblockpage();
+                            }
                         },
                         beforeSend: function() {
-                            $.blockpage({
-                                msg: 'saving data'
-                            });
+                            if ($.isFunction($.fn.blockpage)){
+                                $.blockpage({
+                                    msg: 'saving data'
+                                });
+                            }
                         }
                     });
                 } else {
