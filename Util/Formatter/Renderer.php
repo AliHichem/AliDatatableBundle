@@ -65,10 +65,11 @@ class Renderer
      * apply foreach given cell content the given (if exists) view
      * 
      * @param array $data 
+     * @param array $objects
      * 
      * @return void
      */
-    public function applyTo(array &$data)
+    public function applyTo(array &$data, array $objects)
     {
         foreach ($data as $row_index => $row)
         {
@@ -86,6 +87,7 @@ class Renderer
                     $view = 'AliDatatableBundle:Renderers:_default.html.twig';
                 }
                 $params                          = array_merge($params, array(
+                    'dt_obj'  => $objects[$row_index],
                     'dt_item' => $data[$row_index][$column_index],
                     'dt_id'   => $identifier_raw
                         )

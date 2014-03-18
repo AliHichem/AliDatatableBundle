@@ -55,7 +55,7 @@ class Datatable
 
     /** @var array */
     protected $_search_fields = array();
-    
+
     /** @var array */
     protected static $_instances = array();
 
@@ -69,9 +69,9 @@ class Datatable
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->_container   = $container;
-        $this->_config      = $this->_container->getParameter('ali_datatable');
-        $this->_em          = $this->_container->get('doctrine.orm.entity_manager');
+        $this->_container    = $container;
+        $this->_config       = $this->_container->getParameter('ali_datatable');
+        $this->_em           = $this->_container->get('doctrine.orm.entity_manager');
         $this->_request      = $this->_container->get('request');
         $this->_queryBuilder = new DoctrineBuilder($container);
         self::$_current_instance = $this;
@@ -126,12 +126,12 @@ class Datatable
     {
         $request       = $this->_request;
         $iTotalRecords = $this->_queryBuilder->getTotalRecords();
-        $data          = $this->_queryBuilder->getData($hydration_mode);
+        list($data, $objects) = $this->_queryBuilder->getData($hydration_mode);
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
-                    $ids[$key] = $val[$id_index];
-                });
+            $ids[$key] = $val[$id_index];
+        });
         if (!is_null($this->_fixed_data))
         {
             $this->_fixed_data = array_reverse($this->_fixed_data);
@@ -146,14 +146,14 @@ class Datatable
         }
         if (!is_null($this->_renderer_obj))
         {
-            $this->_renderer_obj->applyTo($data);
+            $this->_renderer_obj->applyTo($data,$objects);
         }
         if (!empty($this->_multiple))
         {
             array_walk($data, function($val, $key) use(&$data, $ids) {
-                        array_unshift($val, "<input type='checkbox' name='dataTables[actions][]' value='{$ids[$key]}' />");
-                        $data[$key] = $val;
-                    });
+                array_unshift($val, "<input type='checkbox' name='dataTables[actions][]' value='{$ids[$key]}' />");
+                $data[$key] = $val;
+            });
         }
         $output = array(
             "sEcho"                => intval($request->get('sEcho')),
@@ -477,11 +477,12 @@ class Datatable
      * 
      * @return Datatable 
      */
-    public function setGroupBy($groupby) {
+    public function setGroupBy($groupby)
+    {
         $this->_queryBuilder->setGroupBy($groupby);
         return $this;
     }
-    
+
     /**
      * set search
      * 
@@ -552,7 +553,7 @@ class Datatable
     {
         return $this->_config;
     }
-    
+
     /**
      * get search field
      * 
@@ -580,6 +581,4 @@ class Datatable
         return $this;
     }
 
-
-    
 }

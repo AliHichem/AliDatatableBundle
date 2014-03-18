@@ -2,9 +2,9 @@
 
 namespace Ali\DatatableBundle\Util\Factory\Query;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\ORM\Query,
-    Doctrine\ORM\Query\Expr\Join;
 
 class DoctrineBuilder implements QueryInterface
 {
@@ -90,6 +90,24 @@ class DoctrineBuilder implements QueryInterface
     }
 
     /**
+     * convert object to array
+     * @param object $object
+     * @return array
+     */
+    protected function _toArray($object)
+    {
+        $reflectionClass = new \ReflectionClass(get_class($object));
+        $array           = array();
+        foreach ($reflectionClass->getProperties() as $property)
+        {
+            $property->setAccessible(true);
+            $array[$property->getName()] = $property->getValue($object);
+            $property->setAccessible(false);
+        }
+        return $array;
+    }
+
+    /**
      * add join
      * 
      * @example:
@@ -170,22 +188,7 @@ class DoctrineBuilder implements QueryInterface
         {
             $qb->resetDQLPart('orderBy');
         }
-        if ($hydration_mode == Query::HYDRATE_ARRAY)
-        {
-            $selectFields = $this->fields;
-            foreach ($selectFields as &$field)
-            {
-                if (!preg_match('~as~', $field))
-                {
-                    $field = $field . ' as ' . str_replace('.', '_', $field);
-                }
-            }
-            $qb->select(implode(" , ", $selectFields));
-        }
-        else
-        {
-            $qb->select($this->entity_alias);
-        }
+        $qb->select($this->entity_alias);
         $this->_addSearch($qb);
         $query          = $qb->getQuery();
         $iDisplayLength = (int) $request->get('iDisplayLength');
@@ -193,30 +196,26 @@ class DoctrineBuilder implements QueryInterface
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
-        $items                = $query->getResult($hydration_mode);
-        $iTotalDisplayRecords = (string) count($items);
-        $data                 = array();
-        if ($hydration_mode == Query::HYDRATE_ARRAY)
+        $objects      = $query->getResult(Query::HYDRATE_OBJECT);
+        $selectFields = array();
+        foreach ($this->fields as $label => $selector)
         {
-            foreach ($items as $item)
-            {
-                $data[] = array_values($item);
-            }
+            $has_alias      = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $selector, $matches);
+            $_f             = ( $has_alias > 0 ) ? $matches[1][0] : $selector;
+            $selectFields[] = substr($_f, strpos($_f, '.') + 1);
         }
-        else
+        $data = array();
+        foreach ($objects as $object)
         {
-            foreach ($items as $item)
+            $d   = array();
+            $map = $this->_toArray($object);
+            foreach ($selectFields as $key)
             {
-                $_data = array();
-                foreach ($this->fields as $field)
-                {
-                    $method  = "get" . ucfirst(substr($field, strpos($field, '.') + 1));
-                    $_data[] = $item->$method();
-                }
-                $data[] = $_data;
+                $d[] = $map[$key];
             }
+            $data[] = $d;
         }
-        return $data;
+        return [$data, $objects];
     }
 
     /**
