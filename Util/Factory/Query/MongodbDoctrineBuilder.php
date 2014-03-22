@@ -167,12 +167,13 @@ class MongodbDoctrineBuilder implements QueryInterface
 //        $qb->select($selectFields);
 //        $this->_addSearch($qb);
 //        $qb->hydrate(false);
-        $query          = $qb->getQuery();
-        $iDisplayLength = (int) $request->get('iDisplayLength');
-        if ($iDisplayLength > 0)
+        $limit = (int) $request->get('iDisplayLength');
+        $skip  = (int) $request->get('iDisplayStart');
+        if ($limit > 0)
         {
-            $qb->limit($iDisplayLength)->skip($request->get('iDisplayStart'));
+            $qb->skip($skip)->limit($limit);
         }
+        $query                = $qb->getQuery();
         $items                = $query->execute()->toArray();
         $iTotalDisplayRecords = (string) count($items);
         $data                 = array();
