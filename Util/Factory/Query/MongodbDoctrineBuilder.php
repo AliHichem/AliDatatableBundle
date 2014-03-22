@@ -144,15 +144,12 @@ class MongodbDoctrineBuilder implements QueryInterface
         {
             throw new \Exception(sprintf('Only array hydration mode is support for datatable'));
         }
-        $request    = $this->request;
-        $dql_fields = array_values($this->fields);
+        $request     = $this->request;
+        $dql_fields  = array_values($this->fields);
+        $order_field = null;
         if ($request->get('iSortCol_0') != null)
         {
-            $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
-        }
-        else
-        {
-            $order_field = null;
+            $order_field = $dql_fields[$request->get('iSortCol_0')];
         }
         $qb = clone $this->queryBuilder;
         if (!is_null($order_field))
@@ -179,9 +176,6 @@ class MongodbDoctrineBuilder implements QueryInterface
         $items                = $query->execute()->toArray();
         $iTotalDisplayRecords = (string) count($items);
         $data                 = array();
-//        echo "<pre>";
-//        \Doctrine\Common\Util\Debug::dump($items);
-//        exit;
         foreach ($items as $item)
         {
             $_item = [];
@@ -268,7 +262,6 @@ class MongodbDoctrineBuilder implements QueryInterface
         $this->entity_name  = $entity_name;
         $this->entity_alias = $entity_alias;
         $this->queryBuilder->find($entity_name);
-//        $this->queryBuilder = $this->dm->createQueryBuilder($entity_name);
         return $this;
     }
 
@@ -282,7 +275,6 @@ class MongodbDoctrineBuilder implements QueryInterface
     public function setFields(array $fields)
     {
         $this->fields = $fields;
-//        $this->queryBuilder->select(implode(', ', $fields));
         return $this;
     }
 
@@ -298,8 +290,6 @@ class MongodbDoctrineBuilder implements QueryInterface
     {
         $this->order_field = strtolower($order_field);
         $this->order_type  = strtolower($order_type);
-//        $this->queryBuilder->sort($order_field, ($order_field == 'asc' ? 1 : 0));
-        $this->queryBuilder->sort($order_field, $order_type);
         return $this;
     }
 
