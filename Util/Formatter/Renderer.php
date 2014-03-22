@@ -87,10 +87,6 @@ class Renderer
                 {
                     $view = 'AliDatatableBundle:Renderers:_default.html.twig';
                 }
-//                echo "<pre>";
-//                \Doctrine\Common\Util\Debug::dump($raw[$row_index]);
-//                \Doctrine\Common\Util\Debug::dump($data[$row_index]);
-//                exit;
                 $params                          = array_merge($params, array(
                     'dt_obj'  => !is_null($raw[$row_index]) ? $raw[$row_index] : NULL,
                     'dt_item' => $data[$row_index][$column_index],

@@ -77,6 +77,24 @@ class MongodbDoctrineBuilder implements QueryInterface
     }
 
     /**
+     * convert object to array
+     * @param object $object
+     * @return array
+     */
+    protected function _toArray($object)
+    {
+        $reflectionClass = new \ReflectionClass(get_class($object));
+        $array           = array();
+        foreach ($reflectionClass->getProperties() as $property)
+        {
+            $property->setAccessible(true);
+            $array[$property->getName()] = $property->getValue($object);
+            $property->setAccessible(false);
+        }
+        return $array;
+    }
+
+    /**
      * add join
      * 
      * @example:
@@ -151,7 +169,7 @@ class MongodbDoctrineBuilder implements QueryInterface
         }
 //        $qb->select($selectFields);
 //        $this->_addSearch($qb);
-        $qb->hydrate(false);
+//        $qb->hydrate(false);
         $query          = $qb->getQuery();
         $iDisplayLength = (int) $request->get('iDisplayLength');
         if ($iDisplayLength > 0)
@@ -161,9 +179,13 @@ class MongodbDoctrineBuilder implements QueryInterface
         $items                = $query->execute()->toArray();
         $iTotalDisplayRecords = (string) count($items);
         $data                 = array();
+//        echo "<pre>";
+//        \Doctrine\Common\Util\Debug::dump($items);
+//        exit;
         foreach ($items as $item)
         {
             $_item = [];
+            $item  = $this->_toArray($item);
             foreach ($selectFields as $key => $value)
             {
                 $_item[$value] = isset($item[$value]) ? $item[$value] : NULL;
