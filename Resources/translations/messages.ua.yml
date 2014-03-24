@@ -1,0 +1,20 @@
+ali:
+    common:
+        action: Дії
+        confirm_delete: "Ви дійсно бажаєте видалити цей елемент?"
+        delete: видалити
+        edit: редагувати
+        no_action: "(Не вдається видалити)"
+        sProcessing:   "Почекайте..."
+        sLengthMenu:   "Показати _MENU_ записів"
+        sZeroRecords:  "Записи відсутні."
+        sInfo:         "Записи від _START_ до _END_ з _TOTAL_ записів"
+        sInfoEmpty:    "Записи від 0 до 0 з 0 записів"
+        sInfoFiltered: "(відфільтровано з _MAX_ записів)"
+        sInfoPostFix:  ""
+        sSearch:       "Пошук:"
+        sFirst: "Перша"
+        sPrevious: "Попередня"
+        sNext: "Наступна"
+        sLast: "Остання"
+        search: "пошук"
