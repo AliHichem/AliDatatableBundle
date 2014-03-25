@@ -215,7 +215,7 @@ class DoctrineBuilder implements QueryInterface
             }
             $data[] = $d;
         }
-        return [$data, $objects];
+        return array($data, $objects);
     }
 
     /**
