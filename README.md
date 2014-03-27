@@ -16,7 +16,7 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * support of custom twig/phpClosure renderers.
  * support of custom grouped actions.
  
-###### Soon : support of ODM (MongoDB).
+###### Soon : support of ODM (MongoDB) : developement under progress in the "mongodb" branch.
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_01.png"></div>
 
@@ -44,7 +44,7 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 
 ### Installation
 
-Installation is a quick (I promise!) 7 step process:
+Installation is a quick (I promise!) 3 step process:
 
 1. [Download AliDatatableBundle using composer](#step-1-download-alidatatablebundle)
 2. [Enable the Bundle](#step-2--enable-the-bundle)
@@ -382,6 +382,16 @@ private function _datatable()
                     ->setHasAction(true);
 }
 ```
+
+In a twig renderer you can have access the the field value using dt_item variable
+```
+{{ dt_item }}
+```
+or access the entire entity object using dt_obj variable
+```
+<a href="{{ path('route_to_user_edit',{ 'user_id' : dt_obj.id }) }}" > {{ dt_obj.username }} </a>
+```
+NOTE: be careful of LAZY LOADING when using dt_obj !
 
 **PHP Closures**
 
