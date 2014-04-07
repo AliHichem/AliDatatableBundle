@@ -83,6 +83,9 @@ class DoctrineBuilder implements QueryInterface
                 $search_param = $request->get("sSearch_{$i}");
                 if ($request->get("sSearch_{$i}") !== false && !empty($search_param))
                 {
+                    $field = explode(' ',trim($search_field));
+                    $search_field = $field[0];
+                    
                     $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
                 }
             }
