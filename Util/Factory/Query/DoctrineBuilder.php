@@ -86,6 +86,9 @@ class DoctrineBuilder implements QueryInterface
             $filteringType = $this->getFilteringType();
             foreach ($search_fields as $i => $search_field)
             {
+                $field = explode(' ',trim($search_field));
+                $search_field = $field[0];
+                
                 // Global filtering
                 if(!empty($global_search) || $global_search == '0'){
                     
@@ -104,11 +107,6 @@ class DoctrineBuilder implements QueryInterface
                 $bRegex = $request->get("bRegex_{$i}");
                 if ($request->get("bSearchable_{$i}") != 'false' && (!empty($search_param) || $search_param == '0'))
                 {
-//                    if($bRegex == 'false'){
-//                        $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
-//                    }elseif($bRegex == 'true'){
-//                        $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}' ");
-//                    }
                     if(array_key_exists($i, $filteringType)){
                         switch ($filteringType[$i]) {
                             case 's':
