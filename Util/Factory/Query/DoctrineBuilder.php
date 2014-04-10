@@ -54,6 +54,9 @@ class DoctrineBuilder implements QueryInterface
     /** @var boolean */
     protected $search = FALSE;
 
+    /** @var array */
+    protected $filtering_type = array();
+    
     /**
      * class constructor 
      * 
@@ -80,10 +83,11 @@ class DoctrineBuilder implements QueryInterface
             $search_fields = array_values($this->fields);
             $global_search = $request->query->get('sSearch');
             $orExpr = $queryBuilder->expr()->orX();
+            $filteringType = $this->getFilteringType();
             foreach ($search_fields as $i => $search_field)
             {
                 // Global filtering
-                if(!empty($global_search)){
+                if(!empty($global_search) || $global_search == '0'){
                     
                     if ($request->query->get('bSearchable_'.$i) && $request->query->get('bSearchable_'.$i) == "true") {
                         $qbParam = "sSearch_global_{$i}";
@@ -97,12 +101,32 @@ class DoctrineBuilder implements QueryInterface
                 
                 // Individual filtering
                 $search_param = $request->get("sSearch_{$i}");
-                if ($request->get("sSearch_{$i}") !== false && !empty($search_param))
+                $bRegex = $request->get("bRegex_{$i}");
+                if ($request->get("bSearchable_{$i}") != 'false' && (!empty($search_param) || $search_param == '0'))
                 {
-                    $field        = explode(' ', trim($search_field));
-                    $search_field = $field[0];
-
-                    $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
+//                    if($bRegex == 'false'){
+//                        $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
+//                    }elseif($bRegex == 'true'){
+//                        $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}' ");
+//                    }
+                    if(array_key_exists($i, $filteringType)){
+                        switch ($filteringType[$i]) {
+                            case 's':
+                                $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}' ");
+                                break;
+                            case 'f':
+                                $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
+                                break;
+                            case 'b':
+                                $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}' ");
+                                break;
+                            case 'e':
+                                $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}%' ");
+                                break;
+                        }
+                    }else{
+                        $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
+                    }
                 }
             }
             $queryBuilder->andWhere($orExpr);
@@ -454,4 +478,29 @@ class DoctrineBuilder implements QueryInterface
         return $this;
     }
 
+    /**
+     * set filtering type
+     * 's' strict
+     * 'f' full => LIKE '%' . $value . '%'
+     * 'b' begin => LIKE '%' . $value
+     * 'e' end => LIKE $value . '%'
+     * 
+     * @example 
+     * 
+     *      ->setFilteringType(array(0 => 's',2 => 'f',5 => 'b'))
+     * 
+     * @param array $filtering_type
+     * 
+     * @return DoctrineBuilder
+     */
+    public function setFilteringType(array $filtering_type)
+    {
+        $this->filtering_type = $filtering_type;
+        return $this;
+    }
+    
+    public function getFilteringType() {
+        return $this->filtering_type;
+    }
+    
 }
