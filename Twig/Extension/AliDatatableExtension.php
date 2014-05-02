@@ -55,8 +55,20 @@ class AliDatatableExtension extends \Twig_Extension
         $options['search']        = $dt->getSearch();
         $options['search_fields'] = $dt->getSearchFields();
         $options['multiple']      = $dt->getMultiple();
-        $options['sort']          = is_null($dt->getOrderField()) ? NULL : array(array_search(
+        if (is_null($dt->getOrderField())) {
+            $options['sort'] = null;
+        } else {
+            if (empty($options['multiple'])) {
+                $options['sort'] = array(array_search(
                     $dt->getOrderField(), array_values($dt->getFields())), $dt->getOrderType());
+            } else {
+                $sortColum = array_search($dt->getOrderField(), array_values($dt->getFields()));
+                $sortColum++;
+                $sortType = $dt->getOrderType();
+                
+                $options['sort'] = array($sortColum, $sortType);
+            }
+        }
         $main_template            = 'AliDatatableBundle:Main:index.html.twig';
         if (isset($options['main_template']))
         {
