@@ -12,3 +12,9 @@ services:
         arguments: [ @service_container ]
         tags:
             -  { name: twig.extension }
+    
+    datatable.kernel.listener.terminate:
+        class: Ali\DatatableBundle\Listener\KernelTerminateListener
+        arguments: [ @service_container ]
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate, method: onKernelTerminate }
