@@ -203,6 +203,12 @@ class Datatable
         return $instance;
     }
 
+    public static function clearInstance()
+    {
+        self::$_instances = array();
+    }
+
+
     /**
      * get entity name
      * 
