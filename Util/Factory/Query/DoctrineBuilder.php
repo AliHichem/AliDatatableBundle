@@ -107,23 +107,30 @@ class DoctrineBuilder implements QueryInterface
                 $bRegex = $request->get("bRegex_{$i}");
                 if ($request->get("bSearchable_{$i}") != 'false' && (!empty($search_param) || $search_param == '0'))
                 {
+                    $queryBuilder->andWhere($queryBuilder->expr()->like($search_field, ":sSearch_{$i}"));
+                    
                     if(array_key_exists($i, $filteringType)){
                         switch ($filteringType[$i]) {
                             case 's':
-                                $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}' ");
+                                $queryBuilder->setParameter("sSearch_{$i}", $request->get("sSearch_{$i}"));
+//                                $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}' ");
                                 break;
                             case 'f':
-                                $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
+                                $queryBuilder->setParameter("sSearch_{$i}", sprintf("%%%s%%", $request->get("sSearch_{$i}")));
+//                                $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
                                 break;
                             case 'b':
-                                $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}' ");
+                                $queryBuilder->setParameter("sSearch_{$i}", sprintf("%%%s", $request->get("sSearch_{$i}")));
+//                                $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}' ");
                                 break;
                             case 'e':
-                                $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}%' ");
+                                $queryBuilder->setParameter("sSearch_{$i}", sprintf("%s%%", $request->get("sSearch_{$i}")));
+//                                $queryBuilder->andWhere(" $search_field like '{$request->get("sSearch_{$i}")}%' ");
                                 break;
                         }
                     }else{
-                        $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
+                        $queryBuilder->setParameter("sSearch_{$i}", sprintf("%%%s%%", $request->get("sSearch_{$i}")));
+//                        $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
                     }
                 }
             }
