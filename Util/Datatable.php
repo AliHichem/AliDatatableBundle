@@ -66,6 +66,15 @@ class Datatable
     protected $_hidden_fields = array();
     
     /** @var array */
+    protected $_not_filterable_fields = array();
+    
+    /** @var array */
+    protected $_not_sortable_fields = array();
+    
+    /** @var array */
+    protected $_hidden_fields = array();
+    
+    /** @var array */
     protected static $_instances = array();
 
     /** @var Datatable */
@@ -665,6 +674,37 @@ class Datatable
     public function setHiddenFields(array $hidden_fields)
     {
         $this->_hidden_fields = $hidden_fields;
+        return $this;
+    }
+
+    /**
+     * get hidden field
+     * 
+     * @return array
+     */
+    public function getHiddenFields()
+    {
+        return $this->_hidden_fields;
+    }
+
+    /**
+     * set filtering type
+     * 's' strict
+     * 'f' full => LIKE '%' . $value . '%'
+     * 'b' begin => LIKE '%' . $value
+     * 'e' end => LIKE $value . '%'
+     * 
+     * @example 
+     * 
+     *      ->setFilteringType(array(0 => 's',2 => 'f',5 => 'b'))
+     * 
+     * @param array $filtering_type
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setFilteringType(array $filtering_type)
+    {
+        $this->_queryBuilder->setFilteringType($filtering_type);
         return $this;
     }
     
