@@ -135,8 +135,8 @@ class Datatable
     {
         $request       = $this->_request;
         $iTotalRecords = $this->_queryBuilder->getTotalRecords();
-        $iTotalDisplayRecords = $this->_queryBuilder->getTotalDisplayRecords();
-        $data          = $this->_queryBuilder->getData($hydration_mode);
+        $iTotalDisplayRecords = $this->_queryBuilder->getTotalDisplayRecords();       
+        list($data, $objects) = $this->_queryBuilder->getData($hydration_mode);  
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {

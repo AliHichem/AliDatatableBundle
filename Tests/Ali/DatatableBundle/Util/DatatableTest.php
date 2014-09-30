@@ -120,6 +120,7 @@ class DatatableTest extends BaseTestCase
                             "title"        => 'p.name',
                             "_identifier_" => 'p.id')
         );
+        
         $this->assertInternalType('boolean', $this->_datatable->getHasAction());
     }
 
