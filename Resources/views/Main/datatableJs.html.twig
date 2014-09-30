@@ -45,17 +45,6 @@
         {% if multiple %}
         $aoColumnDefs.push({ 'bSortable': false, 'aTargets': [ 0 ] });
         {% endif %}
-        {% set i = 0 %}
-        {% for label,key in fields %}
-            {% if label != '_identifier_' %}
-                {% if (not_filterable_fields is not empty and i in not_filterable_fields) or (not_sortable_fields is not empty and i in not_sortable_fields) or (hidden_fields is not empty and i in hidden_fields) %}
-                $aoColumnDefs.push({ {{ hidden_fields is not empty and i in hidden_fields ? "'bVisible': false," : "" }} {{ not_sortable_fields is not empty and i in not_sortable_fields ? "'bSortable': false," : "" }} {{ not_filterable_fields is not empty and i in not_filterable_fields ? "'bSearchable': false," : "" }} 'aTargets': [ {{i}} ] });
-                {% endif %}
-            {% elseif action %}
-                $aoColumnDefs.push({ 'bSortable': false, 'bSearchable': false, 'aTargets': [ {{i}} ] });
-            {% endif %}
-            {% set i = i+1 %}
-        {% endfor %}
         {% if action and not action_twig %} 
         $aoColumnDefs.push({
             "fnRender": function ( oObj ) {
@@ -160,12 +149,16 @@
                         data: form.serialize(),
                         success: function(msg) {
                             $('#'+getId()).dataTable().fnDraw();
-                            $.unblockpage();
+                            if ($.isFunction($.fn.unblockpage)){
+                                $.unblockpage();
+                            }
                         },
                         beforeSend: function() {
-                            $.blockpage({
-                                msg: 'saving data'
-                            });
+                            if ($.isFunction($.fn.blockpage)){
+                                $.blockpage({
+                                    msg: 'saving data'
+                                });
+                            }
                         }
                     });
                 } else {
@@ -182,7 +175,7 @@
         }
 
         {% if search %}
-{#        $(".dataTables_filter").remove();#}
+        $(".dataTables_filter").remove();
         var search_selector = "#{{id}} input[searchable=true]";
         $(search_selector).keypress( function (event) {
             var index = $(this).attr('index');
@@ -209,11 +202,6 @@
                 this.value = this.initVal;
             }
         });
-        $("tfoot input").keyup( function () {
-            /* Filter on the column (the index) of this element */
-            var oTable = eval('oTable_{{id}}'.split('-').join('_'));
-            oTable.fnFilter( this.value, $("tfoot input").index(this) );
-        } );
         {% endif %}
     });
 </script>
