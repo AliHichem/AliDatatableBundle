@@ -2,7 +2,7 @@
 {% if multiple %}
 <form name="frm-{{id}}">
 {% endif %}
-    <table class="display table table-bordered" id="{{id}}"> 
+    <table class="{{ class|default('display table table-bordered') }}" id="{{id}}"> 
         <thead> 
             <tr> 
             {% if multiple %}
