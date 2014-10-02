@@ -52,6 +52,9 @@ class Datatable
 
     /** @var boolean */
     protected $_search;
+    
+    /** @var boolean */
+    protected $_global_search = true;
 
     /** @var array */
     protected $_search_fields = array();
@@ -312,6 +315,16 @@ class Datatable
     }
 
     /**
+     * get global_search
+     * 
+     * @return boolean
+     */
+    public function getGlobalSearch()
+    {
+        return $this->_global_search;
+    }
+
+    /**
      * set entity
      * 
      * @param type $entity_name
@@ -509,10 +522,25 @@ class Datatable
     public function setSearch($search)
     {
         $this->_search = $search;
-        $this->_queryBuilder->setSearch($search);
+        $this->_queryBuilder->setSearch($search || $this->_global_search);
+        return $this;
+    }
+    
+    /**
+     * set global search
+     * 
+     * @param bool $global_search
+     * 
+     * @return Datatable
+     */
+    public function setGlobalSearch($global_search)
+    {
+        $this->_global_search = $global_search;
+        $this->_queryBuilder->setSearch($global_search || $this->_search);
         return $this;
     }
 
+    
     /**
      * set datatable identifier
      * 

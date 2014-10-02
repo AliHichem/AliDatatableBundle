@@ -77,7 +77,7 @@ class DoctrineBuilder implements QueryInterface
      */
     protected function _addSearch(\Doctrine\ORM\QueryBuilder $queryBuilder)
     {
-        if ($this->search == TRUE)
+        if ($this->search == true)
         {
             $request       = $this->request;
             $search_fields = array_values($this->fields);
@@ -90,7 +90,7 @@ class DoctrineBuilder implements QueryInterface
                 $search_field = $field[0];
                 
                 // Global filtering
-                if(!empty($global_search) || $global_search == '0'){
+                if(!empty($global_search) || $global_search == '0') {
                     
                     if ($request->query->get('bSearchable_'.$i) && $request->query->get('bSearchable_'.$i) == "true") {
                         $qbParam = "sSearch_global_{$i}";
@@ -98,6 +98,7 @@ class DoctrineBuilder implements QueryInterface
                             $search_field,
                             ":$qbParam"
                         ));
+  
                         $queryBuilder->setParameter($qbParam, "%" . $global_search . "%");
                     }
                 }
@@ -106,7 +107,7 @@ class DoctrineBuilder implements QueryInterface
                 $search_param = $request->get("sSearch_{$i}");
                 $bRegex = $request->get("bRegex_{$i}");
                 if ($request->get("bSearchable_{$i}") != 'false' && (!empty($search_param) || $search_param == '0'))
-                {                    
+                {   
                     $queryBuilder->andWhere($queryBuilder->expr()->like($search_field, ":sSearch_{$i}"));
                     
                     if(array_key_exists($i, $filteringType)){
@@ -128,6 +129,10 @@ class DoctrineBuilder implements QueryInterface
                         $queryBuilder->setParameter("sSearch_{$i}", sprintf("%%%s%%", $request->get("sSearch_{$i}")));
                     }
                 }
+            }
+            
+            if(!empty($global_search) || $global_search == '0') {
+                $queryBuilder->andWhere($orExpr);
             }
         }
     }
@@ -219,6 +224,7 @@ class DoctrineBuilder implements QueryInterface
         if (empty($gb) || !in_array($this->fields['_identifier_'], $gb))
         {
             $qb->select(" count({$this->fields['_identifier_']}) ");
+
             return $qb->getQuery()->getSingleScalarResult();
         }
         else

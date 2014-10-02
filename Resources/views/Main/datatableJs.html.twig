@@ -108,7 +108,7 @@
                 }
             },
             "bSort": true,
-            "bFilter": {% if search %} true {% else %} false {% endif %},
+            "bFilter": {% if search == true or global_search == true %} true {% else %} false {% endif %},
             "oLanguage": {
                 "sProcessing":     '{{ 'ali.common.sProcessing' | trans() }}',
                 "sLengthMenu":     '{{ 'ali.common.sLengthMenu' | trans() }}',
@@ -185,8 +185,10 @@
             });
         }
 
+        {% if global_search == false %}
+            $(".dataTables_filter").remove();
+        {% endif %}
         {% if search %}
-        $(".dataTables_filter").remove();
         var search_selector = "#{{id}} input[searchable=true]";
         $(search_selector).keypress( function (event) {
             var index = $(this).attr('index');
