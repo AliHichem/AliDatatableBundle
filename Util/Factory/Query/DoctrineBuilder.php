@@ -287,17 +287,21 @@ class DoctrineBuilder implements QueryInterface
         $objects = $query->getResult(Query::HYDRATE_OBJECT);
         $maps    = $query->getResult(Query::HYDRATE_SCALAR);
         $data    = array();
+        
         $get_scalar_key = function($field) {
-            $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
+            $has_alias = preg_match_all('~([A-z]*\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
             $_f        = str_replace('.', '_', $_f);
             return $_f;
         };
+        
         $fields = array();
+        
         foreach ($this->fields as $field)
         {
             $fields[] = $get_scalar_key($field);
         }
+        
         foreach ($maps as $map)
         {
             $item = array();
