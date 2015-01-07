@@ -205,6 +205,22 @@ class DatatableTest extends BaseTestCase
         $this->assertArrayHasKey("someAliasName", $r[1][0]);
     }
     
+    public function test_multipleAlias()
+    {
+        $r = $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => "(SELECT Product.name 
+                                              FROM Ali\DatatableBundle\Entity\Product as Product
+                                              WHERE Product.id = 1) as someAliasName",
+                            "_identifier_" => 'p.id')
+                )->getQueryBuilder()->getData(null);
+        
+        
+        $this->assertArrayHasKey("someAliasName", $r[1][0]);
+    }
+    
     public function test_SQLCommandInFields()
     {
         $datatable = $this->_datatable

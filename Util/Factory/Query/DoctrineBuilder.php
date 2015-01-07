@@ -297,7 +297,7 @@ class DoctrineBuilder implements QueryInterface
         
         $get_scalar_key = function($field) {
 
-            $has_alias = preg_match_all('~([A-z]*\.[A-z]+)?\sas\s(.*)~', $field, $matches);
+            $has_alias = preg_match_all('/([A-z]*\.[A-z]+)?\sas\s(.*)$/', $field, $matches);
             $_f        = ( $has_alias == true ) ? $matches[2][0] : $field;
             $_f        = str_replace('.', '_', $_f);
 
