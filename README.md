@@ -165,6 +165,8 @@ private function _datatable()
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
                             "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
+                            "total"         => 'COUNT(x.people) as total'       // Use SQL commands, you must always define an alias
+                            "sub"           => '(SELECT i FROM ... ) as sub'    // you can set sub DQL request, you must always define an alias
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setWhere(                                                     // set your dql where statement
