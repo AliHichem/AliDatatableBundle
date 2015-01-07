@@ -272,6 +272,13 @@ class DoctrineBuilder implements QueryInterface
         {
             $select[] = $join[1];
         }
+        
+        foreach ($this->fields as $key => $field) {
+            if (stripos($field, " as ") !== false || stripos($field, "(") !== false) {
+                $select[] = $field;
+            }
+        }
+
         $qb->select(implode(',', $select));
 
         // add search
@@ -289,9 +296,11 @@ class DoctrineBuilder implements QueryInterface
         $data    = array();
         
         $get_scalar_key = function($field) {
-            $has_alias = preg_match_all('~([A-z]*\.[A-z]+)?\sas~', $field, $matches);
-            $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
+
+            $has_alias = preg_match_all('~([A-z]*\.[A-z]+)?\sas\s(.*)~', $field, $matches);
+            $_f        = ( $has_alias == true ) ? $matches[2][0] : $field;
             $_f        = str_replace('.', '_', $_f);
+
             return $_f;
         };
         
@@ -301,7 +310,7 @@ class DoctrineBuilder implements QueryInterface
         {
             $fields[] = $get_scalar_key($field);
         }
-        
+
         foreach ($maps as $map)
         {
             $item = array();
