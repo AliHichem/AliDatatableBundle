@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('all')
+                ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('action')->defaultTrue()->end()
                         ->scalarNode('search')->defaultFalse()->end()

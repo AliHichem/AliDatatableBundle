@@ -151,6 +151,8 @@ private function _datatable()
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
                             "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                            "total"         => 'COUNT(x.people) as total'       // Use SQL commands, you must always define an alias
+                            "sub"           => '(SELECT i FROM ... ) as sub'    // you can set sub DQL request, you must always define an alias
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setWhere(                                                     // set your dql where statement
@@ -249,7 +251,8 @@ private function _datatable()
 
 ###### Activate search globally
 
-The filtering functionality that is very useful for quickly search through the information from the database  - however the search is only built in one way : the individual column filtering.
+The filtering functionality that is very useful for quickly search through the information from the database.
+This bundle provide two way of filtering, who can be used together : Global search and individual column search.
 
 By default the filtering functionality is disabled, to get it working you just need to activate it from your configuration method like this :
 
@@ -258,7 +261,9 @@ private function _datatable()
 {
     return $this->get('datatable')
                 //...
-                ->setSearch(TRUE);
+                ->setSearch(TRUE); // for individual column search
+                // or
+                ->setGlobalSearch(TRUE);
 }
 ```
 ###### Set search fields

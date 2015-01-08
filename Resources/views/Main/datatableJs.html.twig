@@ -1,0 +1,226 @@
+{% block main %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        function getId() { return "{{id}}"; };
+        function getWrapper() { return  "#{{id}}_wrapper"; };
+        var s = getWrapper();
+        var multiple = {% if multiple %} true {% else %} false {% endif %};
+        var multiple_rawhtml = '';
+        {% if multiple %}
+            var multiple_rawhtml = '\
+                    <label class="dataTables_multiple">\
+                    <span style="margin:0 40px 0 0px;">\
+                        Execute\
+                        <select name="dataTables[select]">\
+                            {% for key,item in multiple %}\
+                            <option value="{{ path(item.route) }}">{{item.title}}</option>\
+                            {% endfor %}\
+                        </select>\
+                        <button class="btn-datatable-multiple" >OK</button>\
+                    <span>\
+                    </label>';
+        {% endif %}
+        var $js_conf = {{ js_conf | raw }};
+        var $js = {};
+        for(key in $js_conf) { 
+            if ($js_conf.hasOwnProperty(key)) {
+                eval ( ' $js["'+key+'"] = ' + $js_conf[key]+ ' ; ' ); 
+            }
+        }
+        var $options = {{ js | raw }};
+        var $opts = {};
+        for(key in $options) {
+            if ($options.hasOwnProperty(key)) {
+                $opts[key] = $options[key];
+                try{
+                    var type = typeof (eval (' tmp = ' + $options[key] + ' ; '));
+                    if (type == 'object' || type == 'function'){
+                        eval (' $opts["' + key + '"] = ' + $options[key] + ' ; ');
+                    }
+                }catch (e){ }
+            }
+        }
+        $options = $opts;
+        var $aoColumnDefs = new Array();
+        {% if multiple %}
+        $aoColumnDefs.push({ 'bSortable': false, 'aTargets': [ 0 ] });
+        {% endif %}
+        {% set i = 0 %}
+        {% for label,key in fields %}
+            {% if label != '_identifier_' %}
+                {% if (not_filterable_fields is not empty and i in not_filterable_fields) or (not_sortable_fields is not empty and i in not_sortable_fields) or (hidden_fields is not empty and i in hidden_fields) %}
+                $aoColumnDefs.push({ {{ hidden_fields is not empty and i in hidden_fields ? "'bVisible': false," : "" }} {{ not_sortable_fields is not empty and i in not_sortable_fields ? "'bSortable': false," : "" }} {{ not_filterable_fields is not empty and i in not_filterable_fields ? "'bSearchable': false," : "" }} 'aTargets': [ {{i}} ] });
+                {% endif %}
+            {% elseif action %}
+                $aoColumnDefs.push({ 'bSortable': false, 'bSearchable': false, 'aTargets': [ {{i}} ] });
+            {% endif %}
+            {% set i = i+1 %}
+        {% endfor %}
+        {% if action and not action_twig %} 
+        $aoColumnDefs.push({
+            "fnRender": function ( oObj ) {
+                var $edit_url = strtr(
+                    "{{ path(edit_route , { 'id': "xx" }) }}",
+                    { "xx": oObj.aData[{{fields|length}}-1] }
+                );
+                var $link_edit = "<a  style='float:right; margin-right:10px' class='dialog' title='edit'";
+                $link_edit += "href='"+$edit_url+"'>";
+                $link_edit += "{{ 'ali.common.edit'|trans()}}</a>";
+                var $delete_url = strtr(
+                    "{{ path(delete_route, { 'id': "xx" }) }}",
+                    { "xx": oObj.aData[{{fields|length}}-1] }
+                );
+                var $link_delete = "<form style='float:right' class='form' action='"+$delete_url+"' method='post'>";
+                $link_delete += strtr(
+                                    '{{ form_widget(delete_form) }}',
+                                    { "_id_": oObj.aData[{{fields|length}}-1] }
+                                );
+                $link_delete += "<a class='button-delete' href='#' type='submit'>{{ 'ali.common.delete'|trans() }}</a>";
+                $link_delete += " </form>";
+                var $out = $link_delete+ " " + $link_edit ;
+                if (oObj.aData[{{fields|length}}-1] == null )
+                {
+                    $out = "<div style='float:right'>{{ 'ali.common.no_action'|trans() }}</div>";
+                }
+                return $out
+            },
+            "aTargets": [ multiple ? {{fields|length}} : ({{fields|length}} -1)  ]
+        });
+        {% endif %} 
+        var $defaults = {
+            "bJQueryUI": true,
+            "sPaginationType": "full_numbers",
+            "aLengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
+            "iDisplayLength": 10,
+            "bServerSide": true,
+            "bProcessing": true,
+            "sAjaxSource": null,
+            "bPaginate": true,
+            {% if sort %}
+            "aaSorting": [[ {{sort[0]}}, "{{sort[1]}}" ]],
+            {% endif %}
+            "bLengthChange": true,
+            "aoColumnDefs": $aoColumnDefs,
+            "fnDrawCallback": function(oSettings) {
+                var s = getWrapper();
+                if( multiple && $('.dataTables_multiple',$(s)).length==0){
+                    $(s+' .dataTables_length').prepend(multiple_rawhtml);
+                }
+            },
+            "bSort": true,
+            "bFilter": {% if search == true or global_search == true %} true {% else %} false {% endif %},
+            "oLanguage": {
+                "sProcessing":     '{{ 'ali.common.sProcessing' | trans() }}',
+                "sLengthMenu":     '{{ 'ali.common.sLengthMenu' | trans() }}',
+                "sZeroRecords":    '{{ 'ali.common.sZeroRecords' | trans() }}',
+                "sInfo":           '{{ 'ali.common.sInfo' | trans() }}',
+                "sInfoEmpty":      '{{ 'ali.common.sInfoEmpty' | trans() }}',
+                "sInfoFiltered":   '{{ 'ali.common.sInfoFiltered' | trans() }}',
+                "sInfoPostFix":    '{{ 'ali.common.sInfoPostFix' | trans() }}',
+                "sSearch":         '{{ 'ali.common.sSearch' | trans() }}',
+                "sLoadingRecords": '{{ 'ali.common.sLoadingRecords' | trans() }}',
+                "sUrl":            "",
+                "oPaginate": {
+                    "sFirst":    '{{ 'ali.common.sFirst' | trans() }}',
+                    "sPrevious": '{{ 'ali.common.sPrevious' | trans() }}',
+                    "sNext":     '{{ 'ali.common.sNext' | trans() }}',
+                    "sLast":     '{{ 'ali.common.sLast' | trans() }}'
+                }
+            },
+            "bAutoWidth" : false
+        };
+        $.extend($defaults,$js);
+        $.extend($defaults,$options);
+        $('#{{id}}').trigger('datatables_init', $defaults );
+        eval("var "+ "oTable_"+'{{id}}'.split('-').join('_') + "  = $('#{{id}}').dataTable($defaults)");
+        $(s).on('click','.button-delete:parent',function(e){
+            if (!confirm('{{ 'ali.common.confirm_delete'|trans()  }}')) {
+                return false;
+            }
+            $(this).parents('form:eq(0)').submit();
+        });
+
+        if (multiple===true) { 
+            var chbox =  'input:checkbox[name="dataTables[actions][]"]';
+            var chbox_all = 'input:checkbox[name="datatable_action_all"]';
+            $(s).on('click','.btn-datatable-multiple:not(.search_init)',function(e){
+                if($('input:focus',$(s)).length > 0){
+                    return false;
+                }
+                e.preventDefault();
+                if($(chbox+':checked').length > 0){
+                    if (!confirm('Are you sure ?')) {
+                        return false;
+                    }
+                    var form = $(this).parents('form:eq(0)');
+                    var action = $('select[name="dataTables[select]"]',$(s)).val();
+                    $.ajax({
+                        type: "POST",
+                        url: action,
+                        data: form.serialize(),
+                        success: function(msg) {
+                            $('#'+getId()).dataTable().fnDraw();
+                            if ($.isFunction($.fn.unblockpage)){
+                                $.unblockpage();
+                            }
+                        },
+                        beforeSend: function() {
+                            if ($.isFunction($.fn.blockpage)){
+                                $.blockpage({
+                                    msg: 'saving data'
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    alert('You need to select at least one element.');
+                }
+            });
+            $(s).on('click',chbox_all,function(e){
+                if($(this).is(':checked')) {
+                    $(chbox,$(s)).attr("checked",false).click();
+                } else {
+                    $(chbox,$(s)).attr("checked",true).click();
+                }
+            });
+        }
+
+        {% if global_search == false %}
+            $(".dataTables_filter").remove();
+        {% endif %}
+        {% if search %}
+        var search_selector = "#{{id}} input[searchable=true]";
+        $(search_selector).keypress( function (event) {
+            var index = $(this).attr('index');
+            var oTable = eval('oTable_{{id}}'.split('-').join('_'));
+            if (event.keyCode == '13') {
+                oTable.fnFilter( 
+                    this.value, 
+                    oTable.oApi._fnVisibleToColumnIndex( 
+                        oTable.fnSettings(), 
+                        index 
+                    ) 
+                );
+            }
+        }).each( function (i) {
+            this.initVal = this.value;
+        }).focus( function () {
+            if ( this.className == "search_init" ){
+                this.className = "";
+                this.value = "";
+            }
+        }).blur( function (i) {
+            if ( this.value == "" ){
+                this.className = "search_init";
+                this.value = this.initVal;
+            }
+        });
+        $("tfoot input").keyup( function () {
+            /* Filter on the column (the index) of this element */
+            var oTable = eval('oTable_{{id}}'.split('-').join('_'));
+            oTable.fnFilter( this.value, $("tfoot input").index(this) );
+        } );
+        {% endif %}
+    });
+</script>
+{% endblock  %}

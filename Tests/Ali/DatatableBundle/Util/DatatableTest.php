@@ -4,6 +4,9 @@ namespace Ali\DatatableBundle\Util;
 
 use Ali\DatatableBundle\BaseTestCase;
 
+/**
+ * @group Datatable
+ */
 class DatatableTest extends BaseTestCase
 {
 
@@ -16,8 +19,18 @@ class DatatableTest extends BaseTestCase
     protected function setUp($env = 'test')
     {
         parent::setUp($env);
+        $this->initDatatable();
+    }
+    
+    private function initDatatable($query = null)
+    {
         $client           = parent::createClient();
         $crawler          = $client->request('GET', '/');
+        
+        if($query != null) {
+            $client->getRequest()->query->add($query);
+        }       
+                
         $this->_container->set('request', $client->getRequest());
         $this->_datatable = $this->_container->get('datatable');
     }
@@ -120,6 +133,7 @@ class DatatableTest extends BaseTestCase
                             "title"        => 'p.name',
                             "_identifier_" => 'p.id')
         );
+        
         $this->assertInternalType('boolean', $this->_datatable->getHasAction());
     }
 
@@ -146,6 +160,24 @@ class DatatableTest extends BaseTestCase
                 ->setOrder('p.id', 'asc')
         ;
         $this->assertInternalType('string', $this->_datatable->getOrderField());
+    }
+    
+    public function test_getOrderFieldWithAlias()
+    {
+        $this->initDatatable(array("iSortCol_0" => 0));
+        
+        
+        $data = $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => "(SELECT Product.name 
+                                              FROM Ali\DatatableBundle\Entity\Product as Product
+                                              WHERE Product.id = 1) as someAliasName",
+                            "_identifier_" => 'p.id'))
+                ->getQueryBuilder()->getData(null);
+        
+        $this->assertEquals("Laptop", $data[0][0][0]);
     }
 
     public function test_getOrderType()
@@ -186,7 +218,58 @@ class DatatableTest extends BaseTestCase
         ;
         $this->assertInstanceOf('Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder', $this->_datatable->getQueryBuilder());
     }
-
+    
+    public function test_alias()
+    {
+        $r = $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => 'p.name as someAliasName',
+                            "_identifier_" => 'p.id')
+                )->getQueryBuilder()->getData(null);
+        
+        
+        $this->assertArrayHasKey("someAliasName", $r[1][0]);
+    }
+    
+    public function test_multipleAlias()
+    {
+        $r = $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => "(SELECT Product.name 
+                                              FROM Ali\DatatableBundle\Entity\Product as Product
+                                              WHERE Product.id = 1) as someAliasName",
+                            "_identifier_" => 'p.id')
+                )->getQueryBuilder()->getData(null);
+        
+        
+        $this->assertArrayHasKey("someAliasName", $r[1][0]);
+    }
+    
+    public function test_SQLCommandInFields()
+    {
+        $datatable = $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "total"        => 'COUNT(p.id) as total',
+                            "_identifier_" => 'p.id')
+                );
+        
+        /* @var $qb \Doctrine\ORM\QueryBuilder */
+        $qb = $datatable->getQueryBuilder()->getDoctrineQueryBuilder();
+        $qb->groupBy('p.id');
+        
+        $r = $datatable->getQueryBuilder()->getData(null);
+        
+        $this->assertArrayHasKey("total", $r[1][0]);
+        $this->assertEquals(1, $r[0][0][1]);
+        $this->assertEquals(1, $r[1][0]['total']);
+    }
+    
     public function test_getSearch()
     {
         $this->_datatable

@@ -52,10 +52,22 @@ class Datatable
 
     /** @var boolean */
     protected $_search;
+    
+    /** @var boolean */
+    protected $_global_search = true;
 
     /** @var array */
     protected $_search_fields = array();
-
+    
+    /** @var array */
+    protected $_not_filterable_fields = array();
+    
+    /** @var array */
+    protected $_not_sortable_fields = array();
+    
+    /** @var array */
+    protected $_hidden_fields = array();
+    
     /** @var array */
     protected static $_instances = array();
 
@@ -126,7 +138,8 @@ class Datatable
     {
         $request       = $this->_request;
         $iTotalRecords = $this->_queryBuilder->getTotalRecords();
-        list($data, $objects) = $this->_queryBuilder->getData($hydration_mode);
+        $iTotalDisplayRecords = $this->_queryBuilder->getTotalDisplayRecords();       
+        list($data, $objects) = $this->_queryBuilder->getData($hydration_mode);  
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
@@ -158,7 +171,7 @@ class Datatable
         $output = array(
             "sEcho"                => intval($request->get('sEcho')),
             "iTotalRecords"        => $iTotalRecords,
-            "iTotalDisplayRecords" => $iTotalRecords,
+            "iTotalDisplayRecords" => $iTotalDisplayRecords,
             "aaData"               => $data
         );
         return new Response(json_encode($output));
@@ -192,6 +205,12 @@ class Datatable
 
         return $instance;
     }
+
+    public static function clearInstance()
+    {
+        self::$_instances = array();
+    }
+
 
     /**
      * get entity name
@@ -293,6 +312,16 @@ class Datatable
     public function getSearch()
     {
         return $this->_search;
+    }
+
+    /**
+     * get global_search
+     * 
+     * @return boolean
+     */
+    public function getGlobalSearch()
+    {
+        return $this->_global_search;
     }
 
     /**
@@ -493,10 +522,25 @@ class Datatable
     public function setSearch($search)
     {
         $this->_search = $search;
-        $this->_queryBuilder->setSearch($search);
+        $this->_queryBuilder->setSearch($search || $this->_global_search);
+        return $this;
+    }
+    
+    /**
+     * set global search
+     * 
+     * @param bool $global_search
+     * 
+     * @return Datatable
+     */
+    public function setGlobalSearch($global_search)
+    {
+        $this->_global_search = $global_search;
+        $this->_queryBuilder->setSearch($global_search || $this->_search);
         return $this;
     }
 
+    
     /**
      * set datatable identifier
      * 
@@ -578,6 +622,108 @@ class Datatable
     public function setSearchFields(array $search_fields)
     {
         $this->_search_fields = $search_fields;
+        return $this;
+    }
+
+    /**
+     * set not filterable fields
+     * 
+     * @example 
+     * 
+     *      ->setNotFilterableFields(array(0,2,5))
+     * 
+     * @param array $not_filterable_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setNotFilterableFields(array $not_filterable_fields)
+    {
+        $this->_not_filterable_fields = $not_filterable_fields;
+        return $this;
+    }
+    
+    /**
+     * get not filterable field
+     * 
+     * @return array
+     */
+    public function getNotFilterableFields()
+    {
+        return $this->_not_filterable_fields;
+    }
+    
+    /**
+     * set not sortable fields
+     * 
+     * @example 
+     * 
+     *      ->setNotSortableFields(array(0,2,5))
+     * 
+     * @param array $not_sortable_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setNotSortableFields(array $not_sortable_fields)
+    {
+        $this->_not_sortable_fields = $not_sortable_fields;
+        return $this;
+    }
+    
+    /**
+     * get not sortable field
+     * 
+     * @return array
+     */
+    public function getNotSortableFields()
+    {
+        return $this->_not_sortable_fields;
+    }
+    
+    /**
+     * set hidden fields
+     * 
+     * @example 
+     * 
+     *      ->setHiddenFields(array(0,2,5))
+     * 
+     * @param array $hidden_fields
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setHiddenFields(array $hidden_fields)
+    {
+        $this->_hidden_fields = $hidden_fields;
+        return $this;
+    }
+
+    /**
+     * get hidden field
+     * 
+     * @return array
+     */
+    public function getHiddenFields()
+    {
+        return $this->_hidden_fields;
+    }
+
+    /**
+     * set filtering type
+     * 's' strict
+     * 'f' full => LIKE '%' . $value . '%'
+     * 'b' begin => LIKE '%' . $value
+     * 'e' end => LIKE $value . '%'
+     * 
+     * @example 
+     * 
+     *      ->setFilteringType(array(0 => 's',2 => 'f',5 => 'b'))
+     * 
+     * @param array $filtering_type
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setFilteringType(array $filtering_type)
+    {
+        $this->_queryBuilder->setFilteringType($filtering_type);
         return $this;
     }
 

@@ -89,7 +89,8 @@ class Renderer
                 $params                          = array_merge($params, array(
                     'dt_obj'  => $objects[$row_index],
                     'dt_item' => $data[$row_index][$column_index],
-                    'dt_id'   => $identifier_raw
+                    'dt_id'   => $identifier_raw,
+                    'dt_line' => $data[$row_index]
                         )
                 );
                 $data[$row_index][$column_index] = $this->applyView(
