@@ -248,14 +248,17 @@ class DoctrineBuilder implements QueryInterface
         $dql_fields = array_values($this->fields);
 
         // add sorting
-        if ($request->get('iSortCol_0') != null)
+        if ($request->get('iSortCol_0') !== null)
         {
-            $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
+            $order_field = explode(' as ', $dql_fields[$request->get('iSortCol_0')]);
+            end($order_field);
+            $order_field = current($order_field);
         }
         else
         {
             $order_field = null;
         }
+
         $qb = clone $this->queryBuilder;
         if (!is_null($order_field))
         {

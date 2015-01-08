@@ -19,8 +19,18 @@ class DatatableTest extends BaseTestCase
     protected function setUp($env = 'test')
     {
         parent::setUp($env);
+        $this->initDatatable();
+    }
+    
+    private function initDatatable($query = null)
+    {
         $client           = parent::createClient();
         $crawler          = $client->request('GET', '/');
+        
+        if($query != null) {
+            $client->getRequest()->query->add($query);
+        }       
+                
         $this->_container->set('request', $client->getRequest());
         $this->_datatable = $this->_container->get('datatable');
     }
@@ -150,6 +160,24 @@ class DatatableTest extends BaseTestCase
                 ->setOrder('p.id', 'asc')
         ;
         $this->assertInternalType('string', $this->_datatable->getOrderField());
+    }
+    
+    public function test_getOrderFieldWithAlias()
+    {
+        $this->initDatatable(array("iSortCol_0" => 0));
+        
+        
+        $data = $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => "(SELECT Product.name 
+                                              FROM Ali\DatatableBundle\Entity\Product as Product
+                                              WHERE Product.id = 1) as someAliasName",
+                            "_identifier_" => 'p.id'))
+                ->getQueryBuilder()->getData(null);
+        
+        $this->assertEquals("Laptop", $data[0][0][0]);
     }
 
     public function test_getOrderType()
