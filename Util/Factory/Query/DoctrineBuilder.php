@@ -81,7 +81,7 @@ class DoctrineBuilder implements QueryInterface
             foreach ($search_fields as $i => $search_field)
             {
                 $search_param = $request->get("sSearch_{$i}");
-                if ($request->get("sSearch_{$i}") !== false && !empty($search_param))
+                if ($search_param !== false && $search_param != '')
                 {
                     $field        = explode(' ', trim($search_field));
                     $search_field = $field[0];
