@@ -86,7 +86,8 @@ class DoctrineBuilder implements QueryInterface
                     $field        = explode(' ', trim($search_field));
                     $search_field = $field[0];
 
-                    $queryBuilder->andWhere(" $search_field like '%{$request->get("sSearch_{$i}")}%' ");
+                    $queryBuilder->andWhere(" $search_field like :ssearch ");
+                    $queryBuilder->setParameter('ssearch', '%'.$request->get("sSearch_{$i}").'%');
                 }
             }
         }
