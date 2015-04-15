@@ -280,7 +280,35 @@ class DatatableTest extends BaseTestCase
                             "_identifier_" => 'p.id'))
                 ->setOrder('p.id', 'asc')
         ;
+
         $this->assertInternalType('boolean', $this->_datatable->getSearch());
+    }
+    
+    public function test_getSearchWithSubQuery()
+    {
+        $this->initDatatable(array(
+            "sSearch" => "Laptop",
+            "bSearchable_0" => true,
+            "bSearchable_1" => true,
+            ));
+        
+        
+        $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => "(SELECT Product.name 
+                                              FROM Ali\DatatableBundle\Entity\Product as Product
+                                              WHERE Product.id = 1) as someAliasName",
+                            "id"            => 'p.id',
+                            "_identifier_" => 'p.id')
+                )
+                ->setSearch(true)
+                ;
+        
+        $data = $this->_datatable->execute();
+        
+        $this->assertEquals('{"sEcho":0,"iTotalRecords":"1","iTotalDisplayRecords":"1","aaData":[["Laptop",1,1]]}', $data->getContent());
     }
 
     public function test_setRenderders()

@@ -77,6 +77,7 @@ class DoctrineBuilder implements QueryInterface
      */
     protected function _addSearch(\Doctrine\ORM\QueryBuilder $queryBuilder)
     {
+
         if ($this->search == true)
         {
             $request       = $this->request;
@@ -86,47 +87,55 @@ class DoctrineBuilder implements QueryInterface
             $filteringType = $this->getFilteringType();
             foreach ($search_fields as $i => $search_field)
             {
-                $field = explode(' ',trim($search_field));
-                $search_field = $field[0];
-                
+                $search_field = $this->getSearchField($search_field);
+
                 // Global filtering
                 if(!empty($global_search) || $global_search == '0') {
-                    
+
                     if ($request->query->get('bSearchable_'.$i) && $request->query->get('bSearchable_'.$i) == "true") {
-                        $qbParam = "sSearch_global_{$i}";
-                        $orExpr->add($queryBuilder->expr()->like(
-                            $search_field,
-                            ":$qbParam"
-                        ));
-  
-                        $queryBuilder->setParameter($qbParam, "%" . $global_search . "%");
+                        $qbParam = "sSearch_global_" . $i;
+
+                        if($this->isStringDQLQuery($search_field)) {
+                            $orExpr->add(
+                                    $queryBuilder->expr()->eq($search_field, ':' . $qbParam)
+                                    );
+                            $queryBuilder->setParameter($qbParam, $global_search);
+                            
+                        } else {
+                            $orExpr->add($queryBuilder->expr()->like(
+                                $search_field,
+                                ":" . $qbParam
+                            ));
+                            $queryBuilder->setParameter($qbParam, "%" . $global_search . "%");
+                        }
                     }
                 }
                 
                 // Individual filtering
-                $search_param = $request->get("sSearch_{$i}");
+                $searchName = "sSearch_" . $i;
+                $search_param = $request->get($searchName);
                 $bRegex = $request->get("bRegex_{$i}");
                 if ($request->get("bSearchable_{$i}") != 'false' && (!empty($search_param) || $search_param == '0'))
-                {   
-                    $queryBuilder->andWhere($queryBuilder->expr()->like($search_field, ":sSearch_{$i}"));
+                {                       
+                    $queryBuilder->andWhere($queryBuilder->expr()->like($search_field, ":" . $searchName));
                     
                     if(array_key_exists($i, $filteringType)){
                         switch ($filteringType[$i]) {
                             case 's':
-                                $queryBuilder->setParameter("sSearch_{$i}", $request->get("sSearch_{$i}"));
+                                $queryBuilder->setParameter($searchName, $request->get($searchName));
                                 break;
                             case 'f':
-                                $queryBuilder->setParameter("sSearch_{$i}", sprintf("%%%s%%", $request->get("sSearch_{$i}")));
+                                $queryBuilder->setParameter($searchName, sprintf("%%%s%%", $request->get($searchName)));
                                 break;
                             case 'b':
-                                $queryBuilder->setParameter("sSearch_{$i}", sprintf("%%%s", $request->get("sSearch_{$i}")));
+                                $queryBuilder->setParameter($searchName, sprintf("%%%s", $request->get($searchName)));
                                 break;
                             case 'e':
-                                $queryBuilder->setParameter("sSearch_{$i}", sprintf("%s%%", $request->get("sSearch_{$i}")));
+                                $queryBuilder->setParameter($searchName, sprintf("%s%%", $request->get($searchName)));
                                 break;
                         }
                     }else{
-                        $queryBuilder->setParameter("sSearch_{$i}", sprintf("%%%s%%", $request->get("sSearch_{$i}")));
+                        $queryBuilder->setParameter($searchName, sprintf("%%%s%%", $request->get($searchName)));
                     }
                 }
             }
@@ -218,6 +227,7 @@ class DoctrineBuilder implements QueryInterface
     {
         $qb = clone $this->queryBuilder;
         $this->_addSearch($qb);
+        
         $qb->resetDQLPart('orderBy');
 
         $gb = $qb->getDQLPart('groupBy');
@@ -298,9 +308,11 @@ class DoctrineBuilder implements QueryInterface
         $maps    = $query->getResult(Query::HYDRATE_SCALAR);
         $data    = array();
         
-        $get_scalar_key = function($field) {
+        $aliasPattern = self::DQL_ALIAS_PATTERN;
+        
+        $get_scalar_key = function($field) use($aliasPattern) {
 
-            $has_alias = preg_match_all('/([A-z]*\.[A-z]+)?\sas\s(.*)$/', $field, $matches);
+            $has_alias = preg_match_all($aliasPattern, $field, $matches);
             $_f        = ( $has_alias == true ) ? $matches[2][0] : $field;
             $_f        = str_replace('.', '_', $_f);
 
@@ -522,6 +534,76 @@ class DoctrineBuilder implements QueryInterface
     
     public function getFilteringType() {
         return $this->filtering_type;
+    }
+
+    /**
+     * The most of time $search_field is a string that represent the name of a field in data base.
+     * But some times, $search_field is a DQL subquery
+     * 
+     * @param string $field
+     * @return string
+     */
+    private function getSearchField($field)
+    {   
+        if($this->isStringDQLQuery($field)) {
+            
+            $dqlQuery = $field;            
+            
+            $lexer = new Query\Lexer($field);
+            
+            // We have to rename some identifier or the execution will crash
+            while($lexer->moveNext() == true) {
+                if($this->isTheIdentifierILookingFor($lexer)) {
+                    $replacement = sprintf("$1%s_%d$3", $lexer->lookahead['value'], mt_rand());
+                    $pattern = sprintf("/([\(\s])(%s)([\s\.])/", $lexer->lookahead['value']);
+                    
+                    $dqlQuery = preg_replace($pattern, $replacement, $dqlQuery);
+                }
+            }
+            
+            $dqlQuery = substr($dqlQuery, 0, strripos($dqlQuery, ")") + 1);
+            
+            return $dqlQuery;
+        }
+
+        
+        $field = explode(' ', trim($field));
+        return $field[0];
+    }
+    
+    private function isTheIdentifierILookingFor(Query\Lexer $lexer)
+    {
+        if($lexer->token['type'] === Query\Lexer::T_IDENTIFIER && $lexer->isNextToken(Query\Lexer::T_IDENTIFIER)) {
+            return true;
+        }
+        
+        if($lexer->token['type'] === Query\Lexer::T_IDENTIFIER && $lexer->isNextToken(Query\Lexer::T_AS)) {
+            
+            $lexer->moveNext();
+
+            if($lexer->lookahead['type'] === Query\Lexer::T_IDENTIFIER) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    private function isStringDQLQuery($value)
+    {
+         $keysWord = array(
+            "SELECT ",
+            " FROM ",
+            " WHERE "
+        );
+        
+        foreach($keysWord as $keyWord) {
+            if(stripos($value, $keyWord) !== false) {
+                return true;
+            }
+        }
+        
+        return false;
     }
     
 }

@@ -7,8 +7,6 @@ use Symfony\Component\HttpKernel\Kernel,
     Symfony\Bundle\FrameworkBundle\FrameworkBundle,
     Symfony\Bundle\TwigBundle\TwigBundle,
     Doctrine\Bundle\DoctrineBundle\DoctrineBundle,
-//    Symfony\Bundle\AsseticBundle\AsseticBundle,
-//    Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle,
     Ali\DatatableBundle\AliDatatableBundle;
 
 class AppKernel extends Kernel
@@ -16,15 +14,13 @@ class AppKernel extends Kernel
 
     /**
      * {@inheritdoc}
-         */
+     */
     public function registerBundles()
     {
         $bundles = array(
             new FrameworkBundle(),
             new TwigBundle(),
             new DoctrineBundle,
-//            new AsseticBundle(),
-//            new SensioFrameworkExtraBundle(),
             new AliDatatableBundle(),
         );
 

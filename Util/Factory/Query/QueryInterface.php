@@ -4,7 +4,9 @@ namespace Ali\DatatableBundle\Util\Factory\Query;
 
 interface QueryInterface
 {
-
+    
+    const DQL_ALIAS_PATTERN = "/([A-z]*\.[A-z]+)?\sas\s(.*)$/";
+    
     /**
      * get total records
      * 
