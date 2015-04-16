@@ -78,71 +78,68 @@ class DoctrineBuilder implements QueryInterface
     protected function _addSearch(\Doctrine\ORM\QueryBuilder $queryBuilder)
     {
 
-        if ($this->search == true)
-        {
-            $request       = $this->request;
-            $search_fields = array_values($this->fields);
-            $global_search = $request->query->get('sSearch');
-            $orExpr = $queryBuilder->expr()->orX();
-            $filteringType = $this->getFilteringType();
-            foreach ($search_fields as $i => $search_field)
-            {
-                $search_field = $this->getSearchField($search_field);
+        if ($this->search !== true) {
+            return;
+        }
+        
+        $request = $this->request;
+        $search_fields = array_values($this->fields);
+        $global_search = $request->query->get('sSearch');
+        $orExpr = $queryBuilder->expr()->orX();
+        $filteringType = $this->getFilteringType();
+        foreach ($search_fields as $i => $search_field) {
+            $search_field = $this->getSearchField($search_field);
 
-                // Global filtering
-                if(!empty($global_search) || $global_search == '0') {
+            // Global filtering
+            if (!empty($global_search) || $global_search == '0') {
 
-                    if ($request->query->get('bSearchable_'.$i) && $request->query->get('bSearchable_'.$i) == "true") {
-                        $qbParam = "sSearch_global_" . $i;
+                if ($request->query->get('bSearchable_' . $i) && $request->query->get('bSearchable_' . $i) == "true") {
+                    $qbParam = "sSearch_global_" . $i;
 
-                        if($this->isStringDQLQuery($search_field)) {
-                            $orExpr->add(
-                                    $queryBuilder->expr()->eq($search_field, ':' . $qbParam)
-                                    );
-                            $queryBuilder->setParameter($qbParam, $global_search);
-                            
-                        } else {
-                            $orExpr->add($queryBuilder->expr()->like(
-                                $search_field,
-                                ":" . $qbParam
-                            ));
-                            $queryBuilder->setParameter($qbParam, "%" . $global_search . "%");
-                        }
-                    }
-                }
-                
-                // Individual filtering
-                $searchName = "sSearch_" . $i;
-                $search_param = $request->get($searchName);
-                $bRegex = $request->get("bRegex_{$i}");
-                if ($request->get("bSearchable_{$i}") != 'false' && (!empty($search_param) || $search_param == '0'))
-                {                       
-                    $queryBuilder->andWhere($queryBuilder->expr()->like($search_field, ":" . $searchName));
-                    
-                    if(array_key_exists($i, $filteringType)){
-                        switch ($filteringType[$i]) {
-                            case 's':
-                                $queryBuilder->setParameter($searchName, $request->get($searchName));
-                                break;
-                            case 'f':
-                                $queryBuilder->setParameter($searchName, sprintf("%%%s%%", $request->get($searchName)));
-                                break;
-                            case 'b':
-                                $queryBuilder->setParameter($searchName, sprintf("%%%s", $request->get($searchName)));
-                                break;
-                            case 'e':
-                                $queryBuilder->setParameter($searchName, sprintf("%s%%", $request->get($searchName)));
-                                break;
-                        }
-                    }else{
-                        $queryBuilder->setParameter($searchName, sprintf("%%%s%%", $request->get($searchName)));
+                    if ($this->isStringDQLQuery($search_field)) {
+                        $orExpr->add(
+                                $queryBuilder->expr()->eq($search_field, ':' . $qbParam)
+                        );
+                        $queryBuilder->setParameter($qbParam, $global_search);
+                    } else {
+                        $orExpr->add($queryBuilder->expr()->like(
+                                        $search_field, ":" . $qbParam
+                        ));
+                        $queryBuilder->setParameter($qbParam, "%" . $global_search . "%");
                     }
                 }
             }
-            
-            if(!empty($global_search) || $global_search == '0') {
-                $queryBuilder->andWhere($orExpr);
+
+            // Individual filtering
+            $searchName = "sSearch_" . $i;
+            $search_param = $request->get($searchName);
+            $bRegex = $request->get("bRegex_{$i}");
+            if ($request->get("bSearchable_{$i}") != 'false' && (!empty($search_param) || $search_param == '0')) {
+                $queryBuilder->andWhere($queryBuilder->expr()->like($search_field, ":" . $searchName));
+
+                if (array_key_exists($i, $filteringType)) {
+                    switch ($filteringType[$i]) {
+                        case 's':
+                            $queryBuilder->setParameter($searchName, $request->get($searchName));
+                            break;
+                        case 'f':
+                            $queryBuilder->setParameter($searchName, sprintf("%%%s%%", $request->get($searchName)));
+                            break;
+                        case 'b':
+                            $queryBuilder->setParameter($searchName, sprintf("%%%s", $request->get($searchName)));
+                            break;
+                        case 'e':
+                            $queryBuilder->setParameter($searchName, sprintf("%s%%", $request->get($searchName)));
+                            break;
+                    }
+                } else {
+                    $queryBuilder->setParameter($searchName, sprintf("%%%s%%", $request->get($searchName)));
+                }
             }
+        }
+
+        if (!empty($global_search) || $global_search == '0') {
+            $queryBuilder->andWhere($orExpr);
         }
     }
 
@@ -304,6 +301,7 @@ class DoctrineBuilder implements QueryInterface
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
+        
         $objects = $query->getResult(Query::HYDRATE_OBJECT);
         $maps    = $query->getResult(Query::HYDRATE_SCALAR);
         $data    = array();
