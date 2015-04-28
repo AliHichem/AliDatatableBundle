@@ -59,10 +59,10 @@ class DoctrineBuilder implements QueryInterface
      * 
      * @param ContainerInterface $container 
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, $em)
     {
         $this->container    = $container;
-        $this->em           = $this->container->get('doctrine.orm.entity_manager');
+        $this->em           = $em;
         $this->request      = $this->container->get('request');
         $this->queryBuilder = $this->em->createQueryBuilder();
     }
@@ -87,7 +87,7 @@ class DoctrineBuilder implements QueryInterface
                     $search_field = $field[0];
 
                     $queryBuilder->andWhere(" $search_field like :ssearch{$i} ");
-                    $queryBuilder->setParameter("ssearch{$i}", '%'.$request->get("sSearch_{$i}").'%');
+                    $queryBuilder->setParameter("ssearch{$i}", '%' . $request->get("sSearch_{$i}") . '%');
                 }
             }
         }
@@ -206,7 +206,7 @@ class DoctrineBuilder implements QueryInterface
 
         // add search
         $this->_addSearch($qb);
-        
+
         // get results and process data formatting
         $query          = $qb->getQuery();
         $iDisplayLength = (int) $request->get('iDisplayLength');
@@ -214,9 +214,9 @@ class DoctrineBuilder implements QueryInterface
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
-        $objects = $query->getResult(Query::HYDRATE_OBJECT);
-        $maps    = $query->getResult(Query::HYDRATE_SCALAR);
-        $data    = array();
+        $objects        = $query->getResult(Query::HYDRATE_OBJECT);
+        $maps           = $query->getResult(Query::HYDRATE_SCALAR);
+        $data           = array();
         $get_scalar_key = function($field) {
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;

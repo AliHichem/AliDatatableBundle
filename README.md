@@ -160,7 +160,8 @@ Assuming for example that you need a grid in your "index" action, create in your
 private function _datatable()
 {
     return $this->get('datatable')
-                ->setEntity("XXXMyBundle:Entity", "x")                          // replace "XXXMyBundle:Entity" by your entity
+                ->setEntityManager($em)                                         // Optional 
+                ->setEntity("XXXMyBundle:Entity", "x")                          // Replace "XXXMyBundle:Entity" by your entity
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 

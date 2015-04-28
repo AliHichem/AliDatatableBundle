@@ -5,7 +5,8 @@ namespace Ali\DatatableBundle\Util;
 use Symfony\Component\DependencyInjection\ContainerInterface,
     Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\Query,
-    Doctrine\ORM\Query\Expr\Join;
+    Doctrine\ORM\Query\Expr\Join,
+    Doctrine\ORM\EntityManager;
 use Ali\DatatableBundle\Util\Factory\Query\QueryInterface,
     Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
     Ali\DatatableBundle\Util\Formatter\Renderer,
@@ -22,9 +23,9 @@ class Datatable
 
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
     protected $_container;
-
-    /** @var \Doctrine\ORM\EntityManager */
-    protected $_em;
+//
+//    /** @var \Doctrine\ORM\EntityManager */
+//    protected $_em;
 
     /** @var boolean */
     protected $_has_action;
@@ -69,11 +70,9 @@ class Datatable
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->_container    = $container;
-        $this->_config       = $this->_container->getParameter('ali_datatable');
-        $this->_em           = $this->_container->get('doctrine.orm.entity_manager');
-        $this->_request      = $this->_container->get('request');
-        $this->_queryBuilder = new DoctrineBuilder($container);
+        $this->_container        = $container;
+        $this->_config           = $this->_container->getParameter('ali_datatable');
+        $this->_request          = $this->_container->get('request');
         self::$_current_instance = $this;
         $this->_applyDefaults();
     }
@@ -107,7 +106,7 @@ class Datatable
      * @param string $type
      * @param string $cond
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
     {
@@ -146,7 +145,7 @@ class Datatable
         }
         if (!is_null($this->_renderer_obj))
         {
-            $this->_renderer_obj->applyTo($data,$objects);
+            $this->_renderer_obj->applyTo($data, $objects);
         }
         if (!empty($this->_multiple))
         {
@@ -170,7 +169,7 @@ class Datatable
      * 
      * @param string $id
      * 
-     * @return Datatable .
+     * @return \Ali\DatatableBundle\Util\Datatable .
      */
     public static function getInstance($id)
     {
@@ -301,7 +300,7 @@ class Datatable
      * @param type $entity_name
      * @param type $entity_alias
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setEntity($entity_name, $entity_alias)
     {
@@ -310,11 +309,24 @@ class Datatable
     }
 
     /**
+     * set entity manager
+     * 
+     * @param EntityManager $em
+     * 
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        $this->_queryBuilder = new DoctrineBuilder($this->_container, $em);
+        return $this;
+    }
+
+    /**
      * set fields
      * 
      * @param array $fields
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setFields(array $fields)
     {
@@ -327,7 +339,7 @@ class Datatable
      * 
      * @param type $has_action
      * 
-     * @return Datatable
+     * @return \Ali\DatatableBundle\Util\Datatable
      */
     public function setHasAction($has_action)
     {
@@ -341,7 +353,7 @@ class Datatable
      * @param type $order_field
      * @param type $order_type
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setOrder($order_field, $order_type)
     {
@@ -354,7 +366,7 @@ class Datatable
      * 
      * @param type $data
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setFixedData($data)
     {
@@ -404,7 +416,7 @@ class Datatable
      * 
      * @param \Closure $renderer
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setRenderer(\Closure $renderer)
     {
@@ -439,7 +451,7 @@ class Datatable
      * 
      * @param array $renderers
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setRenderers(array $renderers)
     {
@@ -462,7 +474,7 @@ class Datatable
      * @param string $where
      * @param array  $params
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setWhere($where, array $params = array())
     {
@@ -475,7 +487,7 @@ class Datatable
      * 
      * @param string $groupbywhere
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setGroupBy($groupby)
     {
@@ -488,7 +500,7 @@ class Datatable
      * 
      * @param bool $search
      * 
-     * @return Datatable
+     * @return \Ali\DatatableBundle\Util\Datatable
      */
     public function setSearch($search)
     {
@@ -502,7 +514,7 @@ class Datatable
      * 
      * @param string $id
      * 
-     * @return Datatable 
+     * @return \Ali\DatatableBundle\Util\Datatable 
      */
     public function setDatatableId($id)
     {
