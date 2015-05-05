@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.3.0",
 	"twig/twig": ">=1.8,<2.0-dev",
-        "doctrine/common": ">=2.1,<2.4.x-dev"
+        "doctrine/orm": "~2.4@stable,>=2.1,<2.5"
     },
     "target-dir": "Ali/DatatableBundle",
     "autoload": {
