@@ -7,7 +7,7 @@ services:
         arguments: [ @service_container ]
         scope: prototype
         calls:
-            - [setEntityManager, ['@doctrine.orm.default_entity_manager']]
+            - [setEntityManager, ['@doctrine.orm.entity_manager']]
             
     datatable.twig.extension:
         class: Ali\DatatableBundle\Twig\Extension\AliDatatableExtension
