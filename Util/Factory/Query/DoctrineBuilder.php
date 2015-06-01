@@ -74,20 +74,19 @@ class DoctrineBuilder implements QueryInterface
      */
     protected function _addSearch(\Doctrine\ORM\QueryBuilder $queryBuilder)
     {
-        if ($this->search == TRUE)
-        {
+        if ($this->search == true) {
             $request       = $this->request;
-            $search_fields = array_values($this->fields);
-            foreach ($search_fields as $i => $search_field)
-            {
-                $search_param = $request->get("sSearch_{$i}");
-                if ($search_param !== false && $search_param != '')
-                {
-                    $field        = explode(' ', trim($search_field));
-                    $search_field = $field[0];
+            $dqlFields = array_values($this->fields);
+            $columns = $request->get("columns");
 
-                    $queryBuilder->andWhere(" $search_field like :ssearch{$i} ");
-                    $queryBuilder->setParameter("ssearch{$i}", '%' . $request->get("sSearch_{$i}") . '%');
+            foreach ($dqlFields as $i => $dqlField) {
+                if (isset($columns[$i]) && $columns[$i]["search"]["value"] != '') {
+                    $searchValue = $columns[$i]["search"]["value"];
+                    $field        = explode(' ', trim($dqlField));
+                    $dqlField = $field[0];
+
+                    $queryBuilder->andWhere(" $dqlField like :ssearch{$i} ");
+                    $queryBuilder->setParameter("ssearch{$i}", '%' . $searchValue . '%');
                 }
             }
         }
@@ -141,26 +140,31 @@ class DoctrineBuilder implements QueryInterface
     }
 
     /**
-     * get total records
+     * get records count
+     * 
+     * Selection can be total or filtered
+     * 
+     * @param string $selection
+     * @param string $globalSearch
      * 
      * @return integer 
      */
-    public function getTotalRecords()
+    public function getRecordsCount($selection = "total", $globalSearch = null)
     {
         $qb = clone $this->queryBuilder;
-        $this->_addSearch($qb);
-        $qb->resetDQLPart('orderBy');
-
-        $gb = $qb->getDQLPart('groupBy');
-        if (empty($gb) || !in_array($this->fields['_identifier_'], $gb))
-        {
-            $qb->select(" count({$this->fields['_identifier_']}) ");
-            return $qb->getQuery()->getSingleScalarResult();
+        if($selection === "filtered") {
+            $this->_addSearch($qb, $globalSearch);
         }
-        else
-        {
+        $qb->resetDQLPart('orderBy');
+        $gb = $qb->getDQLPart('groupBy');
+        if (empty($gb) || !in_array($this->fields['_identifier_'], $gb)) {
+            $qb->select(" count({$this->fields['_identifier_']}) ");
+
+            return $qb->getQuery()->getSingleScalarResult();
+        } else {
             $qb->resetDQLPart('groupBy');
             $qb->select(" count(distinct {$this->fields['_identifier_']}) ");
+
             return $qb->getQuery()->getSingleScalarResult();
         }
     }
@@ -176,24 +180,20 @@ class DoctrineBuilder implements QueryInterface
     {
         $request    = $this->request;
         $dql_fields = array_values($this->fields);
+        $qb = clone $this->queryBuilder;
 
         // add sorting
-        if ($request->get('iSortCol_0') != null)
-        {
-            $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
-        }
-        else
-        {
-            $order_field = null;
-        }
-        $qb = clone $this->queryBuilder;
-        if (!is_null($order_field))
-        {
-            $qb->orderBy($order_field, $request->get('sSortDir_0', 'asc'));
-        }
-        else
-        {
-            $qb->resetDQLPart('orderBy');
+        $qb->resetDQLPart('orderBy');
+        $order = $request->get('order');
+        if ($order != null) {
+            foreach($order as $key => $value) {
+                $this->orderField = $dql_fields[$order[$key]['column']];
+                $this->orderType = $order[$key]['dir'];
+                $qb->addOrderBy($this->orderField, $this->orderType);
+            }
+        } else {
+            $this->orderField = null;
+            $this->orderType = null;
         }
 
         // extract alias selectors
@@ -209,10 +209,12 @@ class DoctrineBuilder implements QueryInterface
 
         // get results and process data formatting
         $query          = $qb->getQuery();
-        $iDisplayLength = (int) $request->get('iDisplayLength');
-        if ($iDisplayLength > 0)
+        $length = (int) $request->get('length');
+        if ($length > 0)
         {
-            $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
+            $query
+                    ->setFirstResult($request->get('start'))
+                    ->setMaxResults($length);
         }
         $objects        = $query->getResult(Query::HYDRATE_OBJECT);
         $maps           = $query->getResult(Query::HYDRATE_SCALAR);

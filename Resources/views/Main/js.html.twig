@@ -87,9 +87,9 @@
                 "url": null
             },
             "paging": true,
-            {% if sort %}
-            "order": [[ {{sort[0]}}, "{{sort[1]}}" ]],
-            {% endif %}
+            {% if order -%}
+            "order": [[ {{order[0]}}, "{{order[1]}}" ]],
+            {% endif -%}
             "lengthChange": true,
             "columnDefs": $columnDefs,
             "drawCallback": function(oSettings) {
@@ -99,7 +99,7 @@
                 }
             },
             "ordering": true,
-            "searching": {% if search %} true {% else %} false {% endif %},
+            "searching": {%- if search -%} true {% else %} false {%- endif -%},
             "language": {
                 "processing":     '{{ 'ali.common.sProcessing' | trans() }}',
                 "lengthMenu":     '{{ 'ali.common.sLengthMenu' | trans() }}',
