@@ -333,6 +333,35 @@ class Datatable
         $this->_queryBuilder->setFields($fields);
         return $this;
     }
+    
+    /**
+     * Add a field
+     * 
+     * @param string $key
+     * @param string $value
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function addField($key, $value)
+    {
+        $fields = $this->_queryBuilder->getFields() ? $this->_queryBuilder->getFields() : array();
+        $fields[$key] = $value;
+        $this->setFields($fields);
+        return $this;
+    }
+    
+    /**
+     * Add an array of fields
+     * 
+     * @param array $fields
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function addFields(array $fields)
+    {
+        $oldFields = $this->_queryBuilder->getFields() ? $this->_queryBuilder->getFields() : array();        
+        $newFields = array_merge($oldFields, $fields);
+        $this->setFields($newFields);
+        return $this;
+    }
 
     /**
      * set has action
