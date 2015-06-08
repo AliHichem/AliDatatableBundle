@@ -1,0 +1,51 @@
+{% block html %}
+{% if multiple %}
+<form name="frm-{{id}}">
+{% endif %}
+    <table class="display table table-bordered" id="{{id}}"> 
+        <thead> 
+            <tr> 
+            {% if multiple %}
+                <th width="1%" ><input type="checkbox" name="datatable_action_all" /></th>
+            {% endif %}
+            {% for label,key in fields %}
+                {% if label != '_identifier_' %}
+                    <th>{{ label }}</th>
+                {% endif %}
+            {% endfor %}
+            {% if action %}
+                <th>{{ 'ali.common.action'|trans()  }}</th>
+            {% endif %}
+            </tr> 
+        </thead>
+        {% if search %}
+        {% set i = 0 %}
+        <tfoot>
+            <tr>
+                {% if multiple %}
+                <th></th>
+                {% endif %}
+                {% for label,key in fields %}
+                    {% if label != '_identifier_' %}
+                        {% if search_fields is not empty %}
+                            {% if i in search_fields %}
+                            <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                            {% else %}
+                            <td></td>
+                            {% endif %}
+                        {% else %}
+                        <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|trans() }}" class="search_init" /></td>
+                        {% endif %}
+                    {% elseif label == '_identifier_'and action and not action_twig %}
+                        <td></td>
+                    {% endif %}
+                    {% set i = i+1 %}
+                {% endfor %}
+            </tr>
+        </tfoot>
+        {% endif %}
+    </table>
+{% if multiple %}
+</form>
+{% endif %}
+{% endblock  %}

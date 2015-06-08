@@ -17,6 +17,10 @@
 	"twig/twig": ">=1.8,<2.0-dev",
         "doctrine/orm": "~2.4@stable,>=2.1,<=2.5"
     },
+    "suggest": {
+        "components/jquery": "1.11.2",
+        "datatables/datatables": "1.10.7"
+    },
     "target-dir": "Ali/DatatableBundle",
     "autoload": {
         "psr-0": {

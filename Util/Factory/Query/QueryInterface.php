@@ -8,9 +8,13 @@ interface QueryInterface
     /**
      * get total records
      * 
+     * @param string $selection
+     * @param string $globalSearch
+     * @param string $columns
+     * 
      * @return integer 
      */
-    function getTotalRecords();
+    function getRecordsCount($selection, $globalSearch, $columns);
 
     /**
      * get data

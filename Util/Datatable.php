@@ -123,8 +123,13 @@ class Datatable
      */
     public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
-        $request       = $this->_request;
-        $iTotalRecords = $this->_queryBuilder->getTotalRecords();
+        $recordsTotal = $this->_queryBuilder->getRecordsCount("total");
+        if ($this->hasSearchValue()) {
+            $recordsFiltered = $this->_queryBuilder->getRecordsCount("filtered", $this->_request->get('search'));
+        } else {
+            $recordsFiltered = $recordsTotal;
+        }
+        
         list($data, $objects) = $this->_queryBuilder->getData($hydration_mode);
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
@@ -155,10 +160,10 @@ class Datatable
             });
         }
         $output = array(
-            "sEcho"                => intval($request->get('sEcho')),
-            "iTotalRecords"        => $iTotalRecords,
-            "iTotalDisplayRecords" => $iTotalRecords,
-            "aaData"               => $data
+            "draw" => intval($this->_request->get('draw')),
+            "recordsTotal" => $recordsTotal,
+            "recordsFiltered" => $recordsFiltered,
+            "data" => $data
         );
         return new Response(json_encode($output));
     }
@@ -593,6 +598,29 @@ class Datatable
     public function getConfiguration()
     {
         return $this->_config;
+    }
+    
+    /**
+     * Has Search Value
+     * 
+     * @return boolean
+     */
+    public function hasSearchValue() 
+    {
+        $query = $this->_request->query->all();
+
+        if ($query['search']['value']) {
+            return true;
+        }
+
+        $columns = $query['columns'];
+        foreach ($columns as $value) {
+            if ($value['search']['value']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
