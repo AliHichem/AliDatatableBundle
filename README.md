@@ -209,14 +209,24 @@ public function indexAction()
 ### # Rendering inside Twig
 
 ```js
-<!-- XXX\MyBundle\Resources\views\Module\index.html.twig -->
+<!-- add these assets to your page or layout -->
 
 <!-- include the assets -->
-<link href="{{ asset('bundles/alidatatable/css/demo_table.css') }}" type="text/css" rel="stylesheet" />
-<link href="{{ asset('bundles/alidatatable/css/smoothness/jquery-ui-1.8.4.custom.css') }}" type="text/css" rel="stylesheet" />
-<script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.js') }}"></script>
-<script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.datatable.inc.js') }}"></script>
-<script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.dataTables.min.js') }}"></script>    
+{% stylesheets 
+        'bundles/alidatatable/third-party/bootstrap/css/bootstrap.min.css'
+        'bundles/alidatatable/css/dataTables.bootstrap.min.css'
+        filter='cssrewrite' 
+ %}
+     <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}" />
+ {% endstylesheets %}
+{% javascripts
+        'bundles/alidatatable/js/jquery.min.js'
+        'bundles/alidatatable/js/jquery.dataTables.min.js'
+        'bundles/alidatatable/js/dataTables.bootstrap.min.js'
+ %}
+     <script src="{{ asset_url }}" type="text/javascript"></script>
+ {% endjavascripts %}
+
 
 {{ datatable({ 
         'edit_route' : 'RouteForYourEntity_edit',
