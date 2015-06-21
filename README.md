@@ -1,6 +1,9 @@
 AliDatatableBundle
 ==================
 
+### NOTE1 : v >= 2 only compatible with bootstrap.
+### NOTE2 : v >= 2 some internal code changes were made, any code override of the v = 1.* will probably not be compatible with it.
+
 [![Build Status](https://secure.travis-ci.org/AliHichem/AliDatatableBundle.png?branch=master)](http://travis-ci.org/AliHichem/AliDatatableBundle)
 
 The Datatable bundle for symfony2 allow for easily integration of the [jQuery Datatable plugin](http://datatables.net/) with the doctrine2 entities.
@@ -15,7 +18,11 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * support of column search.
  * support of custom twig/phpClosure renderers.
  * support of custom grouped actions.
- 
+
+### New in  v2:
+ * datatable configuration javascript code (even for multiple datatables) is grouped, minimized and moved to the bottom of the <body> element automatically.
+ * twitter bootstrap integration. 
+
 ###### Soon : support of ODM (MongoDB) : developement under progress in the "mongodb" branch.
 
 <div style="text-align:center"><img alt="Screenshot" src="https://github.com/AliHichem/AliDatatableBundle/raw/master/Resources/public/images/sample_01.png"></div>
@@ -52,14 +59,14 @@ Installation is a quick (I promise!) 3 step process:
 
 ##### Step 1: Download AliDatatableBundle 
 
-###### Using composer (Symfony > 2.0)
+###### twitter bootstrapped (v >= 2.0)
 
 Add datatable bundle in your composer.json as below:
 
 ```js
 "require": {
     ...
-    "ali/datatable": "dev-master"
+    "ali/datatable": "~2.0"
 }
 ```
 
@@ -69,21 +76,23 @@ Update/install with this command:
 php composer.phar update ali/datatable
 ```
 
-###### Using native symfony2 installer (Symfony < 2.1) : support of SF2 v < 2.1 will be removed soon.
+###### Classic theme datatable
 
-Include the source to your deps files
+Add datatable bundle in your composer.json as below:
+
+```js
+"require": {
+    ...
+    "ali/datatable": "~1.4"
+}
+```
+
+Update/install with this command:
 
 ```
-[AliDatatableBundle]
-    git=git://github.com/AliHichem/AliDatatableBundle
-    target=bundles/Ali/DatatableBundle
+php composer.phar update ali/datatable
 ```
 
-install the bundle
-
-```
-$ bin/vendor install
-```
 
 ##### Step 2:  Enable the bundle
 
