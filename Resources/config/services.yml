@@ -14,3 +14,9 @@ services:
         arguments: [ @service_container ]
         tags:
             -  { name: twig.extension }
+            
+    datatable.listener:
+        class: Ali\DatatableBundle\EventListener\DatatableListener
+        arguments: [ @twig ]
+        tags:
+            - { name: kernel.event_listener, event: kernel.response,  method: onKernelResponse, priority: 255 }

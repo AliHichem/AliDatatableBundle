@@ -62,11 +62,17 @@ class AliDatatableExtension extends \Twig_Extension
         {
             $main_template = $options['main_template'];
         }
+        $session                  = $this->_container->get('session');
+        $rawjs                    = $this->_container
+                ->get('templating')
+                ->render('AliDatatableBundle:Internal:script.html.twig', $options);
+        $sess_dtb                 = $session->get('datatable', []);
+        $sess_dtb[$options['id']] = $rawjs;
+        $session->set('datatable', $sess_dtb);
 
         return $this->_container
                         ->get('templating')
-                        ->render(
-                                $main_template, $options);
+                        ->render($main_template, $options);
     }
 
     /**
