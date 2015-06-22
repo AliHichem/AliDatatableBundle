@@ -20,7 +20,7 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
  * support of custom grouped actions.
 
 ### New in  v2:
- * datatable configuration javascript code (even for multiple datatables) is grouped, minimized and moved to the bottom of the <body> element automatically.
+ * datatable configuration javascript code (even for multiple datatables) is grouped, minimized and moved to the bottom of the html body element automatically.
  * twitter bootstrap integration. 
 
 ###### Soon : support of ODM (MongoDB) : developement under progress in the "mongodb" branch.
