@@ -4,7 +4,13 @@ AliDatatableBundle
 ### NOTE1 : v >= 2 only compatible with bootstrap.
 ### NOTE2 : v >= 2 some internal code changes were made, any code override of the v = 1.* will probably not be compatible with it.
 
-[![Build Status](https://secure.travis-ci.org/AliHichem/AliDatatableBundle.png?branch=master)](http://travis-ci.org/AliHichem/AliDatatableBundle)
+[![Build Status](https://secure.travis-ci.org/AliHichem/AliDatatableBundle.png?branch=master)](http://travis-ci.org/AliHichem/AliDatatableBundle) 
+<a href="https://codeclimate.com/github/AliHichem/AliDatatableBundle"><img src="https://codeclimate.com/github/AliHichem/AliDatatableBundle/badges/gpa.svg" /></a>
+[![GitHub issues](https://img.shields.io/github/issues/AliHichem/AliDatatableBundle.svg)](https://github.com/AliHichem/AliDatatableBundle/issues)
+[![GitHub forks](https://img.shields.io/github/forks/AliHichem/AliDatatableBundle.svg)](https://github.com/AliHichem/AliDatatableBundle/network)
+[![GitHub stars](https://img.shields.io/github/stars/AliHichem/AliDatatableBundle.svg)](https://github.com/AliHichem/AliDatatableBundle/stargazers)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/AliHichem/AliDatatableBundle/master/LICENSE)
+
 
 The Datatable bundle for symfony2 allow for easily integration of the [jQuery Datatable plugin](http://datatables.net/) with the doctrine2 entities.
 This bundle provides a way to make a projection of a doctrine2 entity to a powerful jquery datagrid. It mainly includes:
