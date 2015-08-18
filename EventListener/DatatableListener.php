@@ -68,10 +68,13 @@ class DatatableListener implements EventSubscriberInterface
         $pos_container = strripos($content, 'alidatatable-scripts');
         $sess_dta      = $session->get('datatable',array());
         $dta_script    = null;
-        array_walk($sess_dta, function(&$part, &$key) {
-            $part = trim(preg_replace('/\s\s+/', ' ', $part));
-        });
-        $dta_script = implode("\n", $sess_dta);
+        if ($sess_data)
+        {
+            array_walk($sess_dta, function(&$part, &$key) {
+                $part = trim(preg_replace('/\s\s+/', ' ', $part));
+            });
+            $dta_script = implode("\n", $sess_dta);
+        }
         $session->set('datatable', array());
         if (!$pos_container)
         {
