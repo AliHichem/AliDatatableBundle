@@ -119,7 +119,7 @@ class Datatable
      * 
      * @param int $hydration_mode
      * 
-     * @return Response 
+     * @return JsonResponse
      */
     public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
