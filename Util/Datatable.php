@@ -3,7 +3,7 @@
 namespace Ali\DatatableBundle\Util;
 
 use Symfony\Component\DependencyInjection\ContainerInterface,
-    Symfony\Component\HttpFoundation\Response;
+    Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\ORM\Query,
     Doctrine\ORM\Query\Expr\Join,
     Doctrine\ORM\EntityManager;
@@ -119,7 +119,7 @@ class Datatable
      * 
      * @param int $hydration_mode
      * 
-     * @return Response 
+     * @return JsonResponse
      */
     public function execute($hydration_mode = Query::HYDRATE_ARRAY)
     {
@@ -160,7 +160,7 @@ class Datatable
             "iTotalDisplayRecords" => $iTotalRecords,
             "aaData"               => $data
         );
-        return new Response(json_encode($output));
+        return new JsonResponse($output);
     }
 
     /**
