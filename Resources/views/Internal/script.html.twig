@@ -167,18 +167,16 @@ $(document).ready(function(){
     {% if search %}
     $(".dataTables_filter").remove();
     var search_selector = "#{{id}} input[searchable=true]";
-    $(search_selector).keypress( function (event) {
+    $(search_selector).keyup( function (event) {
         var index = $(this).attr('index');
         var oTable = eval('oTable_{{id}}'.split('-').join('_'));
-        if (event.keyCode == '13') {
-            oTable.fnFilter( 
-                this.value, 
-                oTable.oApi._fnVisibleToColumnIndex( 
-                    oTable.fnSettings(), 
-                    index 
-                ) 
-            );
-        }
+        oTable.fnFilter(
+            this.value,
+            oTable.oApi._fnVisibleToColumnIndex(
+                oTable.fnSettings(),
+                index
+            )
+        );
     }).each( function (i) {
         this.initVal = this.value;
     }).focus( function () {
