@@ -165,7 +165,6 @@ $(document).ready(function(){
     }
 
     {% if search %}
-    $(".dataTables_filter").remove();
     var search_selector = "#{{id}} input[searchable=true]";
     $(search_selector).keypress( function (event) {
         var index = $(this).attr('index');
