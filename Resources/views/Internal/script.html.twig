@@ -175,8 +175,6 @@ $(document).ready(function(){
             clearTimeout(timeout);
             timeout = setTimeout(function () {
                 var oTable = eval('oTable_{{id}}'.split('-').join('_'));
-                console.log(self.value);
-                console.log(self);
                 oTable.fnFilter(
                     self.value,
                     oTable.oApi._fnVisibleToColumnIndex(
