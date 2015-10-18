@@ -167,22 +167,30 @@ $(document).ready(function(){
     {% if search %}
     $(".dataTables_filter").remove();
     var search_selector = "#{{id}} input[searchable=true]";
-    $(search_selector).keyup( function (event) {
-        var index = $(this).attr('index');
-        var oTable = eval('oTable_{{id}}'.split('-').join('_'));
-        oTable.fnFilter(
-            this.value,
-            oTable.oApi._fnVisibleToColumnIndex(
-                oTable.fnSettings(),
-                index
-            )
-        );
+    var timeout;
+    $(search_selector).keyup( function (e) {
+        if ($.inArray(e.which, [9, 16]) == -1) {
+            var index = $(this).attr('index');
+            var self = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                var oTable = eval('oTable_{{id}}'.split('-').join('_'));
+                console.log(self.value);
+                console.log(self);
+                oTable.fnFilter(
+                    self.value,
+                    oTable.oApi._fnVisibleToColumnIndex(
+                        oTable.fnSettings(),
+                        index
+                    )
+                );
+            }, 700);
+        }
     }).each( function (i) {
         this.initVal = this.value;
     }).focus( function () {
         if ( this.className.match(/\bsearch_init\b/) ){
             this.className.replace(/\bsearch_init\b/g, '').trim();
-            this.value = "";
         }
     }).blur( function (i) {
         if ( this.value == "" ){
