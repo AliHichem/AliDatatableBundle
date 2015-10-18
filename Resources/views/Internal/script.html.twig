@@ -182,13 +182,13 @@ $(document).ready(function(){
     }).each( function (i) {
         this.initVal = this.value;
     }).focus( function () {
-        if ( this.className == "search_init" ){
-            this.className = "";
+        if ( this.className.match(/\bsearch_init\b/) ){
+            this.className.replace(/\bsearch_init\b/g, '').trim();
             this.value = "";
         }
     }).blur( function (i) {
         if ( this.value == "" ){
-            this.className = "search_init";
+            this.className = (this.className.match(/\bsearch_init\b/)) ? this.className : this.className.trim() + " search_init";
             this.value = this.initVal;
         }
     });
