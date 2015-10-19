@@ -200,6 +200,33 @@ class DatatableTest extends BaseTestCase
         $this->assertInternalType('boolean', $this->_datatable->getSearch());
     }
 
+    public function test_getSearchGlobalDisabled()
+    {
+        $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => 'p.name',
+                            "_identifier_" => 'p.id'))
+                ->setOrder('p.id', 'asc')
+        ;
+        $this->assertFalse($this->_datatable->getSearchGlobal());
+    }
+
+    public function test_getSearchGlobalEnabled()
+    {
+        $this->_datatable
+                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setFields(
+                        array(
+                            "title"        => 'p.name',
+                            "_identifier_" => 'p.id'))
+                ->setOrder('p.id', 'asc')
+                ->setSearch(true, true)
+        ;
+        $this->assertTrue($this->_datatable->getSearchGlobal());
+    }
+
     public function test_setRenderders()
     {
         $out  = $this->_datatable

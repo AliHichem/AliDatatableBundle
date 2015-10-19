@@ -53,6 +53,7 @@ class AliDatatableExtension extends \Twig_Extension
         $options['fields']        = $dt->getFields();
         $options['delete_form']   = $this->createDeleteForm('_id_')->createView();
         $options['search']        = $dt->getSearch();
+        $options['search_global'] = $dt->getSearchGlobal();
         $options['search_fields'] = $dt->getSearchFields();
         $options['multiple']      = $dt->getMultiple();
         $options['sort']          = is_null($dt->getOrderField()) ? NULL : array(array_search(
