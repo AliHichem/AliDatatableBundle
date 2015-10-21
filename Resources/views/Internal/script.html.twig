@@ -164,11 +164,8 @@ $(document).ready(function(){
         });
     }
 
-    {% if not search_global %}
-        $(".dataTables_filter").remove();
-    {% endif %}
-
     {% if search %}
+    $(".dataTables_filter").remove();
     var search_selector = "#{{id}} input[searchable=true]";
     $(search_selector).keypress( function (event) {
         var index = $(this).attr('index');

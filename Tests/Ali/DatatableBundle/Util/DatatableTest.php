@@ -211,6 +211,25 @@ class DatatableTest extends BaseTestCase
                 ->setOrder('p.id', 'asc')
         ;
         $this->assertFalse($this->_datatable->getSearchGlobal());
+
+        $this->_datatable
+                ->setSearch(true)
+        ;
+
+        $this->assertFalse($this->_datatable->getSearchGlobal());
+
+        $this->_datatable
+                ->setSearch(true, false)
+        ;
+
+        $this->assertFalse($this->_datatable->getSearchGlobal());
+
+        $this->_datatable
+                ->setSearch(false, false)
+        ;
+
+        $this->assertFalse($this->_datatable->getSearchGlobal());
+
     }
 
     public function test_getSearchGlobalEnabled()

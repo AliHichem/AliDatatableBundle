@@ -547,9 +547,9 @@ class Datatable
      */
     public function setSearch($search, $global = false)
     {
-        $this->_search = $search;
-        $this->_search_global = $global;
-        $this->_queryBuilder->setSearch($search);
+        $this->_search        = $search;
+        $this->_search_global = $search && $global;
+        $this->_queryBuilder->setSearch($this->_search || $this->_search_global);
         return $this;
     }
 
