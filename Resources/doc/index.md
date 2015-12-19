@@ -1,9 +1,10 @@
 AliDatatableBundle
 ==================
 
-The Datatable bundle for symfony2 allow for easily integration of the [jQuery Datatable plugin](http://datatables.net/) with the doctrine2 entities.
+The Datatable bundle for symfony2 allow for easily integration of the [jQuery Datatable plugin](http://datatables.net/) with the doctrine2 entities having twitter bootstrap theme.
 This bundle provides a way to make a projection of a doctrine2 entity to a powerful jquery datagrid.
 
+------------------------------------
 ##### [Installation](#installation-1) 
 
 1. [Download AliDatatableBundle using composer](#step-1-download-alidatatablebundle)
@@ -12,25 +13,22 @@ This bundle provides a way to make a projection of a doctrine2 entity to a power
 
 ##### [How to use AliDatatableBundle ?](#-how-to-use-alidatatablebundle-)
 ##### [Rendering inside Twig](#-rendering-inside-twig)
-
-###### (Advanced use of datatable)
-
 ##### [Advanced php config](#-advanced-php-config)
 ##### [Use of search filters](#-use-of-search-filters)
 
 *  [Activate search globally](#activate-search-globally)
-*  [Set search fields](#set-search-fields)
+*  [Set search fields](#set-search-fields) (new) 
 
-##### [Multiple actions](#-multiple-actions)
+##### [Multiple actions](#-multiple-actions) (new) 
 ##### [Custom renderer](#-custom-renderer)
 ##### [Translation](#-translation)
-##### [Multiple datatable in the same view](#-doctrine-query-builder)
+##### [Multiple datatable in the same view](#-multiple-datatable-in-the-same-view)
 
 ---------------------------------------
 
 ### Installation
 
-Installation is a quick (I promise!) 7 step process:
+Installation is a quick (I promise!) 3 step process:
 
 1. [Download AliDatatableBundle using composer](#step-1-download-alidatatablebundle)
 2. [Enable the Bundle](#step-2--enable-the-bundle)
@@ -38,14 +36,14 @@ Installation is a quick (I promise!) 7 step process:
 
 ##### Step 1: Download AliDatatableBundle 
 
-###### Using composer (Symfony > 2.0)
+###### twitter bootstrapped (v >= 2.0)
 
 Add datatable bundle in your composer.json as below:
 
 ```js
 "require": {
     ...
-    "ali/datatable": "dev-master"
+    "ali/datatable": "~2.0"
 }
 ```
 
@@ -55,21 +53,23 @@ Update/install with this command:
 php composer.phar update ali/datatable
 ```
 
-###### Using native symfony2 installer (Symfony < 2.1) : support of SF2 v < 2.1 will be removed soon.
+###### Classic theme datatable
 
-Include the source to your deps files
+Add datatable bundle in your composer.json as below:
+
+```js
+"require": {
+    ...
+    "ali/datatable": "~1.4"
+}
+```
+
+Update/install with this command:
 
 ```
-[AliDatatableBundle]
-    git=git://github.com/AliHichem/AliDatatableBundle
-    target=bundles/Ali/DatatableBundle
+php composer.phar update ali/datatable
 ```
 
-install the bundle
-
-```
-$ bin/vendor install
-```
 
 ##### Step 2:  Enable the bundle
 
@@ -146,16 +146,17 @@ Assuming for example that you need a grid in your "index" action, create in your
 private function _datatable()
 {
     return $this->get('datatable')
-                ->setEntity("XXXMyBundle:Entity", "x")                          // replace "XXXMyBundle:Entity" by your entity
+                ->setEntityManager($em)                                         // Optional 
+                ->setEntity("XXXMyBundle:Entity", "x")                          // Replace "XXXMyBundle:Entity" by your entity
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setWhere(                                                     // set your dql where statement
-                     'x.adress = :adress',
-                     array('adress' => 'Paris') 
+                     'x.address = :address',
+                     array('address' => 'Paris') 
                 )
                 ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
                 ->setHasAction(true);                                           // you can disable action column from here by setting "false".
@@ -185,14 +186,24 @@ public function indexAction()
 ### # Rendering inside Twig
 
 ```js
-<!-- XXX\MyBundle\Resources\views\Module\index.html.twig -->
+<!-- add these assets to your page or layout -->
 
 <!-- include the assets -->
-<link href="{{ asset('bundles/alidatatable/css/demo_table.css') }}" type="text/css" rel="stylesheet" />
-<link href="{{ asset('bundles/alidatatable/css/smoothness/jquery-ui-1.8.4.custom.css') }}" type="text/css" rel="stylesheet" />
-<script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.js') }}"></script>
-<script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.datatable.inc.js') }}"></script>
-<script type="text/javascript" src="{{ asset('bundles/alidatatable/js/jquery.dataTables.min.js') }}"></script>    
+{% stylesheets 
+        'bundles/alidatatable/third-party/bootstrap/css/bootstrap.min.css'
+        'bundles/alidatatable/css/dataTables.bootstrap.min.css'
+        filter='cssrewrite' 
+ %}
+     <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}" />
+ {% endstylesheets %}
+{% javascripts
+        'bundles/alidatatable/js/jquery.min.js'
+        'bundles/alidatatable/js/jquery.dataTables.min.js'
+        'bundles/alidatatable/js/dataTables.bootstrap.min.js'
+ %}
+     <script src="{{ asset_url }}" type="text/javascript"></script>
+ {% endjavascripts %}
+
 
 {{ datatable({ 
         'edit_route' : 'RouteForYourEntity_edit',
@@ -225,7 +236,7 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
                             "Group"         => 'g.name',
                             "Team"          => 't.name',
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
@@ -233,8 +244,8 @@ private function _datatable()
                 ->addJoin('x.group', 'g', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
                 ->addJoin('x.team', 't', \Doctrine\ORM\Query\Expr\Join::INNER_JOIN)
                 ->setWhere(                                                     // set your dql where statement
-                     'x.adress = :adress',
-                     array('adress' => 'Paris') 
+                     'x.address = :address',
+                     array('address' => 'Paris') 
                 )
                 ->setOrder("x.created", "desc")                                 // it's also possible to set the default order
                 ->setHasAction(true);                                           // you can disable action column from here by setting "false".
@@ -369,6 +380,16 @@ private function _datatable()
 }
 ```
 
+In a twig renderer you can have access the the field value using dt_item variable
+```
+{{ dt_item }}
+```
+or access the entire entity object using dt_obj variable
+```
+<a href="{{ path('route_to_user_edit',{ 'user_id' : dt_obj.id }) }}" > {{ dt_obj.username }} </a>
+```
+NOTE: be careful of LAZY LOADING when using dt_obj !
+
 **PHP Closures**
 
 Assuming the example above, you can set your custom fields renderer using [PHP Closures](http://php.net/manual/en/class.closure.php).
@@ -387,7 +408,7 @@ private function _datatable()
                 ->setFields(
                         array(
                             "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Adress"        => 'x.adress',                      //      "label" => "alias.field_attribute_for_dql"
+                            "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
                             "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setRenderer(
@@ -395,7 +416,7 @@ private function _datatable()
                     {
                         foreach ($data as $key => $value)
                         {
-                            if ($key == 1)                                      // 1 => adress field
+                            if ($key == 1)                                      // 1 => address field
                             {
                                 $data[$key] = $controller_instance
                                         ->get('templating')
@@ -512,7 +533,7 @@ protected function _datatable()
 {
     // ...
     return $this->get('datatable')
-                ->setDatatableId(dta-unique-id_1')
+                ->setDatatableId('dta-unique-id_1')
                 ->setEntity("XXXMyBundle:Entity", "x")
     // ...
 }
@@ -521,7 +542,7 @@ protected function _datatableSecond()
 {
     // ...
     return $this->get('datatable')
-                ->setDatatableId(dta-unique-id_2')
+                ->setDatatableId('dta-unique-id_2')
                 ->setEntity("YYYMyBundle:Entity", "y")
     // ...
 }
