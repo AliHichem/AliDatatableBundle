@@ -2,7 +2,6 @@
 
 namespace Ali\DatatableBundle\Twig\Extension;
 
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Ali\DatatableBundle\Util\Datatable;
 
@@ -38,7 +37,7 @@ class AliDatatableExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            new \Twig_SimpleFilter('dta_trans', array($this, 'dta_trans'))
+            new \Twig_SimpleFilter('dta_trans', array($this, 'dtatransFilter'))
         );
     }
 
@@ -49,12 +48,12 @@ class AliDatatableExtension extends \Twig_Extension
      * 
      * @return string
      */
-    public function dta_trans($id)
+    public function dtatransFilter($id)
     {
         $translator = $this->_container->get('translator');
         $callback   = function($id) {
-            $file = __DIR__ . '/../../Resources/translations/messages.en.yml';
-            return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file))['ali']['common'][explode('.', $id)[2]];
+            $path = $this->_container->get('kernel')->locateResource('@AliDatatableBundle/Resources/translations/messages.en.yml');
+            return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($path))['ali']['common'][explode('.', $id)[2]];
         };
         return $translator->trans($id) === $id ? $callback($id) : $translator->trans($id);
     }

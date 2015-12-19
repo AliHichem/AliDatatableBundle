@@ -123,7 +123,7 @@ class Datatable
         list($data, $objects) = $this->_queryBuilder->getData();
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
-        array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
+        array_walk($data, function($val, $key) use ($id_index, &$ids) {
             $ids[$key] = $val[$id_index];
         });
         if (!is_null($this->_fixed_data))

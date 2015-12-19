@@ -176,7 +176,7 @@ class DoctrineBuilder implements QueryInterface
         $dql_fields = array_values($this->fields);
 
         // add sorting
-        if ($request->get('iSortCol_0') != null)
+        if ($request->get('iSortCol_0') !== null)
         {
             $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
         }

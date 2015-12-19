@@ -2,6 +2,8 @@
 
 namespace Ali\DatatableBundle\Util\Factory\Query;
 
+use Doctrine\ORM\Query\Expr\Join;
+
 interface QueryInterface
 {
 
@@ -109,7 +111,7 @@ interface QueryInterface
      *
      * @return Datatable
      */
-    function setSearch($search); 
+    function setSearch($search);
 
     /**
      * add join
