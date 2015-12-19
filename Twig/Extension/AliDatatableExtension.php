@@ -33,6 +33,33 @@ class AliDatatableExtension extends \Twig_Extension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return array(
+            new \Twig_SimpleFilter('dta_trans', array($this, 'dta_trans'))
+        );
+    }
+
+    /**
+     * Datatable translate filter
+     * 
+     * @param string $id
+     * 
+     * @return string
+     */
+    public function dta_trans($id)
+    {
+        $translator = $this->_container->get('translator');
+        $callback   = function($id) {
+            $file = __DIR__ . '/../../Resources/translations/messages.en.yml';
+            return \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file))['ali']['common'][explode('.', $id)[2]];
+        };
+        return $translator->trans($id) === $id ? $callback($id) : $translator->trans($id);
+    }
+
+    /**
      * Converts a string to time
      * 
      * @param string $string

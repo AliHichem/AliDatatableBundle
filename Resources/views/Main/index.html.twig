@@ -14,7 +14,7 @@
                     {% endif %}
                 {% endfor %}
                 {% if action %}
-                    <th>{{ 'ali.common.action'|trans()  }}</th>
+                    <th>{{ 'ali.common.action'|dta_trans()  }}</th>
                 {% endif %}
                 </tr> 
             </thead>
@@ -29,12 +29,12 @@
                         {% if label != '_identifier_' %}
                             {% if search_fields is not empty %}
                                 {% if i in search_fields %}
-                                <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|trans() }}" class="search_init form-control input-sm" /></td>
+                                <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|dta_trans() }}" class="search_init form-control input-sm" /></td>
                                 {% else %}
                                 <td></td>
                                 {% endif %}
                             {% else %}
-                            <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|trans() }}" class="search_init form-control input-sm" /></td>
+                            <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|dta_trans() }}" class="search_init form-control input-sm" /></td>
                             {% endif %}
                         {% elseif label == '_identifier_'and action and not action_twig %}
                             <td></td>
