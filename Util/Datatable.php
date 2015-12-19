@@ -2,15 +2,15 @@
 
 namespace Ali\DatatableBundle\Util;
 
-use Symfony\Component\DependencyInjection\ContainerInterface,
-    Symfony\Component\HttpFoundation\JsonResponse;
-use Doctrine\ORM\Query,
-    Doctrine\ORM\Query\Expr\Join,
-    Doctrine\ORM\EntityManager;
-use Ali\DatatableBundle\Util\Factory\Query\QueryInterface,
-    Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder,
-    Ali\DatatableBundle\Util\Formatter\Renderer,
-    Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\EntityManager;
+use Ali\DatatableBundle\Util\Factory\Query\QueryInterface;
+use Ali\DatatableBundle\Util\Factory\Query\DoctrineBuilder;
+use Ali\DatatableBundle\Util\Formatter\Renderer;
+use Ali\DatatableBundle\Util\Factory\Prototype\PrototypeBuilder;
 
 class Datatable
 {
@@ -23,9 +23,6 @@ class Datatable
 
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
     protected $_container;
-//
-//    /** @var \Doctrine\ORM\EntityManager */
-//    protected $_em;
 
     /** @var boolean */
     protected $_has_action;
@@ -117,15 +114,13 @@ class Datatable
     /**
      * execute
      * 
-     * @param int $hydration_mode
-     * 
      * @return JsonResponse
      */
-    public function execute($hydration_mode = Query::HYDRATE_ARRAY)
+    public function execute()
     {
         $request       = $this->_request;
         $iTotalRecords = $this->_queryBuilder->getTotalRecords();
-        list($data, $objects) = $this->_queryBuilder->getData($hydration_mode);
+        list($data, $objects) = $this->_queryBuilder->getData();
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($data, $id_index, &$ids) {
@@ -333,7 +328,7 @@ class Datatable
         $this->_queryBuilder->setFields($fields);
         return $this;
     }
-    
+
     /**
      * Add a field
      * 
@@ -343,12 +338,12 @@ class Datatable
      */
     public function addField($key, $value)
     {
-        $fields = $this->_queryBuilder->getFields() ? $this->_queryBuilder->getFields() : array();
+        $fields       = $this->_queryBuilder->getFields() ? $this->_queryBuilder->getFields() : array();
         $fields[$key] = $value;
         $this->setFields($fields);
         return $this;
     }
-    
+
     /**
      * Add an array of fields
      * 
@@ -357,7 +352,7 @@ class Datatable
      */
     public function addFields(array $fields)
     {
-        $oldFields = $this->_queryBuilder->getFields() ? $this->_queryBuilder->getFields() : array();        
+        $oldFields = $this->_queryBuilder->getFields() ? $this->_queryBuilder->getFields() : array();
         $newFields = array_merge($oldFields, $fields);
         $this->setFields($newFields);
         return $this;

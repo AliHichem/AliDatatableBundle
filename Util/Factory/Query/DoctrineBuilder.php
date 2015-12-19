@@ -168,11 +168,9 @@ class DoctrineBuilder implements QueryInterface
     /**
      * get data
      * 
-     * @param int $hydration_mode
-     * 
      * @return array 
      */
-    public function getData($hydration_mode)
+    public function getData()
     {
         $request    = $this->request;
         $dql_fields = array_values($this->fields);
@@ -214,26 +212,28 @@ class DoctrineBuilder implements QueryInterface
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
-        $objects        = $query->getResult(Query::HYDRATE_OBJECT);
-        $maps           = $query->getResult(Query::HYDRATE_SCALAR);
-        $data           = array();
-        $get_scalar_key = function($field) {
+        $objects = $query->getResult(Query::HYDRATE_OBJECT);
+        $data    = array();
+        $_getKey = function($field) {
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
-            $_f        = str_replace('.', '_', $_f);
+            $_f        = explode('.', $_f)[1];
             return $_f;
         };
         $fields = array();
         foreach ($this->fields as $field)
         {
-            $fields[] = $get_scalar_key($field);
+            $fields[] = $_getKey($field);
         }
-        foreach ($maps as $map)
+        foreach ($objects as $object)
         {
             $item = array();
             foreach ($fields as $_field)
             {
-                $item[] = $map[$_field];
+                $ref_class = new \ReflectionClass($object);
+                $property  = $ref_class->getProperty($_field);
+                $property->setAccessible(true);
+                $item[]    = $property->getValue($object);
             }
             $data[] = $item;
         }

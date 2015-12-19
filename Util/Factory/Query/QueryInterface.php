@@ -15,11 +15,9 @@ interface QueryInterface
     /**
      * get data
      * 
-     * @param int $hydration_mode
-     * 
      * @return array
      */
-    function getData($hydration_mode);
+    function getData();
 
     /**
      * set entity
