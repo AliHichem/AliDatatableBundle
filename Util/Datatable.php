@@ -292,8 +292,8 @@ class Datatable
     /**
      * set entity
      * 
-     * @param type $entity_name
-     * @param type $entity_alias
+     * @param string $entity_name
+     * @param string $entity_alias
      * 
      * @return \Ali\DatatableBundle\Util\Datatable 
      */
@@ -361,7 +361,7 @@ class Datatable
     /**
      * set has action
      * 
-     * @param type $has_action
+     * @param boolean $has_action
      * 
      * @return \Ali\DatatableBundle\Util\Datatable
      */
@@ -374,8 +374,8 @@ class Datatable
     /**
      * set order
      * 
-     * @param type $order_field
-     * @param type $order_type
+     * @param string $order_field
+     * @param string $order_type
      * 
      * @return \Ali\DatatableBundle\Util\Datatable 
      */
@@ -388,7 +388,7 @@ class Datatable
     /**
      * set fixed data
      * 
-     * @param type $data
+     * @param null|array $data
      * 
      * @return \Ali\DatatableBundle\Util\Datatable 
      */
