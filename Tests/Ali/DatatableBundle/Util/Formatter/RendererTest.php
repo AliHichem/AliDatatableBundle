@@ -50,7 +50,7 @@ class RendererTest extends BaseTestCase
             ),
                 ), $fields);
         $data   = array(array('something', 'eee'));
-        $r->applyTo($data,array((object)[]));
+        $r->applyTo($data,array((object)array()));
         $this->assertContains('form', $data[0][1]);
     }
 
