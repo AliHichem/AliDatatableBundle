@@ -5,27 +5,27 @@ namespace Ali\DatatableBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @Entity
- * @Table(name="features")
+ * @ORM\Entity
+ * @ORM\Table(name="features")
  */
 class Feature
 {
 
     /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
     /**
-     * @Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100)
      */
     protected $name;
 
     /**
-     * @ManyToOne(targetEntity="Product", inversedBy="features")
-     * @JoinColumn(name="product_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Product", inversedBy="features")
+     * @ORM\JoinColumn(name="product_id", referencedColumnName="id")
      * */
     protected $product;
 

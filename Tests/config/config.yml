@@ -9,3 +9,23 @@ framework:
         storage_id:     session.storage.filesystem
     translator: { fallback: en }
     test: ~
+    
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   pdo_sqlite
+        dbname:   ali
+        charset:  UTF8
+
+    orm:
+        auto_generate_proxy_classes: %kernel.debug%
+        auto_mapping: false
+        mappings:
+            AliDatatableBundle:
+                type: annotation
+                dir: %kernel.root_dir%/Ali/DatatableBundle/Entity
+                prefix: Ali\DatatableBundle\Entity
+
+ali_datatable:  
+    all:    ~
+    js:     ~

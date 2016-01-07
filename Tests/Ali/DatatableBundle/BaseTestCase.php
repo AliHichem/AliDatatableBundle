@@ -4,6 +4,7 @@ namespace Ali\DatatableBundle;
 
 use Ali\DatatableBundle\Tests\AppKernel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Doctrine\Common\Annotations\AnnotationRegistry;  
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
@@ -42,35 +43,15 @@ class BaseTestCase extends WebTestCase
     {
         $kernel           = static::createKernel();
         $kernel->boot();
-        $this->_em        = self::createTestEntityManager();
         $this->_container = $kernel->getContainer();
-        $this->_container->set('doctrine.orm.entity_manager', $this->_em);
+        $this->_em        = $this->_container->get('doctrine.orm.entity_manager');
+        AnnotationRegistry::registerFile($kernel->getRootDir()."/../vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
         if (!isset($GLOBALS['TEST_CHARGED']))
         {
             $this->_createSchemas();
             $this->_insertData();
             $GLOBALS['TEST_CHARGED'] = true;
         }
-    }
-
-    /**
-     * @return EntityManager
-     */
-    static public function createTestEntityManager($paths = array())
-    {
-        if (!class_exists('PDO') || !in_array('sqlite', \PDO::getAvailableDrivers()))
-        {
-            self::markTestSkipped('This test requires SQLite support in your environment');
-        }
-        $paths  = array(realpath(__DIR__ . '/Entity'));
-        $config = Setup::createAnnotationMetadataConfiguration($paths, false);
-        $params = array(
-            'driver'   => 'pdo_sqlite',
-            'memory'   => true,
-            'password' => '',
-            'dbname'   => 'ali'
-        );
-        return EntityManager::create($params, $config);
     }
 
     /**

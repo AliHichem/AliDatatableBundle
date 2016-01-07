@@ -2,39 +2,39 @@
 
 namespace Ali\DatatableBundle\Entity;
 
-use Doctrine\ORM\Mappin as ORM;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @Entity
- * @Table(name="products")
+ * @ORM\Entity
+ * @ORM\Table(name="products")
  */
 class Product
 {
 
     /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
     /**
-     * @Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100)
      */
     protected $name;
 
     /**
-     * @Column(type="decimal", scale=2)
+     * @ORM\Column(type="decimal", scale=2)
      */
     protected $price;
 
     /**
-     * @Column(type="text")
+     * @ORM\Column(type="text")
      */
     protected $description;
 
     /**
-     * @ORMM\OneToMany(targetEntity="Feature", mappedBy="product")
+     * @ORM\OneToMany(targetEntity="Feature", mappedBy="product")
      * */
     protected $features;
 
