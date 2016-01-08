@@ -9,7 +9,7 @@
         {
             "name": "Ali hichem",
             "email": "ali.hichem@mail.com",
-            "role": "Developer"
+            "role": "Author"
         }
     ],
     "require": {
@@ -25,4 +25,3 @@
         }
     }
 }
-

@@ -4,14 +4,14 @@ parameters:
 services:
     datatable:
         class: "%datatable.class%"
-        arguments: [ @service_container ]
+        arguments: [ '@service_container' ]
         scope: prototype
         calls:
             - [setEntityManager, ['@doctrine.orm.entity_manager']]
             
     datatable.twig.extension:
         class: Ali\DatatableBundle\Twig\Extension\AliDatatableExtension
-        arguments: [ @service_container ]
+        arguments: [ '@service_container' ]
         tags:
             -  { name: twig.extension }
             

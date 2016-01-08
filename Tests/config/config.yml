@@ -4,7 +4,7 @@ framework:
     form:            ~
     csrf_protection: ~
     validation:      { enable_annotations: true }
-    templating:      { engines: ['twig','php'] } #assets_version: SomeVersionScheme
+    templating:      { engines: ['twig','php'] } 
     session:
         storage_id:     session.storage.filesystem
     translator: { fallback: en }

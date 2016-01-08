@@ -4,10 +4,6 @@ namespace Ali\DatatableBundle\Tests;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\TwigBundle\TwigBundle;
-use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Ali\DatatableBundle\AliDatatableBundle;
 
 class AppKernel extends Kernel
 {
@@ -18,10 +14,10 @@ class AppKernel extends Kernel
     public function registerBundles()
     {
         $bundles = array(
-            new FrameworkBundle(),
-            new TwigBundle(),
-            new DoctrineBundle(),
-            new AliDatatableBundle(),
+            new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+            new \Symfony\Bundle\TwigBundle\TwigBundle(),
+            new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
+            new \Ali\DatatableBundle\AliDatatableBundle(),
         );
 
         return $bundles;
