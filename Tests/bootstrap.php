@@ -6,7 +6,7 @@ function includeIfExists($file) {
     }
 }
 
-$vendor = realpath(substr(__DIR__, 0, strpos(__DIR__, 'vendor')) . 'vendor');
+$vendor = realpath(__DIR__.'/../vendor');
 
 if (!$loader = includeIfExists($vendor.'/autoload.php')) {
     die('You must set up the project dependencies, run the following commands:'.PHP_EOL.
