@@ -16,7 +16,9 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Tests</directory>
+                <directory>./Tests/Ali/DatatableBundle/Controller</directory>
+                <directory>./Tests/Ali/DatatableBundle/Entity</directory>
+                <directory>./vendor</directory>
             </exclude>
         </whitelist>
     </filter>

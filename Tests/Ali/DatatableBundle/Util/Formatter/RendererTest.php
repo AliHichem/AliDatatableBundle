@@ -22,7 +22,7 @@ class RendererTest extends BaseTestCase
         $this->_datatable = $this->_container->get('datatable');
     }
 
-    public function test_applyView()
+    public function testApplyView()
     {
         $fields = array(
             "title"        => 'p.name',
@@ -33,7 +33,7 @@ class RendererTest extends BaseTestCase
         $this->assertInternalType('string', $out);
     }
 
-    public function test_applyTo()
+    public function testApplyTo()
     {
         $fields = array(
             "title"        => 'p.name',
@@ -50,7 +50,7 @@ class RendererTest extends BaseTestCase
             ),
                 ), $fields);
         $data   = array(array('something', 'eee'));
-        $r->applyTo($data,array((object)array()));
+        $r->applyTo($data, array((object) array()));
         $this->assertContains('form', $data[0][1]);
     }
 
