@@ -346,8 +346,8 @@ class DoctrineBuilder implements QueryInterface
     /**
      * set entity
      * 
-     * @param type $entity_name
-     * @param type $entity_alias
+     * @param string $entity_name
+     * @param string $entity_alias
      * 
      * @return Datatable 
      */
@@ -376,8 +376,8 @@ class DoctrineBuilder implements QueryInterface
     /**
      * set order
      * 
-     * @param type $order_field
-     * @param type $order_type
+     * @param string $order_field
+     * @param string $order_type
      * 
      * @return Datatable 
      */
@@ -392,7 +392,7 @@ class DoctrineBuilder implements QueryInterface
     /**
      * set fixed data
      * 
-     * @param type $data
+     * @param array|null $data
      * 
      * @return Datatable 
      */
