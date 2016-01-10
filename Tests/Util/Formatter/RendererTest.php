@@ -1,8 +1,9 @@
 <?php
 
-namespace Ali\DatatableBundle\Util\Formatter;
+namespace Ali\DatatableBundle\Tests\Util\Formatter;
 
-use Ali\DatatableBundle\BaseTestCase;
+use Ali\DatatableBundle\Tests\BaseTestCase;
+use Ali\DatatableBundle\Util\Formatter\Renderer;
 
 class RendererTest extends BaseTestCase
 {
@@ -43,8 +44,8 @@ class RendererTest extends BaseTestCase
             1 => array(
                 'view'   => 'AliDatatableBundle:Renderers:_actions.html.twig',
                 'params' => array(
-                    'edit_route'            => '_edit',
-                    'delete_route'          => '_delete',
+                    'edit_route'            => 'alidatatable_test_edit',
+                    'delete_route'          => 'alidatatable_test_delete',
                     'delete_form_prototype' => $this->_datatable->getPrototype('delete_form')
                 ),
             ),

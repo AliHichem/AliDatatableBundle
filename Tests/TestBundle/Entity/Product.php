@@ -1,6 +1,6 @@
 <?php
 
-namespace Ali\DatatableBundle\Entity;
+namespace Ali\DatatableBundle\Tests\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -37,6 +37,12 @@ class Product
      * @ORM\OneToMany(targetEntity="Feature", mappedBy="product")
      * */
     protected $features;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="products")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     * */
+    protected $category;
 
     public function __construct()
     {
@@ -95,6 +101,17 @@ class Product
     public function setFeatures($features)
     {
         $this->features = $features;
+        return $this;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategory($category)
+    {
+        $this->category = $category;
         return $this;
     }
 

@@ -212,28 +212,71 @@ class DoctrineBuilder implements QueryInterface
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
-        $objects = $query->getResult(Query::HYDRATE_OBJECT);
-        $data    = array();
-        $_getKey = function($field) {
+        $objects         = $query->getResult(Query::HYDRATE_OBJECT);
+        $data            = array();
+        $entity_alias    = $this->entity_alias;
+        $joins           = $this->joins;
+        $__getParentChain = function($field) use($entity_alias, $joins, &$__getParentChain) {
+            foreach ($joins as $join)
+            {
+                if ($join[1] == $field[0])
+                {
+                    if ($join[0][0] == $entity_alias)
+                    {
+                        return substr($join[0], 2);
+                    }
+                    else
+                    {
+                        $f = $join[0];
+                        if (strpos($f, ' '))
+                        {
+                            $_f = substr($f, 2, strpos($f, ' '));
+                        }
+                        else
+                        {
+
+                            $_f = substr($f, 2);
+                        }
+                        return $__getParentChain($join[0]) . '.' . $_f;
+                    }
+                }
+            }
+        };
+        $__getKey = function($field) use($entity_alias, $__getParentChain) {
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
             $_f        = explode('.', $_f)[1];
+            if ($field[0] != $entity_alias)
+            {
+                return $__getParentChain($field) . '.' . $_f;
+            }
             return $_f;
         };
         $fields = array();
         foreach ($this->fields as $field)
         {
-            $fields[] = $_getKey($field);
+            $fields[] = $__getKey($field);
         }
+        $__getValue = function($prop, $object)use(&$__getValue) {
+            if (strpos($prop, '.'))
+            {
+                $_prop     = substr($prop, 0, strpos($prop, '.'));
+                $ref_class = new \ReflectionClass($object);
+                $property  = $ref_class->getProperty($_prop);
+                $property->setAccessible(true);
+                return $__getValue(substr($prop, strpos($prop, '.') + 1), $property->getValue($object));
+            }
+            $ref_class = new \ReflectionClass($object);
+            $property  = $ref_class->getProperty($prop);
+            $property->setAccessible(true);
+            return $property->getValue($object);
+        };
         foreach ($objects as $object)
         {
             $item = array();
             foreach ($fields as $_field)
             {
-                $ref_class = new \ReflectionClass($object);
-                $property  = $ref_class->getProperty($_field);
-                $property->setAccessible(true);
-                $item[]    = $property->getValue($object);
+                $item[] = $__getValue($_field, $object);
             }
             $data[] = $item;
         }

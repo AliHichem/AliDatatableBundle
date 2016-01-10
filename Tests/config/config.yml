@@ -1,6 +1,6 @@
 framework:
     secret:          test
-    router:          { resource: "%kernel.root_dir%/config/routing.yml" }
+    router:          { resource: "%kernel.root_dir%/TestBundle/Resources/config/routing.yml" }
     form:            ~
     csrf_protection: ~
     validation:      { enable_annotations: true }
@@ -19,12 +19,12 @@ doctrine:
 
     orm:
         auto_generate_proxy_classes: %kernel.debug%
-        auto_mapping: false
+        auto_mapping: true
         mappings:
-            AliDatatableBundle:
+            TestBundle:
                 type: annotation
-                dir: %kernel.root_dir%/Ali/DatatableBundle/Entity
-                prefix: Ali\DatatableBundle\Entity
+                dir: %kernel.root_dir%/TestBundle/Entity
+                prefix: Ali\DatatableBundle\Tests\TestBundle\Entity
 
 ali_datatable:  
     all:    ~

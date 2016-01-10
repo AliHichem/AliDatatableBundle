@@ -14,10 +14,13 @@ class AppKernel extends Kernel
     public function registerBundles()
     {
         $bundles = array(
+            // vendors
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new \Symfony\Bundle\TwigBundle\TwigBundle(),
             new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new \Ali\DatatableBundle\AliDatatableBundle(),
+            // for test purposes
+            new \Ali\DatatableBundle\Tests\TestBundle\TestBundle()
         );
 
         return $bundles;

@@ -1,8 +1,9 @@
 <?php
 
-namespace Ali\DatatableBundle\Util;
+namespace Ali\DatatableBundle\Tests\Util;
 
-use Ali\DatatableBundle\BaseTestCase;
+use Ali\DatatableBundle\Tests\BaseTestCase;
+use Ali\DatatableBundle\Util\Datatable;
 
 class DatatableTest extends BaseTestCase
 {
@@ -37,20 +38,38 @@ class DatatableTest extends BaseTestCase
     public function testAddJoin()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
-                ->addJoin('p.features', 'f');
-
-        /* @var $qb \Doctrine\ORM\QueryBuilder */
-        $qb    = $this->_datatable->getQueryBuilder()->getDoctrineQueryBuilder();
-        $parts = $qb->getDQLParts();
-        $this->assertNotEmpty($parts['join']);
-        $this->assertTrue(array_key_exists('p', $parts['join']));
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Feature', 'f')
+                ->setFields(
+                        array(
+                            "Category"     => 'c.name',
+                            "Product"      => 'p.name',
+                            "Feature"      => 'f.name',
+                            "_identifier_" => 'f.id')
+                )
+                ->addJoin('f.product', 'p')
+                ->addJoin('p.category', 'c');
+        $r    = $this->_datatable->execute();
+        /* @var $r \Symfony\Component\HttpFoundation\JsonResponse */
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $r);
+        $data = json_decode($r->getContent(), true);
+        $this->assertArrayHasKey('sEcho', $data);
+        $this->assertArrayHasKey('iTotalRecords', $data);
+        $this->assertArrayHasKey('iTotalDisplayRecords', $data);
+        $this->assertArrayHasKey('aaData', $data);
+        $this->assertEquals(0, $data['sEcho']);
+        $this->assertEquals('3', $data['iTotalRecords']);
+        $this->assertEquals('3', $data['iTotalDisplayRecords']);
+        $this->assertEquals(array(
+            array('CatA','Laptop', 'CPU I7 Generation', 1),
+            array('CatA','Laptop', 'SolidState drive', 2),
+            array('CatA','Laptop', 'SLI graphic card ', 3),
+                ), $data['aaData']);
     }
 
     public function testExecute()
     {
         $r    = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -74,7 +93,7 @@ class DatatableTest extends BaseTestCase
     {
         $this->_datatable
                 ->setDatatableId('test')
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -88,19 +107,19 @@ class DatatableTest extends BaseTestCase
     public function testGetEntityName()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
                             "_identifier_" => 'p.id')
         );
-        $this->assertEquals('Ali\DatatableBundle\Entity\Product', $this->_datatable->getEntityName());
+        $this->assertEquals('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', $this->_datatable->getEntityName());
     }
 
     public function testGetEntityAlias()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -112,7 +131,7 @@ class DatatableTest extends BaseTestCase
     public function testGetFields()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -124,7 +143,7 @@ class DatatableTest extends BaseTestCase
     public function testGetHasAction()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -136,7 +155,7 @@ class DatatableTest extends BaseTestCase
     public function testGetHasRendererAction()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -148,7 +167,7 @@ class DatatableTest extends BaseTestCase
     public function testGetOrderField()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -161,7 +180,7 @@ class DatatableTest extends BaseTestCase
     public function testGetOrderType()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -174,7 +193,7 @@ class DatatableTest extends BaseTestCase
     public function testGetPrototype()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -187,7 +206,7 @@ class DatatableTest extends BaseTestCase
     public function testGetQueryBuilder()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -200,7 +219,7 @@ class DatatableTest extends BaseTestCase
     public function testGetSearch()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -213,9 +232,9 @@ class DatatableTest extends BaseTestCase
     public function testSetEntity()
     {
         $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
         ;
-        $this->assertEquals('Ali\DatatableBundle\Entity\Product', $this->_datatable->getEntityName());
+        $this->assertEquals('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', $this->_datatable->getEntityName());
         $this->assertEquals('p', $this->_datatable->getEntityAlias());
     }
 
@@ -276,7 +295,7 @@ class DatatableTest extends BaseTestCase
     public function testSetFixedData()
     {
         $r    = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -300,7 +319,7 @@ class DatatableTest extends BaseTestCase
     public function testSetWhere()
     {
         $r    = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -315,7 +334,7 @@ class DatatableTest extends BaseTestCase
     public function testSetGroupBy()
     {
         $r    = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -331,7 +350,7 @@ class DatatableTest extends BaseTestCase
     public function testSetSearch()
     {
         $r    = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -347,7 +366,7 @@ class DatatableTest extends BaseTestCase
     public function testSetDatatableId()
     {
         $dta1 = $this->_container->get('datatable');
-        $dta1->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+        $dta1->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "description"  => 'p.description',
@@ -355,7 +374,7 @@ class DatatableTest extends BaseTestCase
                 )
                 ->setDatatableId('dta1');
         $dta2 = $this->_container->get('datatable');
-        $dta2->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+        $dta2->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -368,7 +387,7 @@ class DatatableTest extends BaseTestCase
 
     public function testGetMultiple()
     {
-        $this->_datatable->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+        $this->_datatable->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "description"  => 'p.description',
@@ -385,7 +404,7 @@ class DatatableTest extends BaseTestCase
                 'route' => 'multiple_delete_route' // path to multiple delete route
             )
         );
-        $this->_datatable->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+        $this->_datatable->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "description"  => 'p.description',
@@ -397,7 +416,7 @@ class DatatableTest extends BaseTestCase
 
     public function testGetConfiguration()
     {
-        $this->_datatable->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+        $this->_datatable->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "description"  => 'p.description',
@@ -413,20 +432,19 @@ class DatatableTest extends BaseTestCase
 
     public function testSetSearchFields()
     {
-        $this->_datatable->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+        $this->_datatable->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "description"  => 'p.description',
                             "_identifier_" => 'p.id')
                 )->setSearchFields(array(0));
         $this->assertEquals(array(0), $this->_datatable->getSearchFields());
-        
     }
 
     public function testSetRenderders()
     {
         $out  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Feature', 'f')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Feature', 'f')
                 ->setFields(
                         array(
                             "title"        => 'f.name',
@@ -437,8 +455,8 @@ class DatatableTest extends BaseTestCase
                             1 => array(
                                 'view'   => 'AliDatatableBundle:Renderers:_actions.html.twig',
                                 'params' => array(
-                                    'edit_route'            => '_edit',
-                                    'delete_route'          => '_delete',
+                                    'edit_route'            => 'alidatatable_test_edit',
+                                    'delete_route'          => 'alidatatable_test_delete',
                                     'delete_form_prototype' => $this->_datatable->getPrototype('delete_form')
                                 ),
                             ),
@@ -455,7 +473,7 @@ class DatatableTest extends BaseTestCase
         $datatable  = $this->_datatable;
         $templating = $this->_container->get('templating');
         $out        = $datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Feature', 'f')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Feature', 'f')
                 ->setFields(
                         array(
                             "title"        => 'f.name',
@@ -470,8 +488,8 @@ class DatatableTest extends BaseTestCase
                             $data[$key] = $templating
                                     ->render(
                                     'AliDatatableBundle:Renderers:_actions.html.twig', array(
-                                'edit_route'            => '_edit',
-                                'delete_route'          => '_delete',
+                                'edit_route'            => 'alidatatable_test_edit',
+                                'delete_route'          => 'alidatatable_test_delete',
                                 'delete_form_prototype' => $datatable->getPrototype('delete_form')
                                     )
                             );

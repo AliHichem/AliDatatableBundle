@@ -1,6 +1,6 @@
 <?php
 
-namespace Ali\DatatableBundle\Entity;
+namespace Ali\DatatableBundle\Tests\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

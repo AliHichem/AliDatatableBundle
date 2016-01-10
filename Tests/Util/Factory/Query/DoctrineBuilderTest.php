@@ -1,8 +1,8 @@
 <?php
 
-namespace Ali\DatatableBundle\Util\Query;
+namespace Ali\DatatableBundle\Tests\Util\Query;
 
-use Ali\DatatableBundle\BaseTestCase;
+use Ali\DatatableBundle\Tests\BaseTestCase;
 
 class DoctrineBuilderTest extends BaseTestCase
 {
@@ -25,7 +25,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testAddJoin()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -39,7 +39,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testGetTotalRecords()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -53,7 +53,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testGetData()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -64,26 +64,26 @@ class DoctrineBuilderTest extends BaseTestCase
         $this->assertInternalType('array', $v);
         $this->assertInternalType('array', $v[0]);
         $this->assertInternalType('array', $v[0][0]);
-        $this->assertInstanceOf('Ali\DatatableBundle\Entity\Product', $v[1][0]);
+        $this->assertInstanceOf('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', $v[1][0]);
     }
 
     public function testGetEntityName()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
                     "_identifier_" => 'p.id')
         );
         $qb = $d->getQueryBuilder();
-        $this->assertEquals('Ali\DatatableBundle\Entity\Product', $qb->getEntityName());
+        $this->assertEquals('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', $qb->getEntityName());
     }
 
     public function testGetEntityAlias()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -96,7 +96,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testGetFields()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -111,7 +111,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testGetOrderField()
     {
         $d  = $this->_datatable
-                        ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                        ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                         ->setFields(
                                 array(
                                     "title"        => 'p.name',
@@ -124,7 +124,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testGetOrderType()
     {
         $d  = $this->_datatable
-                        ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                        ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                         ->setFields(
                                 array(
                                     "title"        => 'p.name',
@@ -137,7 +137,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testGetDoctrineQueryBuilder()
     {
         $d  = $this->_datatable
-                        ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                        ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                         ->setFields(
                                 array(
                                     "title"        => 'p.name',
@@ -150,21 +150,21 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testSetEntity()
     {
         $d  = $this->_datatable
-                        ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                        ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                         ->setFields(
                                 array(
                                     "title"        => 'p.name',
                                     "_identifier_" => 'p.id')
                         )->setOrder('p.id', 'asc');
         $qb = $d->getQueryBuilder();
-        $this->assertEquals('Ali\DatatableBundle\Entity\Product', $qb->getEntityName());
+        $this->assertEquals('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', $qb->getEntityName());
         $this->assertEquals('p', $qb->getEntityAlias());
     }
 
     public function testSetFields()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -179,7 +179,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testSetOrder()
     {
         $d  = $this->_datatable
-                        ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                        ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                         ->setFields(
                                 array(
                                     "title"        => 'p.name',
@@ -193,7 +193,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testSetFixedData()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -207,7 +207,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testSetWhere()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -219,13 +219,13 @@ class DoctrineBuilderTest extends BaseTestCase
         $this->assertInternalType('array', $v);
         $this->assertInternalType('array', $v[0]);
         $this->assertInternalType('array', $v[0][0]);
-        $this->assertInstanceOf('Ali\DatatableBundle\Entity\Product', $v[1][0]);
+        $this->assertInstanceOf('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', $v[1][0]);
     }
 
     public function testSetGroupBy()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                         array(
                             "title"        => 'p.name',
@@ -237,13 +237,13 @@ class DoctrineBuilderTest extends BaseTestCase
         $this->assertInternalType('array', $v);
         $this->assertInternalType('array', $v[0]);
         $this->assertInternalType('array', $v[0][0]);
-        $this->assertInstanceOf('Ali\DatatableBundle\Entity\Product', $v[1][0]);
+        $this->assertInstanceOf('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', $v[1][0]);
     }
 
     public function testSetSearch()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
@@ -259,7 +259,7 @@ class DoctrineBuilderTest extends BaseTestCase
     public function testSetDoctrineQueryBuilder()
     {
         $d  = $this->_datatable
-                ->setEntity('Ali\DatatableBundle\Entity\Product', 'p')
+                ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Product', 'p')
                 ->setFields(
                 array(
                     "title"        => 'p.name',
