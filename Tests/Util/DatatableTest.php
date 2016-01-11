@@ -41,13 +41,13 @@ class DatatableTest extends BaseTestCase
                 ->setEntity('Ali\DatatableBundle\Tests\TestBundle\Entity\Feature', 'f')
                 ->setFields(
                         array(
-                            "Category"     => 'c.name',
-                            "Product"      => 'p.name',
-                            "Feature"      => 'f.name',
+                            "Category"     => 'ct.name',
+                            "Product"      => 'prd.name as product_name',
+                            "Feature"      => 'f.name as feature_name',
                             "_identifier_" => 'f.id')
                 )
-                ->addJoin('f.product', 'p')
-                ->addJoin('p.category', 'c');
+                ->addJoin('f.product', 'prd')
+                ->addJoin('prd.category', 'ct');
         $r    = $this->_datatable->execute();
         /* @var $r \Symfony\Component\HttpFoundation\JsonResponse */
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $r);

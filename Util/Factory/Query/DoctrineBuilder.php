@@ -212,51 +212,51 @@ class DoctrineBuilder implements QueryInterface
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
-        $objects         = $query->getResult(Query::HYDRATE_OBJECT);
-        $data            = array();
-        $entity_alias    = $this->entity_alias;
-        $joins           = $this->joins;
-        $__getParentChain = function($field) use($entity_alias, $joins, &$__getParentChain) {
+        $objects      = $query->getResult(Query::HYDRATE_OBJECT);
+        $data         = array();
+        $entity_alias = $this->entity_alias;
+        $joins        = $this->joins;
+
+        // closures (refactoring would be nice in here..)
+        $__alias = function($string) {
+            return substr($string, 0, strpos($string, '.'));
+        };
+        $__getParentChain = function($field) use($entity_alias, $joins, &$__getParentChain, $__alias) {
             foreach ($joins as $join)
             {
-                if ($join[1] == $field[0])
+                if ($join[1] == $__alias($field))
                 {
-                    if ($join[0][0] == $entity_alias)
+                    if ($__alias($join[0]) == $entity_alias)
                     {
-                        return substr($join[0], 2);
+                        return substr($join[0], strpos($join[0], '.') + 1);
                     }
                     else
                     {
                         $f = $join[0];
                         if (strpos($f, ' '))
                         {
-                            $_f = substr($f, 2, strpos($f, ' '));
+                            $_f = substr($f, strpos($f, '.') + 1, strpos($f, ' '));
                         }
                         else
                         {
 
-                            $_f = substr($f, 2);
+                            $_f = substr($f, strpos($f, '.') + 1);
                         }
                         return $__getParentChain($join[0]) . '.' . $_f;
                     }
                 }
             }
         };
-        $__getKey = function($field) use($entity_alias, $__getParentChain) {
+        $__getKey = function($field) use($entity_alias, $__getParentChain, $__alias) {
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
             $_f        = explode('.', $_f)[1];
-            if ($field[0] != $entity_alias)
+            if ($__alias($field) != $entity_alias)
             {
                 return $__getParentChain($field) . '.' . $_f;
             }
             return $_f;
         };
-        $fields = array();
-        foreach ($this->fields as $field)
-        {
-            $fields[] = $__getKey($field);
-        }
         $__getValue = function($prop, $object)use(&$__getValue) {
             if (strpos($prop, '.'))
             {
@@ -271,6 +271,13 @@ class DoctrineBuilder implements QueryInterface
             $property->setAccessible(true);
             return $property->getValue($object);
         };
+
+        $fields = array();
+        foreach ($this->fields as $field)
+        {
+            $fields[] = $__getKey($field);
+        }
+
         foreach ($objects as $object)
         {
             $item = array();
