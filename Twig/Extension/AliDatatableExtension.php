@@ -27,7 +27,7 @@ class AliDatatableExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'datatable' => new \Twig_Function_Method($this, 'datatable', array("is_safe" => array("html")))
+            'datatable' => new \Twig_SimpleFunction($this, 'datatable', array("is_safe" => array("html")))
         );
     }
 
