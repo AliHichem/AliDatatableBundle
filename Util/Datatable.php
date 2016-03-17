@@ -4,6 +4,7 @@ namespace Ali\DatatableBundle\Util;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\EntityManager;
@@ -69,7 +70,7 @@ class Datatable
     {
         $this->_container        = $container;
         $this->_config           = $this->_container->getParameter('ali_datatable');
-        $this->_request          = $this->_container->get('request');
+        $this->_request          = Request::createFromGlobals();
         self::$_current_instance = $this;
         $this->_applyDefaults();
     }

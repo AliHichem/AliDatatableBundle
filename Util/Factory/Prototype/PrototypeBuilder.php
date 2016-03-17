@@ -3,6 +3,8 @@
 namespace Ali\DatatableBundle\Util\Factory\Prototype;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class PrototypeBuilder
 {
@@ -54,8 +56,8 @@ class PrototypeBuilder
         return $this->container
                         ->get('templating.helper.form')
                         ->widget(
-                                $this->container->get('form.factory')->createBuilder('form', array('id' => '@id'), array())
-                                ->add('id', 'hidden')
+                                $this->container->get('form.factory')->createBuilder(FormType::class, array('id' => '@id'), array())
+                                ->add('id', HiddenType::class)
                                 ->getForm()
                                 ->createView()
         );

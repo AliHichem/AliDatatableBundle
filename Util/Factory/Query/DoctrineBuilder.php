@@ -5,6 +5,7 @@ namespace Ali\DatatableBundle\Util\Factory\Query;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class DoctrineBuilder implements QueryInterface
 {
@@ -63,7 +64,7 @@ class DoctrineBuilder implements QueryInterface
     {
         $this->container    = $container;
         $this->em           = $em;
-        $this->request      = $this->container->get('request');
+        $this->request      = Request::createFromGlobals();
         $this->queryBuilder = $this->em->createQueryBuilder();
     }
 
