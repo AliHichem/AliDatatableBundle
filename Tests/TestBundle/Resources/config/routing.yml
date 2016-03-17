@@ -1,15 +1,15 @@
 alidatatable_test_homepage:
-    pattern:  /
+    path:  /
     defaults: { _controller: TestBundle:Default:index }
 
 alidatatable_test_grid:
-    pattern:  /grid
+    path:  /grid
     defaults: { _controller: TestBundle:Default:grid }
 
 alidatatable_test_delete:
-    pattern:  /
+    path:  /
     defaults: { _controller: TestBundle:Default:delete }
 
 alidatatable_test_edit:
-    pattern:  /
+    path:  /
     defaults: { _controller: TestBundle:Default:edit }
