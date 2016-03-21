@@ -52,7 +52,7 @@ class Datatable
     protected $_search;
 
     /** @var boolean */
-    protected $_search_global;
+    protected $_search_global = false;
 
     /** @var array */
     protected $_search_fields = array();
