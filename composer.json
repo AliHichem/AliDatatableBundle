@@ -9,14 +9,14 @@
         {
             "name": "Ali hichem",
             "email": "ali.hichem@mail.com",
-            "role": "Developer"
+            "role": "Author"
         }
     ],
     "require": {
-        "php": ">=5.3.0",
-	"twig/twig": ">=1.8,<2.0-dev",
-        "doctrine/orm": "~2.4@stable,>=2.1,<=2.5",
-        "symfony/http-kernel": "~2.4"
+        "php": "~5.3|7.0",
+        "twig/twig": ">=1.8,<2.0-dev",
+        "doctrine/orm": "~2.3",
+        "doctrine/doctrine-bundle": "~1.0"
     },
     "target-dir": "Ali/DatatableBundle",
     "autoload": {
@@ -25,4 +25,3 @@
         }
     }
 }
-

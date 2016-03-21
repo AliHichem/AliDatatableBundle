@@ -1,11 +1,31 @@
 framework:
     secret:          test
-    router:          { resource: "%kernel.root_dir%/config/routing.yml" }
+    router:          { resource: "%kernel.root_dir%/TestBundle/Resources/config/routing.yml" }
     form:            ~
     csrf_protection: ~
     validation:      { enable_annotations: true }
-    templating:      { engines: ['twig','php'] } #assets_version: SomeVersionScheme
+    templating:      { engines: ['twig','php'] } 
     session:
         storage_id:     session.storage.filesystem
     translator: { fallback: en }
     test: ~
+    
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   pdo_sqlite
+        dbname:   ali
+        charset:  UTF8
+
+    orm:
+        auto_generate_proxy_classes: %kernel.debug%
+        auto_mapping: true
+        mappings:
+            TestBundle:
+                type: annotation
+                dir: %kernel.root_dir%/TestBundle/Entity
+                prefix: Ali\DatatableBundle\Tests\TestBundle\Entity
+
+ali_datatable:  
+    all:    ~
+    js:     ~

@@ -2,6 +2,8 @@
 
 namespace Ali\DatatableBundle\Util\Factory\Query;
 
+use Doctrine\ORM\Query\Expr\Join;
+
 interface QueryInterface
 {
 
@@ -15,11 +17,9 @@ interface QueryInterface
     /**
      * get data
      * 
-     * @param int $hydration_mode
-     * 
      * @return array
      */
-    function getData($hydration_mode);
+    function getData();
 
     /**
      * set entity
@@ -111,7 +111,7 @@ interface QueryInterface
      *
      * @return Datatable
      */
-    function setSearch($search); 
+    function setSearch($search);
 
     /**
      * add join

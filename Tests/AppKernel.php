@@ -2,30 +2,25 @@
 
 namespace Ali\DatatableBundle\Tests;
 
-use Symfony\Component\HttpKernel\Kernel,
-    Symfony\Component\Config\Loader\LoaderInterface,
-    Symfony\Bundle\FrameworkBundle\FrameworkBundle,
-    Symfony\Bundle\TwigBundle\TwigBundle,
-    Doctrine\Bundle\DoctrineBundle\DoctrineBundle,
-//    Symfony\Bundle\AsseticBundle\AsseticBundle,
-//    Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle,
-    Ali\DatatableBundle\AliDatatableBundle;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
 class AppKernel extends Kernel
 {
 
     /**
      * {@inheritdoc}
-         */
+     */
     public function registerBundles()
     {
         $bundles = array(
-            new FrameworkBundle(),
-            new TwigBundle(),
-            new DoctrineBundle,
-//            new AsseticBundle(),
-//            new SensioFrameworkExtraBundle(),
-            new AliDatatableBundle(),
+            // vendors
+            new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+            new \Symfony\Bundle\TwigBundle\TwigBundle(),
+            new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
+            new \Ali\DatatableBundle\AliDatatableBundle(),
+            // for test purposes
+            new \Ali\DatatableBundle\Tests\TestBundle\TestBundle()
         );
 
         return $bundles;

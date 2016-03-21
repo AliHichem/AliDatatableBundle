@@ -1,42 +1,48 @@
 <?php
 
-namespace Ali\DatatableBundle\Entity;
+namespace Ali\DatatableBundle\Tests\TestBundle\Entity;
 
-use Doctrine\ORM\Mappin as ORM;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @Entity
- * @Table(name="products")
+ * @ORM\Entity
+ * @ORM\Table(name="products")
  */
 class Product
 {
 
     /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
     /**
-     * @Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100)
      */
     protected $name;
 
     /**
-     * @Column(type="decimal", scale=2)
+     * @ORM\Column(type="decimal", scale=2)
      */
     protected $price;
 
     /**
-     * @Column(type="text")
+     * @ORM\Column(type="text")
      */
     protected $description;
 
     /**
-     * @ORMM\OneToMany(targetEntity="Feature", mappedBy="product")
+     * @ORM\OneToMany(targetEntity="Feature", mappedBy="product")
      * */
     protected $features;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="products")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     * */
+    protected $category;
 
     public function __construct()
     {
@@ -95,6 +101,17 @@ class Product
     public function setFeatures($features)
     {
         $this->features = $features;
+        return $this;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategory($category)
+    {
+        $this->category = $category;
         return $this;
     }
 
