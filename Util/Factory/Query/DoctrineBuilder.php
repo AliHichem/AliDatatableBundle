@@ -184,17 +184,15 @@ class DoctrineBuilder implements QueryInterface
     /**
      * get data
      * 
-     * @param int $hydration_mode
-     * 
      * @return array 
      */
-    public function getData($hydration_mode)
+    public function getData()
     {
         $request    = $this->request;
         $dql_fields = array_values($this->fields);
 
         // add sorting
-        if ($request->get('iSortCol_0') != null)
+        if ($request->get('iSortCol_0') !== null)
         {
             $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
         }
@@ -230,26 +228,71 @@ class DoctrineBuilder implements QueryInterface
         {
             $query->setMaxResults($iDisplayLength)->setFirstResult($request->get('iDisplayStart'));
         }
-        $objects        = $query->getResult(Query::HYDRATE_OBJECT);
-        $maps           = $query->getResult(Query::HYDRATE_SCALAR);
-        $data           = array();
-        $get_scalar_key = function($field) {
+        $objects         = $query->getResult(Query::HYDRATE_OBJECT);
+        $data            = array();
+        $entity_alias    = $this->entity_alias;
+        $joins           = $this->joins;
+        $__getParentChain = function($field) use($entity_alias, $joins, &$__getParentChain) {
+            foreach ($joins as $join)
+            {
+                if ($join[1] == $field[0])
+                {
+                    if ($join[0][0] == $entity_alias)
+                    {
+                        return substr($join[0], 2);
+                    }
+                    else
+                    {
+                        $f = $join[0];
+                        if (strpos($f, ' '))
+                        {
+                            $_f = substr($f, 2, strpos($f, ' '));
+                        }
+                        else
+                        {
+
+                            $_f = substr($f, 2);
+                        }
+                        return $__getParentChain($join[0]) . '.' . $_f;
+                    }
+                }
+            }
+        };
+        $__getKey = function($field) use($entity_alias, $__getParentChain) {
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
-            $_f        = str_replace('.', '_', $_f);
+            $_f        = explode('.', $_f)[1];
+            if ($field[0] != $entity_alias)
+            {
+                return $__getParentChain($field) . '.' . $_f;
+            }
             return $_f;
         };
         $fields = array();
         foreach ($this->fields as $field)
         {
-            $fields[] = $get_scalar_key($field);
+            $fields[] = $__getKey($field);
         }
-        foreach ($maps as $map)
+        $__getValue = function($prop, $object)use(&$__getValue) {
+            if (strpos($prop, '.'))
+            {
+                $_prop     = substr($prop, 0, strpos($prop, '.'));
+                $ref_class = new \ReflectionClass($object);
+                $property  = $ref_class->getProperty($_prop);
+                $property->setAccessible(true);
+                return $__getValue(substr($prop, strpos($prop, '.') + 1), $property->getValue($object));
+            }
+            $ref_class = new \ReflectionClass($object);
+            $property  = $ref_class->getProperty($prop);
+            $property->setAccessible(true);
+            return $property->getValue($object);
+        };
+        foreach ($objects as $object)
         {
             $item = array();
             foreach ($fields as $_field)
             {
-                $item[] = $map[$_field];
+                $item[] = $__getValue($_field, $object);
             }
             $data[] = $item;
         }
@@ -319,8 +362,8 @@ class DoctrineBuilder implements QueryInterface
     /**
      * set entity
      * 
-     * @param type $entity_name
-     * @param type $entity_alias
+     * @param string $entity_name
+     * @param string $entity_alias
      * 
      * @return Datatable 
      */
@@ -349,8 +392,8 @@ class DoctrineBuilder implements QueryInterface
     /**
      * set order
      * 
-     * @param type $order_field
-     * @param type $order_type
+     * @param string $order_field
+     * @param string $order_type
      * 
      * @return Datatable 
      */
@@ -365,7 +408,7 @@ class DoctrineBuilder implements QueryInterface
     /**
      * set fixed data
      * 
-     * @param type $data
+     * @param array|null $data
      * 
      * @return Datatable 
      */

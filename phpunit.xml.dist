@@ -16,7 +16,11 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Tests</directory>
+                <directory>./Tests/config</directory>
+                <directory>./Tests/TestBundle/Controller</directory>
+                <directory>./Tests/TestBundle/Entity</directory>
+                <directory>./Tests/TestBundle/Resources</directory>
+                <directory>./vendor</directory>
             </exclude>
         </whitelist>
     </filter>

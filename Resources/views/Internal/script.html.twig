@@ -59,7 +59,7 @@ $(document).ready(function(){
             var $out = $link_delete+ " " + $link_edit ;
             if (data == null )
             {
-                $out = "<div style='float:right'>{{ 'ali.common.no_action'|trans() }}</div>";
+                $out = "<div style='float:right'>{{ 'ali.common.no_action'|dta_trans() }}</div>";
             }
             return $out
         },
@@ -89,21 +89,21 @@ $(document).ready(function(){
         "bSort": true,
         "bFilter": {% if search %} true {% else %} false {% endif %},
         "oLanguage": {
-            "sProcessing":     '{{ 'ali.common.sProcessing' | trans() }}',
-            "sLengthMenu":     '{{ 'ali.common.sLengthMenu' | trans() }}',
-            "sZeroRecords":    '{{ 'ali.common.sZeroRecords' | trans() }}',
-            "sInfo":           '{{ 'ali.common.sInfo' | trans() }}',
-            "sInfoEmpty":      '{{ 'ali.common.sInfoEmpty' | trans() }}',
-            "sInfoFiltered":   '{{ 'ali.common.sInfoFiltered' | trans() }}',
-            "sInfoPostFix":    '{{ 'ali.common.sInfoPostFix' | trans() }}',
-            "sSearch":         '{{ 'ali.common.sSearch' | trans() }}',
-            "sLoadingRecords": '{{ 'ali.common.sLoadingRecords' | trans() }}',
+            "sProcessing":     '{{ 'ali.common.sProcessing' | dta_trans() }}',
+            "sLengthMenu":     '{{ 'ali.common.sLengthMenu' | dta_trans() }}',
+            "sZeroRecords":    '{{ 'ali.common.sZeroRecords' | dta_trans() }}',
+            "sInfo":           '{{ 'ali.common.sInfo' | dta_trans() }}',
+            "sInfoEmpty":      '{{ 'ali.common.sInfoEmpty' | dta_trans() }}',
+            "sInfoFiltered":   '{{ 'ali.common.sInfoFiltered' | dta_trans() }}',
+            "sInfoPostFix":    '{{ 'ali.common.sInfoPostFix' | dta_trans() }}',
+            "sSearch":         '{{ 'ali.common.sSearch' | dta_trans() }}',
+            "sLoadingRecords": '{{ 'ali.common.sLoadingRecords' | dta_trans() }}',
             "sUrl":            "",
             "oPaginate": {
-                "sFirst":    '{{ 'ali.common.sFirst' | trans() }}',
-                "sPrevious": '{{ 'ali.common.sPrevious' | trans() }}',
-                "sNext":     '{{ 'ali.common.sNext' | trans() }}',
-                "sLast":     '{{ 'ali.common.sLast' | trans() }}'
+                "sFirst":    '{{ 'ali.common.sFirst' | dta_trans() }}',
+                "sPrevious": '{{ 'ali.common.sPrevious' | dta_trans() }}',
+                "sNext":     '{{ 'ali.common.sNext' | dta_trans() }}',
+                "sLast":     '{{ 'ali.common.sLast' | dta_trans() }}'
             }
         },
         "bAutoWidth" : false
@@ -113,7 +113,7 @@ $(document).ready(function(){
     $('#{{id}}').trigger('datatables_init', $defaults );
     eval("var "+ "oTable_"+'{{id}}'.split('-').join('_') + "  = $('#{{id}}').dataTable($defaults)");
     $(s).on('click','.button-delete:parent',function(e){
-        if (!confirm('{{ 'ali.common.confirm_delete'|trans()  }}')) {
+        if (!confirm('{{ 'ali.common.confirm_delete'|dta_trans()  }}')) {
             return false;
         }
         $(this).parents('form:eq(0)').submit();
@@ -167,28 +167,32 @@ $(document).ready(function(){
     {% if search %}
     $(".dataTables_filter").remove();
     var search_selector = "#{{id}} input[searchable=true]";
-    $(search_selector).keypress( function (event) {
-        var index = $(this).attr('index');
-        var oTable = eval('oTable_{{id}}'.split('-').join('_'));
-        if (event.keyCode == '13') {
-            oTable.fnFilter( 
-                this.value, 
-                oTable.oApi._fnVisibleToColumnIndex( 
-                    oTable.fnSettings(), 
-                    index 
-                ) 
-            );
+    var timeout;
+    $(search_selector).keyup( function (e) {
+        if ($.inArray(e.which, [9, 16]) == -1) {
+            var index = $(this).attr('index');
+            var self = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                var oTable = eval('oTable_{{id}}'.split('-').join('_'));
+                oTable.fnFilter(
+                    self.value,
+                    oTable.oApi._fnVisibleToColumnIndex(
+                        oTable.fnSettings(),
+                        index
+                    )
+                );
+            }, 700);
         }
     }).each( function (i) {
         this.initVal = this.value;
     }).focus( function () {
-        if ( this.className == "search_init" ){
-            this.className = "";
-            this.value = "";
+        if ( this.className.match(/\bsearch_init\b/) ){
+            this.className.replace(/\bsearch_init\b/g, '').trim();
         }
     }).blur( function (i) {
         if ( this.value == "" ){
-            this.className = "search_init";
+            this.className = (this.className.match(/\bsearch_init\b/)) ? this.className : this.className.trim() + " search_init";
             this.value = this.initVal;
         }
     });

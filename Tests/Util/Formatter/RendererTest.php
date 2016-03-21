@@ -1,8 +1,9 @@
 <?php
 
-namespace Ali\DatatableBundle\Util\Formatter;
+namespace Ali\DatatableBundle\Tests\Util\Formatter;
 
-use Ali\DatatableBundle\BaseTestCase;
+use Ali\DatatableBundle\Tests\BaseTestCase;
+use Ali\DatatableBundle\Util\Formatter\Renderer;
 
 class RendererTest extends BaseTestCase
 {
@@ -22,7 +23,7 @@ class RendererTest extends BaseTestCase
         $this->_datatable = $this->_container->get('datatable');
     }
 
-    public function test_applyView()
+    public function testApplyView()
     {
         $fields = array(
             "title"        => 'p.name',
@@ -33,7 +34,7 @@ class RendererTest extends BaseTestCase
         $this->assertInternalType('string', $out);
     }
 
-    public function test_applyTo()
+    public function testApplyTo()
     {
         $fields = array(
             "title"        => 'p.name',
@@ -43,14 +44,14 @@ class RendererTest extends BaseTestCase
             1 => array(
                 'view'   => 'AliDatatableBundle:Renderers:_actions.html.twig',
                 'params' => array(
-                    'edit_route'            => '_edit',
-                    'delete_route'          => '_delete',
+                    'edit_route'            => 'alidatatable_test_edit',
+                    'delete_route'          => 'alidatatable_test_delete',
                     'delete_form_prototype' => $this->_datatable->getPrototype('delete_form')
                 ),
             ),
                 ), $fields);
         $data   = array(array('something', 'eee'));
-        $r->applyTo($data);
+        $r->applyTo($data, array((object) array()));
         $this->assertContains('form', $data[0][1]);
     }
 
