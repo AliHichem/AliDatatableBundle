@@ -53,14 +53,27 @@ class PrototypeBuilder
      */
     protected function _delete_form()
     {
-        return $this->container
-                        ->get('templating.helper.form')
-                        ->widget(
-                                $this->container->get('form.factory')->createBuilder(FormType::class, array('id' => '@id'), array())
-                                ->add('id', HiddenType::class)
-                                ->getForm()
-                                ->createView()
-        );
+
+        if (version_compare(phpversion(), '5.5', '<')) {
+            return $this->container
+                ->get('templating.helper.form')
+                ->widget(
+                    $this->container->get('form.factory')->createBuilder('form', array('id' => '@id'), array())
+                        ->add('id', 'hidden')
+                        ->getForm()
+                        ->createView()
+                );
+        }
+        else {
+            return $this->container
+                ->get('templating.helper.form')
+                ->widget(
+                    $this->container->get('form.factory')->createBuilder(FormType::class, array('id' => '@id'), array())
+                        ->add('id', HiddenType::class)
+                        ->getForm()
+                        ->createView()
+                );
+        }
     }
 
 }

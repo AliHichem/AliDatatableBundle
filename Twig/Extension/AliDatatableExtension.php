@@ -111,9 +111,16 @@ class AliDatatableExtension extends \Twig_Extension
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder(array('id' => $id))
-                        ->add('id', HiddenType::class)
-                        ->getForm();
+        if (version_compare(phpversion(), '5.5', '<')) {
+            return $this->createFormBuilder(array('id' => $id))
+                ->add('id', 'hidden')
+                ->getForm();
+        }
+        else {
+            return $this->createFormBuilder(array('id' => $id))
+                ->add('id', HiddenType::class)
+                ->getForm();
+        }
     }
 
     /**
@@ -125,7 +132,12 @@ class AliDatatableExtension extends \Twig_Extension
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->_container->get('form.factory')->createBuilder(FormType::class, $data, $options);
+        if (version_compare(phpversion(), '5.5', '<')) {
+            return $this->_container->get('form.factory')->createBuilder('form', $data, $options);
+        }
+        else {
+            return $this->_container->get('form.factory')->createBuilder(FormType::class, $data, $options);
+        }
     }
 
     /**
