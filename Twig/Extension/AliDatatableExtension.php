@@ -118,7 +118,7 @@ class AliDatatableExtension extends \Twig_Extension
         }
         else {
             return $this->createFormBuilder(array('id' => $id))
-                ->add('id', 'Symfony\Component\Form\HiddenType')
+                ->add('id', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
                 ->getForm();
         }
     }
@@ -136,7 +136,7 @@ class AliDatatableExtension extends \Twig_Extension
             return $this->_container->get('form.factory')->createBuilder('form', $data, $options);
         }
         else {
-            return $this->_container->get('form.factory')->createBuilder('Symfony\Component\Form\FormType', $data, $options);
+            return $this->_container->get('form.factory')->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', $data, $options);
         }
     }
 
