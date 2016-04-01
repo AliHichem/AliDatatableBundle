@@ -68,7 +68,7 @@ class PrototypeBuilder
             return $this->container
                 ->get('templating.helper.form')
                 ->widget(
-                    $this->container->get('form.factory')->createBuilder(FormType::class, array('id' => '@id'), array())
+                    $this->container->get('form.factory')->createBuilder('Symfony\Component\Form\FormType', array('id' => '@id'), array())
                         ->add('id', HiddenType::class)
                         ->getForm()
                         ->createView()
