@@ -68,7 +68,7 @@ class AliDatatableExtension extends \Twig_Extension
     {
         if (!isset($options['id']))
         {
-            $options['id'] = 'ali-dta_' . md5(rand(1, 100));
+            $options['id'] = 'ali-dta_' . md5($options['js']['sAjaxSource']);
         }
         $dt                       = Datatable::getInstance($options['id']);
         $config                   = $dt->getConfiguration();
