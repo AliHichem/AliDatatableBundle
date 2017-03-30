@@ -8,7 +8,7 @@ ali:
         sProcessing: "Bezig..."
         sLengthMenu: "_MENU_ resultaten weergeven"
         sZeroRecords: "Geen resultaten om weer te geven"
-        sInfo: "Weergave van _START_ tot _END_ van _TOTAL_ resultaten"
+        sInfo: "Weergave van _START_ t/m _END_ van _TOTAL_ resultaten"
         sInfoEmpty: "Weergaven van 0 tot 0 van 0 resultaten"
         sInfoFiltered: "(gefilterd uit _MAX_ resultaten)"
         sInfoPostFix: ""
