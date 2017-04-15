@@ -95,6 +95,15 @@ interface QueryInterface
     function setFixedData($data);
 
     /**
+     * set search
+     *
+     * @param bool $search
+     *
+     * @return Datatable
+     */
+    public function setSearch($search);
+
+    /**
      * set query where
      * 
      * @param string $where
