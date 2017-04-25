@@ -3,6 +3,8 @@
 namespace Ali\DatatableBundle\Util\Factory\Prototype;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class PrototypeBuilder
 {
@@ -51,14 +53,27 @@ class PrototypeBuilder
      */
     protected function _delete_form()
     {
-        return $this->container
-                        ->get('templating.helper.form')
-                        ->widget(
-                                $this->container->get('form.factory')->createBuilder('form', array('id' => '@id'), array())
-                                ->add('id', 'hidden')
-                                ->getForm()
-                                ->createView()
-        );
+
+        if (version_compare(phpversion(), '5.5', '<')) {
+            return $this->container
+                ->get('templating.helper.form')
+                ->widget(
+                    $this->container->get('form.factory')->createBuilder('form', array('id' => '@id'), array())
+                        ->add('id', 'hidden')
+                        ->getForm()
+                        ->createView()
+                );
+        }
+        else {
+            return $this->container
+                ->get('templating.helper.form')
+                ->widget(
+                    $this->container->get('form.factory')->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', array('id' => '@id'), array())
+                        ->add('id', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
+                        ->getForm()
+                        ->createView()
+                );
+        }
     }
 
 }

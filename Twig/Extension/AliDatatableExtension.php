@@ -3,6 +3,8 @@
 namespace Ali\DatatableBundle\Twig\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Ali\DatatableBundle\Util\Datatable;
 
 class AliDatatableExtension extends \Twig_Extension
@@ -109,9 +111,16 @@ class AliDatatableExtension extends \Twig_Extension
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder(array('id' => $id))
-                        ->add('id', 'hidden')
-                        ->getForm();
+        if (version_compare(phpversion(), '5.5', '<')) {
+            return $this->createFormBuilder(array('id' => $id))
+                ->add('id', 'hidden')
+                ->getForm();
+        }
+        else {
+            return $this->createFormBuilder(array('id' => $id))
+                ->add('id', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
+                ->getForm();
+        }
     }
 
     /**
@@ -123,7 +132,12 @@ class AliDatatableExtension extends \Twig_Extension
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->_container->get('form.factory')->createBuilder('form', $data, $options);
+        if (version_compare(phpversion(), '5.5', '<')) {
+            return $this->_container->get('form.factory')->createBuilder('form', $data, $options);
+        }
+        else {
+            return $this->_container->get('form.factory')->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', $data, $options);
+        }
     }
 
     /**
