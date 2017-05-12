@@ -2,6 +2,9 @@
 
 namespace Ali\DatatableBundle\Util\Factory\Query;
 
+use Ali\DatatableBundle\Util\Datatable;
+use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
+use Ali\DatatableBundle\Util\Factory\Fields\EntityDatatableField;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -28,7 +31,7 @@ class DoctrineBuilder implements QueryInterface
     /** @var string */
     protected $entity_alias;
 
-    /** @var array */
+    /** @var DatatableField[]|array */
     protected $fields;
 
     /** @var string */
@@ -87,7 +90,55 @@ class DoctrineBuilder implements QueryInterface
                     $field        = explode(' ', trim($search_field));
                     $search_field = $field[0];
 
-                    $queryBuilder->andWhere(" $search_field like :ssearch{$i} ");
+                    /** @var DatatableField[] $original_field */
+                    $original_field = array_slice($this->fields, $i, 1);
+
+                    if ($original_field !== null && is_array($original_field) && reset($original_field) instanceof EntityDatatableField && reset($original_field)->getEntityFields() != null)
+                    {
+                        // 1. get the entity fields
+                        $entity_search_fields = reset($original_field)->getEntityFields();
+
+                        // 2. join if needed
+                        $joined_field_alias = null;
+                        foreach ($this->joins as $join)
+                        {
+                            if (strpos($join[0], $search_field) !== FALSE)
+                            {
+                                $joined_field_alias = $join[1];
+                                break;
+                            }
+                        }
+                        if ($joined_field_alias === null)
+                        {
+                            $joined_field_alias = 'cj'.$i;
+                            $queryBuilder->leftJoin($search_field, $joined_field_alias, Join::LEFT_JOIN);
+                        }
+
+                        //3. check if we received an array with search fields
+                        if(!is_array($entity_search_fields))
+                        {
+                            throw new \Exception('Expected an array with fields as answer from the "EntityDatatableField->getEntityFields()" method which you passed in the constructor or in the setter.');
+                        }
+
+                        //4. build the where part of the query (WHERE field LIKE entity_search_field[0] OR WHERE field LIKE entity_search_field[1] OR.....)
+                        $first_field = true;
+                        $query = '';
+                        foreach ($entity_search_fields as $key => $entity_search_field)
+                        {
+                            if ($first_field === false)
+                            {
+                                $query .= 'OR';
+                            }
+                            $query .= ' ' . $joined_field_alias.'.'.$entity_search_field . ' LIKE :ssearch' . $i . ' ';
+                            $first_field = false;
+                        }
+                        $queryBuilder->andWhere($query);
+                    }
+                    else
+                    {
+                        $queryBuilder->andWhere(" $search_field like :ssearch{$i} ");
+                    }
+
                     $queryBuilder->setParameter("ssearch{$i}", '%' . $request->get("sSearch_{$i}") . '%');
                 }
             }
@@ -127,7 +178,7 @@ class DoctrineBuilder implements QueryInterface
      * @param string $type
      * @param string $cond
      * 
-     * @return Datatable 
+     * @return Datatable
      */
     public function addJoin($join_field, $alias, $type = Join::INNER_JOIN, $cond = '')
     {
@@ -247,7 +298,16 @@ class DoctrineBuilder implements QueryInterface
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
             $_f        = explode('.', $_f)[1];
-            if ($field[0] != $entity_alias)
+            $field_key = null;
+            if ($field instanceof DatatableField)
+            {
+                $field_key = $field->getField()[0];
+            }
+            else
+            {
+                $field_key = $field[0];
+            }
+            if ($field_key != $entity_alias)
             {
                 return $__getParentChain($field) . '.' . $_f;
             }
@@ -363,7 +423,7 @@ class DoctrineBuilder implements QueryInterface
     /**
      * set fields
      * 
-     * @param array $fields
+     * @param DatatableField[]|array $fields
      * 
      * @return Datatable 
      */

@@ -2,6 +2,7 @@
 
 namespace Ali\DatatableBundle\Util;
 
+use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -216,6 +217,35 @@ class Datatable
     public function getFields()
     {
         return $this->_queryBuilder->getFields();
+    }
+
+    /**
+     * set fields
+     *
+     * @param DatatableField[] $datatable_fields
+     * @return Datatable
+     */
+    public function setFields(array $datatable_fields)
+    {
+        $this->_queryBuilder->setFields($datatable_fields);
+        return $this;
+    }
+
+    /**
+     * set the entity manager
+     *
+     * @param \Doctrine\ORM\EntityManager $em
+     * @return $this
+     */
+    public function setEntityManager(\Doctrine\ORM\EntityManager $em)
+    {
+        $this->_queryBuilder = new DoctrineBuilder($this->_container, $em);
+        return $this;
+    }
+
+    public static function clearInstances()
+    {
+        static::$_instances = array();
     }
 
     /**
