@@ -298,15 +298,21 @@ class DoctrineBuilder implements QueryInterface
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
             $_f        = explode('.', $_f)[1];
+
             $field_key = null;
             if ($field instanceof DatatableField)
             {
                 $field_key = $field->getField()[0];
             }
+            elseif(!is_string($field))
+            {
+                $field_key = $field->__toString()[0];
+            }
             else
             {
                 $field_key = $field[0];
             }
+
             if ($field_key != $entity_alias)
             {
                 return $__getParentChain($field) . '.' . $_f;
