@@ -14,6 +14,12 @@ services:
         arguments: ['@service_container']
         tags:
             -  { name: twig.extension }
+
+    datatable.twig.get_class.extension:
+        class: Ali\DatatableBundle\Twig\Extension\TwigGetClassNameExtension
+        public: false
+        tags:
+            - { name: twig.extension }
             
     datatable.listener:
         class: Ali\DatatableBundle\EventListener\DatatableListener
