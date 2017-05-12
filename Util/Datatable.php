@@ -219,18 +219,6 @@ class Datatable
         return $this->_queryBuilder->getFields();
     }
 
-    /**
-     * set fields
-     *
-     * @param DatatableField[] $datatable_fields
-     * @return Datatable
-     */
-    public function setFields(array $datatable_fields)
-    {
-        $this->_queryBuilder->setFields($datatable_fields);
-        return $this;
-    }
-
     public static function clearInstances()
     {
         static::$_instances = array();
