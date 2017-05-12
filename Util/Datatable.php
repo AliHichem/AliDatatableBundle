@@ -231,18 +231,6 @@ class Datatable
         return $this;
     }
 
-    /**
-     * set the entity manager
-     *
-     * @param \Doctrine\ORM\EntityManager $em
-     * @return $this
-     */
-    public function setEntityManager(\Doctrine\ORM\EntityManager $em)
-    {
-        $this->_queryBuilder = new DoctrineBuilder($this->_container, $em);
-        return $this;
-    }
-
     public static function clearInstances()
     {
         static::$_instances = array();
