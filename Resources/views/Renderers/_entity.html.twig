@@ -1,0 +1,20 @@
+{% spaceless %}
+    {% if entity is not defined %}
+        missing parameters for rendering entity ({% if entity is not defined %}entity{% endif %})
+    {% else %}
+        {% set found_entity = entity %}
+        {% if found_entity is iterable and 'PersistentCollection' in found_entity|get_class_name %}
+            {% for single_entity in found_entity %}
+                {% embed '@AliDatatable/Blocks/entity.html.twig' %}
+                {% endembed %}
+                {% if loop.last is sameas(false) %}
+                    <br/>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {% set single_entity = found_entity %}
+            {% embed '@AliDatatable/Blocks/entity.html.twig' %}
+            {% endembed %}
+        {% endif %}
+    {% endif %}
+{% endspaceless %}
