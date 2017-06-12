@@ -52,6 +52,9 @@ class Datatable
     /** @var boolean */
     protected $_search;
 
+    /** @var boolean */
+    protected $_search_global = false;
+
     /** @var array */
     protected $_search_fields = array();
 
@@ -291,6 +294,16 @@ class Datatable
     }
 
     /**
+     * get global search
+     *
+     * @return boolean
+     */
+    public function getSearchGlobal()
+    {
+        return $this->_search_global;
+    }
+
+    /**
      * set entity
      * 
      * @param string $entity_name
@@ -524,13 +537,15 @@ class Datatable
      * set search
      * 
      * @param bool $search
+     * @param bool $global
      * 
      * @return \Ali\DatatableBundle\Util\Datatable
      */
-    public function setSearch($search)
+    public function setSearch($search, $global = false)
     {
-        $this->_search = $search;
-        $this->_queryBuilder->setSearch($search);
+        $this->_search        = $search;
+        $this->_search_global = $search && $global;
+        $this->_queryBuilder->setSearch($this->_search || $this->_search_global);
         return $this;
     }
 

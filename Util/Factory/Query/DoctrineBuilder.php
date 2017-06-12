@@ -91,6 +91,22 @@ class DoctrineBuilder implements QueryInterface
                     $queryBuilder->setParameter("ssearch{$i}", '%' . $request->get("sSearch_{$i}") . '%');
                 }
             }
+
+            $search_param = $request->get("sSearch");
+            if ($search_param !== false && $search_param != '')
+            {
+                $search_dql = array();
+                foreach ($search_fields as $i => $search_field)
+                {
+                    $field        = explode(' ', trim($search_field));
+                    $search_field = $field[0];
+
+                    $search_dql[] = "$search_field like :ssearch";
+                }
+
+                $queryBuilder->andWhere(implode(' OR ', $search_dql));
+                $queryBuilder->setParameter("ssearch", '%' . $request->get("sSearch") . '%');
+            }
         }
     }
 
