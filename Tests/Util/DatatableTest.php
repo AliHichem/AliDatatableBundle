@@ -66,6 +66,43 @@ class DatatableTest extends BaseTestCase
                 ), $data['aaData']);
     }
 
+    public function testSetDoctrineQueryBuilderWithJoins()
+    {
+        $repo = $this->_em->getRepository('TestBundle:Feature');
+        $qb   = $repo->createQueryBuilder('f')
+            ->select('f', 'p', 'c')
+            ->innerJoin('f.product', 'p')
+            ->innerJoin('p.category', 'c');
+
+        $this->_datatable
+                ->setFields(
+                    array(
+                        "Category"     => 'c.name',
+                        "Product"      => 'p.name',
+                        "Feature"      => 'f.name',
+                        "_identifier_" => 'f.id')
+        );
+
+        $this->_datatable->getQueryBuilder()->setDoctrineQueryBuilder($qb);
+
+        $r    = $this->_datatable->execute();
+        /* @var $r \Symfony\Component\HttpFoundation\JsonResponse */
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $r);
+        $data = json_decode($r->getContent(), true);
+        $this->assertArrayHasKey('sEcho', $data);
+        $this->assertArrayHasKey('iTotalRecords', $data);
+        $this->assertArrayHasKey('iTotalDisplayRecords', $data);
+        $this->assertArrayHasKey('aaData', $data);
+        $this->assertEquals(0, $data['sEcho']);
+        $this->assertEquals('3', $data['iTotalRecords']);
+        $this->assertEquals('3', $data['iTotalDisplayRecords']);
+        $this->assertEquals(array(
+            array('CatA','Laptop', 'CPU I7 Generation', 1),
+            array('CatA','Laptop', 'SolidState drive', 2),
+            array('CatA','Laptop', 'SLI graphic card ', 3),
+                ), $data['aaData']);
+    }
+
     public function testExecute()
     {
         $r    = $this->_datatable
