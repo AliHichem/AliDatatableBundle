@@ -271,7 +271,15 @@ class DoctrineBuilder implements QueryInterface
         $__getParentChain = function($field) use($entity_alias, $joins, &$__getParentChain) {
             foreach ($joins as $join)
             {
-                if ($join[1] == $field[0])
+                if ($field instanceof EntityDatatableField)
+                {
+                    $field_name = $field->getField();
+                }
+                else
+                {
+                    $field_name = $field[0];
+                }
+                if ($join[1] == $field_name)
                 {
                     if ($join[0][0] == $entity_alias)
                     {
