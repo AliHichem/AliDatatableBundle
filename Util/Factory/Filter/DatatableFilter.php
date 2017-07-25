@@ -43,4 +43,13 @@ class DatatableFilter
         return $this->filter_values;
     }
 
+    public static function constructBooleanFilter($yes_label = 'yes', $no_label = 'no')
+    {
+        return new DatatableFilter(
+            array(
+                new DatatableFilterValue(1, $yes_label),
+                new DatatableFilterValue(0, $no_label)
+            )
+        );
+    }
 }
