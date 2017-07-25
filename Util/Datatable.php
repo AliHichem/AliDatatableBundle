@@ -643,13 +643,15 @@ class Datatable
      *
      * @example
      *
-     *      ->setFilterFields(
-     *              array(
-     *                  0 => new DatatableFilter(array(new DatatableFilterValue(false => 'No'), new DatatableFilterValue(true => 'Yes'))),
-     *                  2 => new DatatableFilter(),
-     *                  5 => new DatatableFilter()
-     *              )
-     *        )
+     *      ->setFilterFields(array(
+     *                3 => new DatatableFilter(array(
+     *                    new DatatableFilterValue(0, $translator->trans('option.no')),
+     *                   new DatatableFilterValue(1, $translator->trans('option.yes'))
+     *                ))
+     *                4 => new DatatableFilter(array(
+     *                    new DatatableFilterValue(0, $translator->trans('option.no')),
+     *                    new DatatableFilterValue(1, $translator->trans('option.yes'))
+     *                ))
      *
      * @param array $filter_fields
      *
