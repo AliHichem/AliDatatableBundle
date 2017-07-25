@@ -199,9 +199,6 @@ $(document).ready(function(){
     });
     $(filter_selector).change( function(e) {
         var value = this.value;
-        if ( this.value === "" ){
-            $(this).removeClass('search_active');
-        }
         var index = $(this).attr('index');
         var oTable = eval('oTable_{{id}}'.split('-').join('_'));
         oTable.fnFilter(
