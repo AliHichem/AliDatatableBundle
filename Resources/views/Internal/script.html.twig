@@ -167,6 +167,7 @@ $(document).ready(function(){
     {% if search %}
     $(".dataTables_filter").remove();
     var search_selector = "#{{id}} input[searchable=true]";
+    var filter_selector = "#{{id}} select[searchable=true]";
     var timeout;
     $(search_selector).keyup( function (e) {
         if ($.inArray(e.which, [9, 16]) == -1) {
@@ -195,6 +196,21 @@ $(document).ready(function(){
             this.className = (this.className.match(/\bsearch_init\b/)) ? this.className : this.className.trim() + " search_init";
             this.value = this.initVal;
         }
+    });
+    $(filter_selector).change( function(e) {
+        var value = this.value;
+        if ( this.value === "" ){
+            $(this).removeClass('search_active');
+        }
+        var index = $(this).attr('index');
+        var oTable = eval('oTable_{{id}}'.split('-').join('_'));
+        oTable.fnFilter(
+            value,
+            oTable.oApi._fnVisibleToColumnIndex(
+                oTable.fnSettings(),
+                index
+            )
+        );
     });
     {% endif %}
 });

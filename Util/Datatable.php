@@ -57,10 +57,14 @@ class Datatable
     protected $_search_fields = array();
 
     /** @var array */
+    protected $_filter_fields = array();
+
+    /** @var array */
     protected static $_instances = array();
 
     /** @var Datatable */
     protected static $_current_instance = NULL;
+
 
     /**
      * class constructor 
@@ -621,6 +625,39 @@ class Datatable
     public function setSearchFields(array $search_fields)
     {
         $this->_search_fields = $search_fields;
+        return $this;
+    }
+
+    /**
+     * get filter field
+     *
+     * @return array
+     */
+    public function getFilterFields()
+    {
+        return $this->_filter_fields;
+    }
+
+    /**
+     * set filter fields
+     *
+     * @example
+     *
+     *      ->setFilterFields(
+     *              array(
+     *                  0 => new DatatableFilter(array(new DatatableFilterValue(false => 'No'), new DatatableFilterValue(true => 'Yes'))),
+     *                  2 => new DatatableFilter(),
+     *                  5 => new DatatableFilter()
+     *              )
+     *        )
+     *
+     * @param array $filter_fields
+     *
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setFilterFields(array $filter_fields)
+    {
+        $this->_filter_fields = $filter_fields;
         return $this;
     }
 
