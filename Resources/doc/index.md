@@ -138,6 +138,9 @@ ali_datatable:
 Assuming for example that you need a grid in your "index" action, create in your controller method as below:
 
 ```php
+
+use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
+
 /**
  * set datatable configs
  * 
@@ -150,9 +153,9 @@ private function _datatable()
                 ->setEntity("XXXMyBundle:Entity", "x")                          // Replace "XXXMyBundle:Entity" by your entity
                 ->setFields(
                         array(
-                            "Name"          => 'x.name',                        // Declaration for fields: 
-                            "Address"        => 'x.address',                    //      "label" => "alias.field_attribute_for_dql"
-                            "_identifier_"  => 'x.id')                          // you have to put the identifier field without label. Do not replace the "_identifier_"
+                            "Name"          => new DatatableField('x.name'),      // Declaration for fields: 
+                            "Address"        => new DatatableField('x.address'),  //      "label" => "alias.field_attribute_for_dql"
+                            "_identifier_"  => new DatatableField('x.id'))        // you have to put the identifier field without label. Do not replace the "_identifier_"
                         )
                 ->setWhere(                                                     // set your dql where statement
                      'x.address = :address',
