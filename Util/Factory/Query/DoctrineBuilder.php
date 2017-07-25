@@ -271,9 +271,14 @@ class DoctrineBuilder implements QueryInterface
         $__getParentChain = function($field) use($entity_alias, $joins, &$__getParentChain) {
             foreach ($joins as $join)
             {
-                if ($field instanceof EntityDatatableField)
+                if ($field instanceof DatatableField)
                 {
                     $field_name = $field->getField();
+                    if (strpos($field_name, '.') !== false)
+                    {
+                        $parts = explode('.', $field_name);
+                        $field_name = $parts[0];
+                    }
                 }
                 else
                 {
@@ -305,23 +310,11 @@ class DoctrineBuilder implements QueryInterface
         $__getKey = function($field) use($entity_alias, $__getParentChain) {
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
-            $_f        = explode('.', $_f)[1];
+            $_parts     = explode('.', $_f);
+            $_j        = $_parts[0];
+            $_f        = $_parts[1];
 
-            $field_key = null;
-            if ($field instanceof DatatableField)
-            {
-                $field_key = $field->getField()[0];
-            }
-            elseif(!is_string($field))
-            {
-                $field_key = $field->__toString()[0];
-            }
-            else
-            {
-                $field_key = $field[0];
-            }
-
-            if ($field_key != $entity_alias)
+            if ($_j != $entity_alias)
             {
                 return $__getParentChain($field) . '.' . $_f;
             }
