@@ -266,7 +266,9 @@ class DoctrineBuilder implements QueryInterface
         $select = array($this->entity_alias);
         foreach ($this->joins as $join)
         {
-            $select[] = $join[1];
+            if (strpos($join[1], ".")) {
+                $select[] = $join[1];
+            }
         }
         $qb->select(implode(',', $select));
 
@@ -332,6 +334,7 @@ class DoctrineBuilder implements QueryInterface
                 }
             }
         };
+
         $__getKey = function($field) use($entity_alias, $__getParentChain) {
             $has_alias = preg_match_all('~([A-z]?\.[A-z]+)?\sas~', $field, $matches);
             $_f        = ( $has_alias > 0 ) ? $matches[1][0] : $field;
