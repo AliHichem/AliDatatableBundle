@@ -266,7 +266,7 @@ class DoctrineBuilder implements QueryInterface
         $select = array($this->entity_alias);
         foreach ($this->joins as $join)
         {
-            if (strpos($join[1], ".")) {
+            if (strpos($join[0], ".")) {
                 $select[] = $join[1];
             }
         }
