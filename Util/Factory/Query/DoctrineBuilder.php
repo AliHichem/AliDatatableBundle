@@ -3,6 +3,7 @@
 namespace Ali\DatatableBundle\Util\Factory\Query;
 
 use Ali\DatatableBundle\Util\Datatable;
+use Ali\DatatableBundle\Util\Exceptions\UnableToUseCustomJoinAsObjectFieldException;
 use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
 use Ali\DatatableBundle\Util\Factory\Fields\EntityDatatableField;
 use Doctrine\ORM\Query;
@@ -241,6 +242,7 @@ class DoctrineBuilder implements QueryInterface
         // add sorting
         if ($request->get('iSortCol_0') !== null)
         {
+
             $order_field = current(explode(' as ', $dql_fields[$request->get('iSortCol_0')]));
         }
         else
@@ -248,12 +250,15 @@ class DoctrineBuilder implements QueryInterface
             $order_field = null;
         }
         $qb = clone $this->queryBuilder;
-        if (!is_null($order_field))
+        if ($order_field !== null)
         {
             $field = $dql_fields[$request->get('iSortCol_0')];
-            if ($field instanceof DQLDatatableField) {
+            if ($field instanceof DQLDatatableField)
+            {
                 $qb->orderBy($field->getAlias(), $request->get('sSortDir_0', 'asc'));
-            } else {
+            }
+            else
+            {
                 $qb->orderBy($order_field, $request->get('sSortDir_0', 'asc'));
             }
         }
@@ -266,16 +271,16 @@ class DoctrineBuilder implements QueryInterface
         $select = array($this->entity_alias);
         foreach ($this->joins as $join)
         {
-            if (strpos($join[0], ".")) {
-                $select[] = $join[1];
-            }
+            $select[] = $join[1];
         }
         $qb->select(implode(',', $select));
 
         // add specific selects
         $has_add_select = false;
-        foreach ($this->fields as $field) {
-            if ($field instanceof DQLDatatableField) {
+        foreach ($this->fields as $field)
+        {
+            if ($field instanceof DQLDatatableField)
+            {
                 $has_add_select = true;
                 $qb->addSelect(sprintf("%s as %s", $field->getField(), $field->getAlias()));
             }
@@ -313,6 +318,10 @@ class DoctrineBuilder implements QueryInterface
                 }
                 if ($join[1] == $field_name)
                 {
+                    if (strpos($join[0], '\\') > 0)
+                    {
+                        throw new UnableToUseCustomJoinAsObjectFieldException($field[0], $field[1]);
+                    }
                     if ($join[0][0] == $entity_alias)
                     {
                         return substr($join[0], 2);
@@ -346,14 +355,18 @@ class DoctrineBuilder implements QueryInterface
             return $parts[1];
         };
         $__getValue = function($prop, $object, $has_add_select, $field)use(&$__getValue, $__getKey) {
-            if ($field instanceof DQLDatatableField) {
+            if ($field instanceof DQLDatatableField)
+            {
                 return $object[$field->getAlias()];
-            } elseif ($has_add_select) {
+            }
+            elseif ($has_add_select)
+            {
                 $object = $object[0];
             }
 
             // with LEFT joins target object can be NULL, so simply return null then
-            if ($object === null) {
+            if ($object === null)
+            {
                 return null;
             }
 
@@ -365,7 +378,9 @@ class DoctrineBuilder implements QueryInterface
                 $property  = $ref_class->getProperty($_prop);
                 $property->setAccessible(true);
                 return $__getValue(substr($prop, strpos($prop, '.') + 1), $property->getValue($object), false, null);
-            } elseif ($strpos === 0) {
+            }
+            elseif ($strpos === 0)
+            {
                 $prop = substr($prop, 1);
             }
 
