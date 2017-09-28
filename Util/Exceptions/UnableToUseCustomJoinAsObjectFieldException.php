@@ -2,16 +2,21 @@
 
 namespace Ali\DatatableBundle\Util\Exceptions;
 
-
-class UnableToUseCustomJoinAsObjectFieldException extends \Exception
+/**
+ * Class CustomJoinFieldException
+ *
+ * @author Maarten Sprakel <maarten@extendas.com>
+ */
+class CustomJoinFieldException extends \Exception
 {
-
     /**
-     * UnableToUseCustomJoinAsObjectFieldException constructor.
+     * CustomJoinFieldException constructor.
+     *
+     * @param string $prop
      */
-    public function __construct($alias, $field)
+    public function __construct($prop)
     {
-        $message = sprintf('Non-doctrine joins cannot be used as normal selects, please use a DQLDatatableField for field "%s.%s"',$alias, $field);
+        $message = sprintf("setFields() contains a field that is joined with a custom join: %s. To solve this use, ex: \$translator->trans('thead.field') => new DQLDatatableField('q.field', 'alias')", $prop);
         parent::__construct($message);
     }
 }

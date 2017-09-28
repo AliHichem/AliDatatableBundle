@@ -3,7 +3,7 @@
 namespace Ali\DatatableBundle\Util\Factory\Query;
 
 use Ali\DatatableBundle\Util\Datatable;
-use Ali\DatatableBundle\Util\Exceptions\UnableToUseCustomJoinAsObjectFieldException;
+use Ali\DatatableBundle\Util\Exceptions\CustomJoinFieldException;
 use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
 use Ali\DatatableBundle\Util\Factory\Fields\EntityDatatableField;
 use Doctrine\ORM\Query;
@@ -271,7 +271,10 @@ class DoctrineBuilder implements QueryInterface
         $select = array($this->entity_alias);
         foreach ($this->joins as $join)
         {
-            $select[] = $join[1];
+            if (strpos($join[0], "."))
+            {
+                $select[] = $join[1];
+            }
         }
         $qb->select(implode(',', $select));
 
@@ -318,10 +321,10 @@ class DoctrineBuilder implements QueryInterface
                 }
                 if ($join[1] == $field_name)
                 {
-                    if (strpos($join[0], '\\') > 0)
-                    {
-                        throw new UnableToUseCustomJoinAsObjectFieldException($field[0], $field[1]);
-                    }
+//                    if (strpos($join[0], '\\') > 0)
+//                    {
+//                        throw new UnableToUseCustomJoinAsObjectFieldException($field[0], $field[1]);
+//                    }
                     if ($join[0][0] == $entity_alias)
                     {
                         return substr($join[0], 2);
@@ -368,6 +371,11 @@ class DoctrineBuilder implements QueryInterface
             if ($object === null)
             {
                 return null;
+            }
+
+            if (strpos($prop, '\\') !== false)
+            {
+                throw new CustomJoinFieldException($prop);
             }
 
             $strpos = strpos($prop, '.');
