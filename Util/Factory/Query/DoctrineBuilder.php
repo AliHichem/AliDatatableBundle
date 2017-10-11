@@ -205,6 +205,51 @@ class DoctrineBuilder implements QueryInterface
     }
 
     /**
+     * Using getSQL() all parameters are converted to ?, but we don't know what's where..
+     * the Doctrine Query object has no public function to get the correct parameters
+     * therefore I've constructed a solution using preg_match_all.. this makes sure that a DQL query
+     * using the same parameters twice, will also be in the parameters twice
+     * ex. DQL: SELECT q FROM Entity WHERE q.date < :now AND q.date > :now
+     * ==  SQL: SELECT * FROM table WHERE q.date < ? AND q.date > ?
+     * will be given parameters: ['2017-01-01 01:01:01', '2017-01-01 01:01:01']
+     *
+     * @param Query $query
+     * @return array
+     */
+    public function getSQLParamsFromQuery(Query $query)
+    {
+        $dql = $query->getDQL();
+
+        $matches = []; $params = [];
+        preg_match_all("/[^:]{1}(\?[0-9]|:[a-z]+[a-zA-Z0-9_]*)([ ,)(=><.\n]|$)/", $dql, $matches);
+        foreach ($matches[1] as $k=>$v) {
+            $var_name = substr($v, 1);
+            $params[$k] = $query->getParameter($var_name)->getValue();
+            // exception here for datetime.. might be more exceptions needed here..
+            if ($params[$k] instanceof \DateTime) {
+                $params[$k] = $params[$k]->format('Y-m-d H:i:s');
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Helper to execute native SQL through Doctrine
+     *
+     * @param string $sql
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function executeNativeSQL($sql, $params)
+    {
+        $stmt = $this->queryBuilder->getEntityManager()->getConnection()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    /**
      * get total records
      *
      * @return integer
@@ -214,6 +259,21 @@ class DoctrineBuilder implements QueryInterface
         $qb = clone $this->queryBuilder;
         $this->_addSearch($qb);
         $qb->resetDQLPart('orderBy');
+
+        // queries with having are very annoying.. but this will find them and use an SQL subquery to deal with them.
+        // Note this same method could be used fully instead of the below, but I don't trust the code enough for
+        // use in all of SPIN for now..
+        if ($qb->getDQLPart('having')) {
+            // in case of having, we need the OVER() function from native SQL
+            $qb->select(" count(distinct {$this->fields['_identifier_']}) as sclr0");
+            $query = $qb->getQuery();
+
+            $params = $this->getSQLParamsFromQuery($query);
+            // trick here is to use a subquery suming the sclr0 distinct count
+            $sql = "SELECT SUM(sclr0) as total FROM (".$query->getSQL().") AS sumqry";
+            $result = $this->executeNativeSQL($sql, $params);
+            return (int)$result[0]['total'];
+        }
 
         $gb = $qb->getDQLPart('groupBy');
         if (empty($gb) || !in_array($this->fields['_identifier_'], $gb))
