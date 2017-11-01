@@ -5,7 +5,6 @@ services:
     datatable:
         class: "%datatable.class%"
         arguments: ['@service_container']
-        scope: prototype
         calls:
             - [setEntityManager, ['@doctrine.orm.entity_manager']]
             
@@ -17,7 +16,6 @@ services:
 
     datatable.twig.get_class.extension:
         class: Ali\DatatableBundle\Twig\Extension\TwigGetClassNameExtension
-        public: false
         tags:
             - { name: twig.extension }
             
