@@ -244,8 +244,16 @@ class DoctrineBuilder implements QueryInterface
      */
     protected function executeNativeSQL($sql, $params)
     {
+        // The $query->getSQL() function returns a ? for each value. Unfortunately the
+        // $stmt->execute($params) argument expects either the ?1 or the :var format. We have
+        // neither so we're manually changing each ? to the corresponding parameter..
+        $pos = 0;
+        while (($pos = strpos($sql, '?', $pos)) !== false) {
+            $sql = sprintf("%s'%s'%s", substr($sql, 0, $pos), array_shift($params), substr($sql,$pos+1));
+        }
+
         $stmt = $this->queryBuilder->getEntityManager()->getConnection()->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -268,9 +276,16 @@ class DoctrineBuilder implements QueryInterface
             $qb->select(" count(distinct {$this->fields['_identifier_']}) as sclr0");
             $query = $qb->getQuery();
 
+            // annoying Doctrine version difference sclr0 vs sclr_0
+            if (strpos($query->getSQL(), 'sclr_0') !== false) {
+                $sclr = 'sclr_0';
+            } else {
+                $sclr = 'sclr0';
+            }
+
             $params = $this->getSQLParamsFromQuery($query);
             // trick here is to use a subquery suming the sclr0 distinct count
-            $sql = "SELECT SUM(sclr0) as total FROM (".$query->getSQL().") AS sumqry";
+            $sql = "SELECT SUM($sclr) as total FROM (" . $query->getSQL() . ") AS sumqry";
             $result = $this->executeNativeSQL($sql, $params);
             return (int)$result[0]['total'];
         }
