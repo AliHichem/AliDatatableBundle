@@ -1,5 +1,6 @@
 ali:
     common:
+        all: '-- all --'
         action: Actions
         confirm_delete: "Are you sure to delete this item ?"
         delete: delete

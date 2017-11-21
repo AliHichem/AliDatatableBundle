@@ -1,5 +1,6 @@
 ali:
     common:
+        all: ''
         action: "Acciones"
         confirm_delete: "¿Está seguro de que desea eliminar este elemento?"
         delete: "borrar"

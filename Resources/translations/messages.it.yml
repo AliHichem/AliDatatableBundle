@@ -1,5 +1,6 @@
 ali:
     common:
+        all: ''
         action: Azioni
         confirm_delete: "Sei sicuro di voler eliminare questa voce?"
         delete: cancellare
