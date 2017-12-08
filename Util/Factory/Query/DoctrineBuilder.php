@@ -381,6 +381,11 @@ class DoctrineBuilder implements QueryInterface
         $__getParentChain = function($field_parts) use($entity_alias, $joins, &$__getParentChain) {
             foreach ($joins as $join)
             {
+                // skip join with argument a class since we cannot handle them anyway :(
+                if (false === strpos($join[0], '.') || false !== strpos($join[0], '\\')) {
+                    continue;
+                }
+
                 // get join alias
                 if ($field_parts instanceof DatatableField) {
                     $join_alias = $field_parts->getField();
