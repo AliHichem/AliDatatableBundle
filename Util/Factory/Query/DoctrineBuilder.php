@@ -398,10 +398,6 @@ class DoctrineBuilder implements QueryInterface
                 {
                     // $join[0] is the join statement, something like lc.customer_card
                     $join_field_parts = explode('.', $join[0]);
-                    if (count($join_field_parts) !== 2) {
-                        throw new \Exception("Expected ->addJoin({$join[0]}, {$join[1]}, {$join[2]}, $join[3]}) first parameter to have two parts, ex.: alias.fieldname");
-                    }
-
                     if ($join_field_parts[0] == $entity_alias) {
                         return $join_field_parts[1];
                     } else {
