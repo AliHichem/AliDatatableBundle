@@ -378,45 +378,37 @@ class DoctrineBuilder implements QueryInterface
         $data            = array();
         $entity_alias    = $this->entity_alias;
         $joins           = $this->joins;
-        $__getParentChain = function($field) use($entity_alias, $joins, &$__getParentChain) {
+        $__getParentChain = function($field_parts) use($entity_alias, $joins, &$__getParentChain) {
             foreach ($joins as $join)
             {
-                if ($field instanceof DatatableField)
-                {
-                    $field_name = $field->getField();
-                    if (strpos($field_name, '.') !== false)
-                    {
-                        $parts = explode('.', $field_name);
-                        $field_name = $parts[0];
+                // get join alias
+                if ($field_parts instanceof DatatableField) {
+                    $join_alias = $field_parts->getField();
+                    if (strpos($join_alias, '.') !== false) {
+                        $parts = explode('.', $join_alias);
+                        $join_alias = $parts[0];
                     }
                 }
-                else
-                {
-                    $field_name = $field[0];
+                else {
+                    $join_alias = $field_parts[0];
                 }
-                if ($join[1] == $field_name)
-                {
-//                    if (strpos($join[0], '\\') > 0)
-//                    {
-//                        throw new UnableToUseCustomJoinAsObjectFieldException($field[0], $field[1]);
-//                    }
-                    if ($join[0][0] == $entity_alias)
-                    {
-                        return substr($join[0], 2);
-                    }
-                    else
-                    {
-                        $f = $join[0];
-                        if (strpos($f, ' '))
-                        {
-                            $_f = substr($f, 2, strpos($f, ' '));
-                        }
-                        else
-                        {
 
-                            $_f = substr($f, 2);
-                        }
-                        return $__getParentChain($join[0]) . '.' . $_f;
+                // find correct join by matching join alias
+                if ($join[1] == $join_alias)
+                {
+                    // $join[0] is the join statement, something like lc.customer_card
+                    $join_field_parts = explode('.', $join[0]);
+                    if (count($join_field_parts) !== 2) {
+                        throw new \Exception("Expected ->addJoin({$join[0]}, {$join[1]}, {$join[2]}, $join[3]}) first parameter to have two parts, ex.: alias.fieldname");
+                    }
+
+                    if ($join_field_parts[0] == $entity_alias) {
+                        return $join_field_parts[1];
+                    } else {
+                        return sprintf("%s.%s",
+                            $__getParentChain($join_field_parts),
+                            $join_field_parts[1]
+                        );
                     }
                 }
             }
