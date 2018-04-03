@@ -12,14 +12,14 @@ interface QueryInterface
      * 
      * @return integer 
      */
-    function getTotalRecords();
+    function getTotalRecords(array $filter_fields=[]);
 
     /**
      * get data
      * 
      * @return array
      */
-    function getData();
+    function getData(array $filter_fields=[]);
 
     /**
      * set entity

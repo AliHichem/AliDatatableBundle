@@ -76,9 +76,11 @@ class DoctrineBuilder implements QueryInterface
     /**
      * get the search dql
      *
-     * @return string
+     * @param \Doctrine\ORM\QueryBuilder $queryBuilder
+     * @param array $filter_fields
+     * @throws \Exception
      */
-    protected function _addSearch(\Doctrine\ORM\QueryBuilder $queryBuilder)
+    protected function _addSearch(\Doctrine\ORM\QueryBuilder $queryBuilder, array $filter_fields=[])
     {
         if ($this->search == TRUE)
         {
@@ -87,6 +89,9 @@ class DoctrineBuilder implements QueryInterface
             foreach ($search_fields as $i => $search_field)
             {
                 $search_param = $request->get("sSearch_{$i}");
+                $is_filter_field = (bool)isset($filter_fields[$i]);
+                $equals_operator = $is_filter_field ? '=' : 'like';
+
                 if ($search_param !== false && $search_param != '')
                 {
                     $field        = explode(' ', trim($search_field));
@@ -99,10 +104,10 @@ class DoctrineBuilder implements QueryInterface
                         $original_field = current($original_field);
                         $search_field = $original_field->getField();
                         if ($original_field->getNeedsHaving()) {
-                            $queryBuilder->andHaving(" $search_field like :ssearch{$i} ");
+                            $queryBuilder->andHaving(" $search_field $equals_operator :ssearch{$i} ");
                         } else {
                             $search_field = $original_field->getField();
-                            $queryBuilder->andWhere(" $search_field like :ssearch{$i} ");
+                            $queryBuilder->andWhere(" $search_field $equals_operator :ssearch{$i} ");
                         }
                     }
                     elseif ($original_field !== null && is_array($original_field) && reset($original_field) instanceof EntityDatatableField && reset($original_field)->getEntityFields() != null)
@@ -141,17 +146,17 @@ class DoctrineBuilder implements QueryInterface
                             {
                                 $query .= 'OR';
                             }
-                            $query .= ' ' . $joined_field_alias.'.'.$entity_search_field . ' LIKE :ssearch' . $i . ' ';
+                            $query .= " $joined_field_alias.$entity_search_field $equals_operator :ssearch{$i} ";
                             $first_field = false;
                         }
                         $queryBuilder->andWhere($query);
                     }
                     else
                     {
-                        $queryBuilder->andWhere(" $search_field like :ssearch{$i} ");
+                        $queryBuilder->andWhere(" $search_field $equals_operator :ssearch{$i} ");
                     }
 
-                    $queryBuilder->setParameter("ssearch{$i}", '%' . $request->get("sSearch_{$i}") . '%');
+                    $queryBuilder->setParameter("ssearch{$i}", $equals_operator == '=' ? $request->get("sSearch_{$i}") : '%' . $request->get("sSearch_{$i}") . '%');
                 }
             }
         }
@@ -262,10 +267,10 @@ class DoctrineBuilder implements QueryInterface
      *
      * @return integer
      */
-    public function getTotalRecords()
+    public function getTotalRecords(array $filter_fields=[])
     {
         $qb = clone $this->queryBuilder;
-        $this->_addSearch($qb);
+        $this->_addSearch($qb, $filter_fields);
         $qb->resetDQLPart('orderBy');
 
         // queries with having are very annoying.. but this will find them and use an SQL subquery to deal with them.
@@ -309,7 +314,7 @@ class DoctrineBuilder implements QueryInterface
      *
      * @return array
      */
-    public function getData()
+    public function getData(array $filter_fields=[])
     {
         $request    = $this->request;
         $dql_fields = array_values($this->fields);
@@ -365,7 +370,7 @@ class DoctrineBuilder implements QueryInterface
         }
 
         // add search
-        $this->_addSearch($qb);
+        $this->_addSearch($qb, $filter_fields);
 
         // get results and process data formatting
         $query          = $qb->getQuery();
