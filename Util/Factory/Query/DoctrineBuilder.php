@@ -6,6 +6,7 @@ use Ali\DatatableBundle\Util\Datatable;
 use Ali\DatatableBundle\Util\Exceptions\CustomJoinFieldException;
 use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
 use Ali\DatatableBundle\Util\Factory\Fields\EntityDatatableField;
+use Ali\DatatableBundle\Util\Factory\Filter\DatatableFilter;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -89,8 +90,8 @@ class DoctrineBuilder implements QueryInterface
             foreach ($search_fields as $i => $search_field)
             {
                 $search_param = $request->get("sSearch_{$i}");
-                $is_filter_field = (bool)isset($filter_fields[$i]);
-                $equals_operator = $is_filter_field ? '=' : 'like';
+                $is_filter_field_with_equals = isset($filter_fields[$i]) && $filter_fields[$i]->getSearchType() == DatatableFilter::SEARCH_TYPE_EQUALS;
+                $equals_operator = $is_filter_field_with_equals ? '=' : 'like';
 
                 if ($search_param !== false && $search_param != '')
                 {
