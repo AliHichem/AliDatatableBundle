@@ -83,11 +83,29 @@ class DatatableFilter
      */
     public static function constructBooleanFilter($yes_label = 'yes', $no_label = 'no')
     {
-        return new DatatableFilter(
+        return new self(
             array(
                 new DatatableFilterValue(1, $yes_label),
                 new DatatableFilterValue(0, $no_label)
             )
         );
+    }
+
+    /**
+     * Static helper to create filter for array of entities
+     *
+     * @param array $entities
+     * @param string $getter
+     * @return DatatableFilter
+     */
+    public static function constructEntityFilter(array $entities, $getter='__toString()')
+    {
+        $filters = [];
+        foreach ($entities as $entity)
+        {
+            $value = $entity->$getter();
+            $filters[] = new DatatableFilterValue($value, $value);
+        }
+        return new self($filters);
     }
 }
