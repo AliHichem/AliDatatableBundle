@@ -7,6 +7,7 @@ use Ali\DatatableBundle\Util\Exceptions\CustomJoinFieldException;
 use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
 use Ali\DatatableBundle\Util\Factory\Fields\EntityDatatableField;
 use Ali\DatatableBundle\Util\Factory\Filter\DatatableFilter;
+use Ali\DatatableBundle\Util\Factory\Filter\DateTimeFilter;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -100,8 +101,33 @@ class DoctrineBuilder implements QueryInterface
 
                     /** @var DatatableField[] $original_field */
                     $original_field = array_slice($this->fields, $i, 1);
+                    if (isset($filter_fields[$i]) && $filter_fields[$i] instanceof DateTimeFilter)
+                    {
+                        $parts = explode(" - ", $search_param);
 
-                    if ($original_field !== null && is_array($original_field) && current($original_field) instanceof DQLDatatableField) {
+                        $start = new \DateTime($parts[0]);
+                        $end = new \DateTime($parts[1]);
+
+                        if (false === $filter_fields[$i]->isFilterTime())
+                        {
+                            $start->setTime(0,0, 0);
+                            $end->setTime(23, 59, 59);
+                        }
+
+                        if ($original_field !== null && is_array($original_field) && current($original_field) instanceof DQLDatatableField)
+                        {
+                            $field = current($original_field);
+                            $search_field = $field->getField();
+                        }
+
+                        $queryBuilder->andWhere("$search_field >= :ssearch_start{$i} AND $search_field <= :ssearch_end{$i}");
+                        $queryBuilder->setParameter("ssearch_start{$i}", $start);
+                        $queryBuilder->setParameter("ssearch_end{$i}", $end);
+
+                        continue;
+                    }
+                    elseif ($original_field !== null && is_array($original_field) && current($original_field) instanceof DQLDatatableField)
+                    {
                         $original_field = current($original_field);
                         $search_field = $original_field->getField();
                         if ($original_field->getNeedsHaving()) {
