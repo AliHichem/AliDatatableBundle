@@ -113,6 +113,11 @@ class DoctrineBuilder implements QueryInterface
                             $start->setTime(0,0, 0);
                             $end->setTime(23, 59, 59);
                         }
+                        else
+                        {
+                            // make sure to get the full last minute
+                            $end->setTime($end->format('H'), $end->format('i'), 59);
+                        }
 
                         if ($original_field !== null && is_array($original_field) && current($original_field) instanceof DQLDatatableField)
                         {
