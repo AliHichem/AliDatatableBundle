@@ -8,6 +8,7 @@ use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
 use Ali\DatatableBundle\Util\Factory\Fields\EntityDatatableField;
 use Ali\DatatableBundle\Util\Factory\Filter\DatatableFilter;
 use Ali\DatatableBundle\Util\Factory\Filter\DateTimeFilter;
+use Ali\DatatableBundle\Util\Factory\Filter\MultiSelectFilter;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -128,6 +129,21 @@ class DoctrineBuilder implements QueryInterface
                         $queryBuilder->andWhere("$search_field >= :ssearch_start{$i} AND $search_field <= :ssearch_end{$i}");
                         $queryBuilder->setParameter("ssearch_start{$i}", $start);
                         $queryBuilder->setParameter("ssearch_end{$i}", $end);
+
+                        continue;
+                    }
+                    elseif (isset($filter_fields[$i]) && $filter_fields[$i] instanceof MultiSelectFilter)
+                    {
+                        $search_field = $filter_fields[$i]->getSearchField();
+                        $parts = explode(',', $search_param);
+
+                        $ors = [];
+                        foreach ($parts as $k=>$part)
+                        {
+                            $ors[] = "$search_field = :ssearch{$i}_part{$k}";
+                            $queryBuilder->setParameter("ssearch{$i}_part{$k}", trim($part));
+                        }
+                        $queryBuilder->andWhere(implode(' OR ', $ors));
 
                         continue;
                     }
