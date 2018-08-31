@@ -2,6 +2,7 @@
 
 namespace Ali\DatatableBundle\Util;
 
+use Ali\DatatableBundle\Util\Factory\Fields\DatatableField;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,10 +57,14 @@ class Datatable
     protected $_search_fields = array();
 
     /** @var array */
+    protected $_filter_fields = array();
+
+    /** @var array */
     protected static $_instances = array();
 
     /** @var Datatable */
     protected static $_current_instance = NULL;
+
 
     /**
      * class constructor 
@@ -120,8 +125,8 @@ class Datatable
     public function execute()
     {
         $request       = $this->_request;
-        $iTotalRecords = $this->_queryBuilder->getTotalRecords();
-        list($data, $objects) = $this->_queryBuilder->getData();
+        $iTotalRecords = $this->_queryBuilder->getTotalRecords($this->getFilterFields());
+        list($data, $objects) = $this->_queryBuilder->getData($this->getFilterFields());
         $id_index      = array_search('_identifier_', array_keys($this->getFields()));
         $ids           = array();
         array_walk($data, function($val, $key) use ($id_index, &$ids) {
@@ -216,6 +221,11 @@ class Datatable
     public function getFields()
     {
         return $this->_queryBuilder->getFields();
+    }
+
+    public static function clearInstances()
+    {
+        static::$_instances = array();
     }
 
     /**
@@ -615,6 +625,41 @@ class Datatable
     public function setSearchFields(array $search_fields)
     {
         $this->_search_fields = $search_fields;
+        return $this;
+    }
+
+    /**
+     * get filter field
+     *
+     * @return array
+     */
+    public function getFilterFields()
+    {
+        return $this->_filter_fields;
+    }
+
+    /**
+     * set filter fields
+     *
+     * @example
+     *
+     *      ->setFilterFields(array(
+     *                3 => new DatatableFilter(array(
+     *                    new DatatableFilterValue(0, $translator->trans('option.no')),
+     *                   new DatatableFilterValue(1, $translator->trans('option.yes'))
+     *                ))
+     *                4 => new DatatableFilter(array(
+     *                    new DatatableFilterValue(0, $translator->trans('option.no')),
+     *                    new DatatableFilterValue(1, $translator->trans('option.yes'))
+     *                ))
+     *
+     * @param array $filter_fields
+     *
+     * @return \Ali\DatatableBundle\Util\Datatable
+     */
+    public function setFilterFields(array $filter_fields)
+    {
+        $this->_filter_fields = $filter_fields;
         return $this;
     }
 

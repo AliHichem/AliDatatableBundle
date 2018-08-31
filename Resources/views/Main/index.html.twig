@@ -30,6 +30,15 @@
                             {% if search_fields is not empty %}
                                 {% if i in search_fields %}
                                 <td><input index="{{i}}" searchable="true" type="text" placeholder="{{ 'ali.common.search'|dta_trans() }}" class="search_init form-control input-sm" /></td>
+                                {% elseif i in filter_fields|keys %}
+                                    <td>
+                                        <select index="{{ i }}" searchable="true" class="search_init form-control input-sm">
+                                            <option value="">{{ 'ali.common.all'|dta_trans() }}</option>
+                                            {% for filter_value in filter_fields[i].filterValues %}
+                                                <option value="{{ filter_value.value }}">{{ filter_value.label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
                                 {% else %}
                                 <td></td>
                                 {% endif %}

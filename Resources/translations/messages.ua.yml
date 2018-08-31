@@ -1,5 +1,6 @@
 ali:
     common:
+        all: ''
         action: Дії
         confirm_delete: "Ви дійсно бажаєте видалити цей елемент?"
         delete: видалити

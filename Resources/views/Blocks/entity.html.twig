@@ -1,0 +1,7 @@
+{% spaceless %}
+    {% if single_entity is defined and single_entity is not null and path_name is not defined %}
+        {{ entity }}
+    {% elseif single_entity is defined and single_entity is not null %}
+        <a data-id="{{ single_entity.id }}" data-title="{{ single_entity }}" data-url="{{ path(path_name, {'id': single_entity.id}) }}" href="{{ path(path_name, {'id': single_entity.id}) }}">{{ single_entity }}</a>
+    {% endif %}
+{% endspaceless %}

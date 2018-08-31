@@ -1,5 +1,6 @@
 ali:
     common:
+        all: ''
         action: 行动
         confirm_delete: "你是否确定删除此项目吗？"
         delete: 删除

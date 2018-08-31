@@ -1,5 +1,6 @@
 ali:
     common:
+        all: ''
         action: 'الإجراءات'
         confirm_delete: 'هل أنت متأكد من حذف هذا البند؟'
         delete: حذف
