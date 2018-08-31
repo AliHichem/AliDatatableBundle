@@ -7,7 +7,7 @@
             {% for single_entity in found_entity %}
                 {% embed '@AliDatatable/Blocks/entity.html.twig' %}
                 {% endembed %}
-                {% if loop.last is sameas(false) %}
+                {% if loop.last is same as(false) %}
                     <br/>
                 {% endif %}
             {% endfor %}
