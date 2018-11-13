@@ -15,16 +15,19 @@ class DatatableFilter
     /** @var DatatableFilterValue[] */
     protected $filter_values = array();
     protected $search_type;
+    protected $default_value;
 
     /**
      * DatatableFilter constructor.
      * @param array $filter_values
      * @param string $search_type
+     * @param mixed $default_value
      */
-    public function __construct(array $filter_values, $search_type=self::SEARCH_TYPE_EQUALS)
+    public function __construct(array $filter_values, $search_type=self::SEARCH_TYPE_EQUALS, $default_value = null)
     {
         $this->filter_values = $filter_values;
         $this->search_type = $search_type;
+        $this->default_value = $default_value;
     }
 
     /**
@@ -75,19 +78,40 @@ class DatatableFilter
     }
 
     /**
+     * @return mixed|null
+     */
+    public function getDefaultValue()
+    {
+        return $this->default_value;
+    }
+
+    /**
+     * @param mixed|null $default_value
+     * @return DatatableFilter
+     */
+    public function setDefaultValue($default_value)
+    {
+        $this->default_value = $default_value;
+        return $this;
+    }
+
+    /**
      * Static helper to easily create boolean filter
      *
      * @param string $yes_label
      * @param string $no_label
+     * @param bool|null $default_value
      * @return DatatableFilter
      */
-    public static function constructBooleanFilter($yes_label = 'yes', $no_label = 'no')
+    public static function constructBooleanFilter($yes_label = 'yes', $no_label = 'no', $default_value = null)
     {
         return new self(
             array(
                 new DatatableFilterValue(1, $yes_label),
                 new DatatableFilterValue(0, $no_label)
-            )
+            ),
+            self::SEARCH_TYPE_EQUALS,
+            (int)$default_value
         );
     }
 
