@@ -1,3 +1,7 @@
+NOTE: This bundle is not maintained anymore.
+============================================
+
+
 AliDatatableBundle
 ==================
 
